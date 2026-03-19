@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\AcademicYear;
+use App\Models\SchoolClass;
+use App\Models\Teacher;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class ClassController extends Controller
+{
+    public function index(): View
+    {
+        $classes = SchoolClass::with(['academicYear', 'homeroomTeacher.user'])
+            ->orderByDesc('id')
+            ->paginate(20);
+
+        return view('admin.classes.index', compact('classes'));
+    }
+
+    public function create(): View
+    {
+        $years = AcademicYear::orderByDesc('is_active')->orderByDesc('name')->get();
+        $teachers = Teacher::with('user')->orderByDesc('id')->get();
+
+        return view('admin.classes.create', compact('years', 'teachers'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'level' => ['nullable', 'string', 'max:10'],
+            'major' => ['nullable', 'string', 'max:50'], // IPA, IPS
+            'academic_year_id' => ['nullable', 'exists:academic_years,id'],
+            'homeroom_teacher_id' => ['nullable', 'exists:teachers,id'],
+        ]);
+
+        SchoolClass::create($data);
+
+        return redirect()->route('admin.classes.index')->with('success', 'Kelas berhasil dibuat.');
+    }
+
+    public function edit(SchoolClass $class): View
+    {
+        $years = AcademicYear::orderByDesc('is_active')->orderByDesc('name')->get();
+        $teachers = Teacher::with('user')->orderByDesc('id')->get();
+
+        return view('admin.classes.edit', compact('class', 'years', 'teachers'));
+    }
+
+    public function update(Request $request, SchoolClass $class): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'level' => ['nullable', 'string', 'max:10'],
+            'major' => ['nullable', 'string', 'max:50'], // IPA, IPS
+            'academic_year_id' => ['nullable', 'exists:academic_years,id'],
+            'homeroom_teacher_id' => ['nullable', 'exists:teachers,id'],
+        ]);
+
+        $class->update($data);
+
+        return redirect()->route('admin.classes.index')->with('success', 'Kelas berhasil diperbarui.');
+    }
+
+    public function destroy(SchoolClass $class): RedirectResponse
+    {
+        $class->delete();
+
+        return redirect()->route('admin.classes.index')->with('success', 'Kelas berhasil dihapus.');
+    }
+}
+

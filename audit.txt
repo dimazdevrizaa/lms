@@ -1,0 +1,10 @@
+tanggal: 04-03-2026
+1. memperindah tampilan
+2. membuat ui card yang bisa di tekan agar lebih mudah
+3. menyesuaikan data yang ada di database dengan tampilan di dashboard semua role
+
+tanggal: 10-03-2026
+1. seluruh guru melakukan untuk mengambil kelas nya masing masing sehingga siswa sudah memiliki banyak mata pelajaran 
+
+
+1. mengembalikan logo pada background
