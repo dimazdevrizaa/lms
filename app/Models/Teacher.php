@@ -28,10 +28,6 @@ class Teacher extends Model
         return $this->hasMany(SchoolClass::class, 'homeroom_teacher_id');
     }
 
-    public function subjects(): HasMany
-    {
-        return $this->hasMany(Subject::class);
-    }
 
     public function teachingAssignments(): HasMany
     {

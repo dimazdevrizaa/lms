@@ -16,6 +16,17 @@
                     <input class="form-control" name="name" value="{{ old('name', $year->name) }}" required>
                 </div>
 
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal Mulai (Opsional)</label>
+                        <input type="date" class="form-control" name="start_date" value="{{ old('start_date', $year->start_date ? $year->start_date->format('Y-m-d') : '') }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal Selesai (Opsional)</label>
+                        <input type="date" class="form-control" name="end_date" value="{{ old('end_date', $year->end_date ? $year->end_date->format('Y-m-d') : '') }}">
+                    </div>
+                </div>
+
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" value="1" name="is_active" id="is_active"
                            @checked(old('is_active', $year->is_active))>

@@ -8,6 +8,8 @@ use App\Models\Meeting;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\ClassSubjectTeacher;
+use App\Models\AcademicYear;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -28,15 +30,26 @@ class AssignmentController extends Controller
 
     public function create(): View
     {
-        $teacher = Teacher::where('user_id', Auth::id())->with('subjects')->firstOrFail();
-        $classes = SchoolClass::orderBy('name')->get();
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $activeYear = AcademicYear::where('is_active', true)->first();
         
-        // Hanya ambil mata pelajaran yang diampu oleh guru ini
-        $subjects = $teacher->subjects()->orderBy('name')->get();
-
-        // Fallback jika kosong
-        if ($subjects->isEmpty()) {
-            $subjects = Subject::orderBy('name')->get();
+        if ($activeYear) {
+            $assignedClassIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('class_id');
+            $classes = SchoolClass::whereIn('id', $assignedClassIds)->orderBy('name')->get();
+            
+            $assignedSubjectIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+        } else {
+            $classes = SchoolClass::orderBy('name')->get();
+            $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+            if ($subjects->isEmpty()) {
+                $subjects = Subject::orderBy('name')->get();
+            }
         }
 
         $meetings = Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get();
@@ -82,12 +95,26 @@ class AssignmentController extends Controller
     {
         abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
 
-        $teacher = Teacher::where('user_id', Auth::id())->with('subjects')->firstOrFail();
-        $classes = SchoolClass::orderBy('name')->get();
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $activeYear = AcademicYear::where('is_active', true)->first();
         
-        $subjects = $teacher->subjects()->orderBy('name')->get();
-        if ($subjects->isEmpty()) {
-            $subjects = Subject::orderBy('name')->get();
+        if ($activeYear) {
+            $assignedClassIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('class_id');
+            $classes = SchoolClass::whereIn('id', $assignedClassIds)->orderBy('name')->get();
+            
+            $assignedSubjectIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+        } else {
+            $classes = SchoolClass::orderBy('name')->get();
+            $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+            if ($subjects->isEmpty()) {
+                $subjects = Subject::orderBy('name')->get();
+            }
         }
 
         $meetings = Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get();

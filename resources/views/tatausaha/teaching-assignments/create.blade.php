@@ -16,8 +16,23 @@
                         @csrf
 
                         <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #25671E;">Tahun Ajar</label>
+                            <select class="form-select ts-select" name="academic_year_id" required>
+                                <option value="">-- Pilih Tahun Ajar --</option>
+                                @foreach($academicYears as $ay)
+                                    <option value="{{ $ay->id }}" @selected(old('academic_year_id') == $ay->id)>
+                                        {{ $ay->name }} {{ $ay->is_active ? '(Aktif)' : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('academic_year_id')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
                             <label class="form-label" style="font-weight: 600; color: #25671E;">Kelas</label>
-                            <select class="form-select" name="class_id" required>
+                            <select class="form-select ts-select" name="class_id" required>
                                 <option value="">-- Pilih Kelas --</option>
                                 @foreach($classes as $c)
                                     <option value="{{ $c->id }}" @selected(old('class_id') == $c->id)>{{ $c->name }}</option>
@@ -30,11 +45,11 @@
 
                         <div class="mb-4">
                             <label class="form-label" style="font-weight: 600; color: #25671E;">Mata Pelajaran</label>
-                            <select class="form-select" name="subject_id" required>
+                            <select class="form-select ts-select" name="subject_id" required>
                                 <option value="">-- Pilih Mata Pelajaran --</option>
                                 @foreach($subjects as $s)
                                     <option value="{{ $s->id }}" @selected(old('subject_id') == $s->id)>
-                                        {{ $s->name }} ({{ $s->code ?? '-' }}) - {{ $s->teacher->user->name ?? 'Belum ada guru' }}
+                                        {{ $s->name }} ({{ $s->code ?? '-' }})
                                     </option>
                                 @endforeach
                             </select>
@@ -45,7 +60,7 @@
 
                         <div class="mb-4">
                             <label class="form-label" style="font-weight: 600; color: #25671E;">Guru</label>
-                            <select class="form-select" name="teacher_id" required>
+                            <select class="form-select ts-select" name="teacher_id" required>
                                 <option value="">-- Pilih Guru --</option>
                                 @foreach($teachers as $t)
                                     <option value="{{ $t->id }}" @selected(old('teacher_id') == $t->id)>{{ $t->user->name }}</option>

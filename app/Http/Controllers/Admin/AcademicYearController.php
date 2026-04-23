@@ -28,6 +28,8 @@ class AcademicYearController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:50'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'is_active' => ['nullable', 'boolean'],
         ]);
 
@@ -54,6 +56,8 @@ class AcademicYearController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:50'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'is_active' => ['nullable', 'boolean'],
         ]);
 

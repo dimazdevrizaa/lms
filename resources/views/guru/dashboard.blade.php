@@ -67,11 +67,57 @@
 
     <!-- Main Content Section -->
     <div class="row">
-        <!-- Kelas & Mata Pelajaran -->
+        <!-- Jadwal Hari Ini & Kelas -->
         <div class="col-md-7 mb-4">
-            <div class="card">
+            <!-- Jadwal Mengajar Hari Ini -->
+            <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-header border-bottom-0 pt-4 pb-0 bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title fw-bold mb-0">📅 Jadwal Mengajar Hari Ini</h5>
+                        <span class="badge" style="background-color: #25671E;">{{ $todayIndo }}</span>
+                    </div>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title mb-4">🎓 Kelas yang Diampu (Per Jurusan)</h5>
+                    @if($todaySchedules->isNotEmpty())
+                        <div class="list-group list-group-flush">
+                            @foreach($todaySchedules as $schedule)
+                                <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center border-bottom">
+                                    <div class="d-flex align-items-center">
+                                        <div class="p-2 rounded bg-light me-3 text-center" style="min-width: 65px;">
+                                            <div class="small fw-bold" style="color: #48A111;">{{ \Carbon\Carbon::parse($schedule->timeSlot->start_time)->format('H:i') }}</div>
+                                            <div class="small text-muted" style="font-size: 0.7rem;">{{ \Carbon\Carbon::parse($schedule->timeSlot->end_time)->format('H:i') }}</div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-bold text-dark">{{ $schedule->subject->name ?? '-' }}</h6>
+                                            <div class="d-flex align-items-center gap-2 small text-muted">
+                                                <span><i class="fas fa-door-open me-1"></i> Kelas {{ $schedule->schoolClass->name ?? '-' }}</span>
+                                                <span style="color: #ccc;">|</span>
+                                                <span><i class="fas fa-clock me-1"></i> {{ $schedule->timeSlot->label }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('guru.meetings.create', ['class_id' => $schedule->class_id, 'subject_id' => $schedule->subject_id]) }}" class="btn btn-sm shadow-sm" style="background-color: #F2B50B; color: #fff; border-radius: 8px;">
+                                        <i class="fas fa-plus me-1"></i> Buat Pertemuan
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="fas fa-mug-hot fa-3x" style="color: #e0e0e0;"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1" style="color: #666;">Tidak Ada Jadwal Mengajar</h6>
+                            <p class="small text-muted mb-0">Anda tidak memiliki jadwal kelas pada hari {{ $todayIndo }} berdasarkan jadwal TU.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Kelas & Mata Pelajaran -->
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4">🎓 Daftar Kelas Diampu</h5>
                     <div class="list-group list-group-flush">
                         @forelse($assignedClasses as $major => $majorClasses)
                             <div class="mb-4">

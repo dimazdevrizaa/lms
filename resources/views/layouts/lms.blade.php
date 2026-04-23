@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'LMS SMA 15 Padang')</title>
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/logo.jpg') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -10,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- TomSelect CSS for beautiful dropdowns -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #25671E;
@@ -167,23 +170,23 @@
             z-index: 1;
         }
 
-        /* Watermark dinonaktifkan - bisa menyebabkan tampilan arrow anomali */
-        /*
-        .main-content::before {
+        /* Background Watermark Logo */
+        body::before {
             content: "";
             position: fixed;
-            top: 50%; left: 50%;
+            top: 50%; 
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 200px; height: 200px;
+            width: 350px; 
+            height: 350px;
             background-image: url('{{ asset("images/logo.jpg") }}');
             background-position: center;
             background-repeat: no-repeat;
             background-size: contain;
-            opacity: 0.06;
-            z-index: -1;
+            opacity: 0.05;
+            z-index: -999;
             pointer-events: none;
         }
-        */
 
         /* Toggle button */
         .sidebar-toggle {
@@ -412,6 +415,7 @@
                     <li class="sidebar-header">Akademik</li>
                     <li><a href="{{ route('admin.academic-years.index') }}" class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}"><i class="fas fa-calendar"></i> Tahun Ajaran</a></li>
                     <li><a href="{{ route('admin.classes.index') }}" class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}"><i class="fas fa-door-open"></i> Data Kelas</a></li>
+                    <li><a href="{{ route('admin.subjects.index') }}" class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}"><i class="fas fa-book-open"></i> Mata Pelajaran</a></li>
                     
                     <li class="sidebar-header">Sistem</li>
                     <li><a href="{{ route('admin.monitoring.index') }}" class="{{ request()->routeIs('admin.monitoring.*') ? 'active' : '' }}"><i class="fas fa-eye"></i> Monitoring</a></li>
@@ -423,8 +427,10 @@
                     <li class="sidebar-header">Master Data</li>
                     <li><a href="{{ route('tatausaha.students.index') }}" class="{{ request()->routeIs('tatausaha.students.*') ? 'active' : '' }}"><i class="fas fa-graduation-cap"></i> Data Siswa</a></li>
                     <li><a href="{{ route('tatausaha.teachers.index') }}" class="{{ request()->routeIs('tatausaha.teachers.*') ? 'active' : '' }}"><i class="fas fa-chalkboard-user"></i> Data Guru</a></li>
-                    <li><a href="{{ route('tatausaha.subjects.index') }}" class="{{ request()->routeIs('tatausaha.subjects.*') ? 'active' : '' }}"><i class="fas fa-book-open"></i> Mata Pelajaran</a></li>
                     <li><a href="{{ route('tatausaha.teaching-assignments.index') }}" class="{{ request()->routeIs('tatausaha.teaching-assignments.*') ? 'active' : '' }}"><i class="fas fa-chalkboard"></i> Penugasan Guru</a></li>
+                    
+                    <li class="sidebar-header">Penjadwalan</li>
+                    <li><a href="{{ route('tatausaha.schedules.index') }}" class="{{ request()->routeIs('tatausaha.schedules.*') ? 'active' : '' }}"><i class="fas fa-calendar-week"></i> Jadwal Pelajaran</a></li>
                     
                     <li class="sidebar-header">Laporan</li>
                     <li><a href="{{ route('tatausaha.reports.index') }}" class="{{ request()->routeIs('tatausaha.reports.*') ? 'active' : '' }}"><i class="fas fa-file-pdf"></i> Laporan Akademik</a></li>
@@ -485,7 +491,22 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- TomSelect JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
+        // Inisialisasi TomSelect pada semua elemen yang memiliki class .ts-select
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.ts-select').forEach((el) => {
+                new TomSelect(el, {
+                    create: false,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    }
+                });
+            });
+        });
+
         // Sidebar toggle functionality
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');

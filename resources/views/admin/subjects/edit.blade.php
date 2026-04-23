@@ -13,7 +13,7 @@
         <div class="col-lg-7">
             <div class="card">
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ route('tatausaha.subjects.update', $subject) }}">
+                    <form method="POST" action="{{ route('admin.subjects.update', $subject) }}">
                         @csrf
                         @method('PUT')
 
@@ -50,26 +50,12 @@
                             @enderror
                         </div>
 
-                        <!-- Guru (Pengampu) -->
-                        <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">👨‍🏫 Guru (Opsional)</label>
-                            <select class="form-select" style="border-color: #25671E;" name="teacher_id">
-                                <option value="">-- Belum ditentukan --</option>
-                                @foreach($teachers as $teacher)
-                                    <option value="{{ $teacher->id }}" @selected(old('teacher_id', $subject->teacher_id) == $teacher->id)>
-                                        {{ $teacher->user->name }} (NIP: {{ $teacher->nip ?? '—' }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('teacher_id')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+
 
                         <!-- Buttons -->
                         <div class="d-flex gap-2 mt-5">
                             <button class="btn btn-lg" style="background-color: #48A111; color: white; border: none;" type="submit">✓ Simpan Perubahan</button>
-                            <a class="btn btn-lg btn-outline-secondary" href="{{ route('tatausaha.subjects.index') }}">Batal</a>
+                            <a class="btn btn-lg btn-outline-secondary" href="{{ route('admin.subjects.index') }}">Batal</a>
                         </div>
                     </form>
                 </div>

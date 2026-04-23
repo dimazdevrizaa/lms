@@ -7,6 +7,7 @@ use App\Models\ClassSubjectTeacher;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\AcademicYear;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,26 +19,83 @@ class TeachingAssignmentController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = ClassSubjectTeacher::with(['schoolClass', 'subject', 'teacher.user'])->latest();
+        $academicYears = AcademicYear::orderBy('name', 'desc')->get();
+        $activeYear = AcademicYear::where('is_active', true)->first();
 
-        if ($request->filled('class_id')) {
-            $query->where('class_id', $request->class_id);
-        }
-        if ($request->filled('subject_id')) {
-            $query->where('subject_id', $request->subject_id);
+        // Default ke tahun ajar aktif jika belum ada filter
+        $selectedYearId = $request->filled('academic_year_id')
+            ? $request->academic_year_id
+            : ($activeYear?->id ?? null);
+
+        $query = ClassSubjectTeacher::with(['schoolClass', 'subject', 'teacher.user', 'academicYear']);
+
+        if ($selectedYearId) {
+            $query->where('academic_year_id', $selectedYearId);
         }
         if ($request->filled('teacher_id')) {
             $query->where('teacher_id', $request->teacher_id);
         }
 
-        $assignments = $query->paginate(20);
+        // Ambil semua dan group berdasarkan nama mata pelajaran
+        $allAssignments = $query->get();
+        $groupedBySubjectName = $allAssignments->groupBy(fn($a) => $a->subject->name ?? 'Tanpa Nama');
+
+        // Urutkan berdasarkan nama mata pelajaran
+        $orderedGroups = collect();
+        foreach ($groupedBySubjectName->sortKeys() as $subjectName => $assignments) {
+            $orderedGroups->put($subjectName, [
+                'subject_name' => $subjectName,
+                'assignments' => $assignments->sortBy(fn($a) => $a->schoolClass->name ?? ''),
+            ]);
+        }
+
         $classes = SchoolClass::orderBy('name')->get();
-        $subjects = Subject::with('teacher')->orderBy('name')->get();
         $teachers = Teacher::with('user')->orderBy('id')->get();
+        $subjects = Subject::orderBy('name')->get();
 
         return view('tatausaha.teaching-assignments.index', compact(
-            'assignments', 'classes', 'subjects', 'teachers'
+            'orderedGroups', 'academicYears', 'classes', 'subjects', 'teachers', 'selectedYearId'
         ));
+    }
+
+    /**
+     * Print-friendly view untuk cetak PDF via browser
+     */
+    public function printPdf(Request $request): View
+    {
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        $selectedYearId = $request->filled('academic_year_id')
+            ? $request->academic_year_id
+            : ($activeYear?->id ?? null);
+
+        $query = ClassSubjectTeacher::with(['schoolClass', 'subject', 'teacher.user', 'academicYear']);
+
+        if ($selectedYearId) {
+            $query->where('academic_year_id', $selectedYearId);
+        }
+        if ($request->filled('subject_name')) {
+            $query->whereHas('subject', function($q) use ($request) {
+                // Gunakan like agar jika difilter kata pertama saja bisa matching (opsional)
+                $q->where('name', 'like', $request->subject_name . '%');
+            });
+        }
+
+        // Ambil semua dan group berdasarkan nama mata pelajaran
+        $allAssignments = $query->get();
+        $groupedBySubjectName = $allAssignments->groupBy(fn($a) => $a->subject->name ?? 'Tanpa Nama');
+
+        // Urutkan berdasarkan nama mata pelajaran
+        $orderedGroups = collect();
+        foreach ($groupedBySubjectName->sortKeys() as $subjectName => $assignments) {
+            $orderedGroups->put($subjectName, [
+                'subject_name' => $subjectName,
+                'assignments' => $assignments->sortBy(fn($a) => $a->schoolClass->name ?? ''),
+            ]);
+        }
+
+        $academicYear = $selectedYearId ? AcademicYear::find($selectedYearId) : null;
+
+        return view('tatausaha.teaching-assignments.print', compact('orderedGroups', 'academicYear'));
     }
 
     /**
@@ -45,11 +103,12 @@ class TeachingAssignmentController extends Controller
      */
     public function create(): View
     {
+        $academicYears = AcademicYear::orderBy('name', 'desc')->get();
         $classes = SchoolClass::orderBy('name')->get();
-        $subjects = Subject::with('teacher')->orderBy('name')->get();
+        $subjects = Subject::orderBy('name')->get();
         $teachers = Teacher::with('user')->orderBy('id')->get();
 
-        return view('tatausaha.teaching-assignments.create', compact('classes', 'subjects', 'teachers'));
+        return view('tatausaha.teaching-assignments.create', compact('academicYears', 'classes', 'subjects', 'teachers'));
     }
 
     /**
@@ -58,22 +117,25 @@ class TeachingAssignmentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
+            'academic_year_id' => ['required', 'exists:academic_years,id'],
             'class_id' => ['required', 'exists:classes,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
             'teacher_id' => ['required', 'exists:teachers,id'],
         ], [
+            'academic_year_id.required' => 'Pilih tahun ajar.',
             'class_id.required' => 'Pilih kelas.',
             'subject_id.required' => 'Pilih mata pelajaran.',
             'teacher_id.required' => 'Pilih guru.',
         ]);
 
-        $exists = ClassSubjectTeacher::where('class_id', $data['class_id'])
+        $exists = ClassSubjectTeacher::where('academic_year_id', $data['academic_year_id'])
+            ->where('class_id', $data['class_id'])
             ->where('subject_id', $data['subject_id'])
             ->exists();
 
         if ($exists) {
             return back()->withInput()->withErrors([
-                'subject_id' => 'Mapel ini sudah ditugaskan ke kelas tersebut. Edit penugasan yang ada jika ingin mengganti guru.',
+                'subject_id' => 'Mapel ini sudah ditugaskan ke kelas tersebut pada tahun ajar ini. Edit penugasan yang ada jika ingin mengganti guru.',
             ]);
         }
 
@@ -88,12 +150,13 @@ class TeachingAssignmentController extends Controller
      */
     public function edit(ClassSubjectTeacher $teaching_assignment): View
     {
+        $academicYears = AcademicYear::orderBy('name', 'desc')->get();
         $classes = SchoolClass::orderBy('name')->get();
-        $subjects = Subject::with('teacher')->orderBy('name')->get();
+        $subjects = Subject::orderBy('name')->get();
         $teachers = Teacher::with('user')->orderBy('id')->get();
 
         return view('tatausaha.teaching-assignments.edit', compact(
-            'teaching_assignment', 'classes', 'subjects', 'teachers'
+            'teaching_assignment', 'academicYears', 'classes', 'subjects', 'teachers'
         ));
     }
 
@@ -103,19 +166,21 @@ class TeachingAssignmentController extends Controller
     public function update(Request $request, ClassSubjectTeacher $teaching_assignment): RedirectResponse
     {
         $data = $request->validate([
+            'academic_year_id' => ['required', 'exists:academic_years,id'],
             'class_id' => ['required', 'exists:classes,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
             'teacher_id' => ['required', 'exists:teachers,id'],
         ]);
 
-        $exists = ClassSubjectTeacher::where('class_id', $data['class_id'])
+        $exists = ClassSubjectTeacher::where('academic_year_id', $data['academic_year_id'])
+            ->where('class_id', $data['class_id'])
             ->where('subject_id', $data['subject_id'])
             ->where('id', '!=', $teaching_assignment->id)
             ->exists();
 
         if ($exists) {
             return back()->withInput()->withErrors([
-                'subject_id' => 'Mapel ini sudah ditugaskan ke kelas tersebut.',
+                'subject_id' => 'Mapel ini sudah ditugaskan ke kelas tersebut di tahun ajar yang sama.',
             ]);
         }
 
@@ -136,44 +201,5 @@ class TeachingAssignmentController extends Controller
             ->with('success', 'Penugasan berhasil dihapus.');
     }
 
-    /**
-     * Bulk assign: seluruh guru mengambil kelas berdasarkan mapel yang diampu
-     * Mapel IPA -> kelas IPA, Mapel IPS -> kelas IPS, Mapel Umum -> semua kelas
-     */
-    public function assignAll(): RedirectResponse
-    {
-        $classes = SchoolClass::all();
-        $subjects = Subject::with('teacher')->get();
-        $assigned = 0;
 
-        foreach ($subjects as $subject) {
-            if (!$subject->teacher_id) continue;
-
-            foreach ($classes as $class) {
-                $classMajor = $class->major ?? '';
-                $subjectMajor = $subject->major ?? 'Umum';
-
-                $match = match (strtoupper($subjectMajor)) {
-                    'IPA' => in_array(strtoupper($classMajor), ['IPA']),
-                    'IPS' => in_array(strtoupper($classMajor), ['IPS']),
-                    'UMUM', '' => true,
-                    default => strtoupper($classMajor) === strtoupper($subjectMajor),
-                };
-
-                if (!$match) continue;
-
-                $existed = ClassSubjectTeacher::updateOrCreate(
-                    ['class_id' => $class->id, 'subject_id' => $subject->id],
-                    ['teacher_id' => $subject->teacher_id]
-                );
-
-                if ($existed->wasRecentlyCreated) {
-                    $assigned++;
-                }
-            }
-        }
-
-        return redirect()->route('tatausaha.teaching-assignments.index')
-            ->with('success', "Penugasan selesai. {$assigned} penugasan baru ditambahkan.");
-    }
 }

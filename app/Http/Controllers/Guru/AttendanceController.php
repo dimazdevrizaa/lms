@@ -57,9 +57,11 @@ class AttendanceController extends Controller
 
     public function create(Request $request): View
     {
-        $teacher = Teacher::where('user_id', Auth::id())->with('subjects')->firstOrFail();
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
         $classes = SchoolClass::with('students.user')->orderBy('name')->get();
-        $subjects = $teacher->subjects()->orderBy('name')->get();
+        
+        $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
         
         if ($subjects->isEmpty()) {
             $subjects = Subject::orderBy('name')->get();

@@ -24,6 +24,7 @@
                     <thead style="background-color: #F7F0F0;">
                     <tr>
                         <th style="border-left: 4px solid #25671E; color: #25671E;">📅 Nama Tahun Ajaran</th>
+                        <th>⏳ Rentang Waktu</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">⚙️ Aksi</th>
                     </tr>
@@ -33,6 +34,13 @@
                         <tr>
                             <td>
                                 <strong style="color: #25671E;">{{ $year->name }}</strong>
+                            </td>
+                            <td>
+                                @if($year->start_date && $year->end_date)
+                                    <span class="small text-muted">{{ $year->start_date->translatedFormat('d M Y') }} - {{ $year->end_date->translatedFormat('d M Y') }}</span>
+                                @else
+                                    <span class="small text-muted fst-italic">Belum diatur</span>
+                                @endif
                             </td>
                             <td class="text-center">
                                 @if($year->is_active)

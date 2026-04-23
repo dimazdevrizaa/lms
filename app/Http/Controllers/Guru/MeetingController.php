@@ -7,6 +7,8 @@ use App\Models\Meeting;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\ClassSubjectTeacher;
+use App\Models\AcademicYear;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,32 +37,65 @@ class MeetingController extends Controller
         }
 
         // Tampilan awal: Grup Kelas & Mapel yang diajar
-        $meetingGroups = Meeting::where('teacher_id', $teacherId)
-            ->with(['schoolClass', 'subject'])
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        
+        $assignments = collect([]);
+        if ($activeYear) {
+            $assignments = ClassSubjectTeacher::where('teacher_id', $teacherId)
+                ->where('academic_year_id', $activeYear->id)
+                ->with(['schoolClass', 'subject'])
+                ->get();
+        }
+
+        // Hitung total meeting yang sudah dibuat untuk tiap kelommpok
+        $meetingCounts = Meeting::where('teacher_id', $teacherId)
             ->select('class_id', 'subject_id')
             ->selectRaw('count(*) as total_meetings')
             ->groupBy('class_id', 'subject_id')
             ->get()
-            ->groupBy(function ($group) {
-                return $group->schoolClass->major ?? 'Umum';
-            })
-            ->map(function ($majorGroup) {
-                return $majorGroup->groupBy(function ($item) {
-                    return $item->subject->name ?? 'Tanpa Mata Pelajaran';
-                });
+            ->keyBy(function($item) {
+                return $item->class_id . '_' . $item->subject_id;
             });
+
+        $meetingGroups = $assignments->map(function($assignment) use ($meetingCounts) {
+            $key = $assignment->class_id . '_' . $assignment->subject_id;
+            $assignment->total_meetings = $meetingCounts->has($key) ? $meetingCounts->get($key)->total_meetings : 0;
+            return $assignment;
+        })
+        ->groupBy(function ($group) {
+            return $group->schoolClass->major ?? 'Umum';
+        })
+        ->map(function ($majorGroup) {
+            return $majorGroup->groupBy(function ($item) {
+                return $item->subject->name ?? 'Tanpa Mata Pelajaran';
+            });
+        });
 
         return view('guru.meetings.index', compact('meetingGroups'));
     }
 
     public function create(Request $request): View
     {
-        $teacher = Teacher::where('user_id', Auth::id())->with('subjects')->firstOrFail();
-        $classes = SchoolClass::orderBy('name')->get();
-        $subjects = $teacher->subjects()->orderBy('name')->get();
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $activeYear = AcademicYear::where('is_active', true)->first();
         
-        if ($subjects->isEmpty()) {
-            $subjects = Subject::orderBy('name')->get();
+        if ($activeYear) {
+            $assignedClassIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('class_id');
+            $classes = SchoolClass::whereIn('id', $assignedClassIds)->orderBy('name')->get();
+            
+            $assignedSubjectIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+        } else {
+            $classes = SchoolClass::orderBy('name')->get();
+            $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+            if ($subjects->isEmpty()) {
+                $subjects = Subject::orderBy('name')->get();
+            }
         }
 
         // Auto-fill logic untuk pertemuan lanjutan
@@ -107,12 +142,26 @@ class MeetingController extends Controller
     {
         abort_unless($meeting->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
 
-        $teacher = Teacher::where('user_id', Auth::id())->with('subjects')->firstOrFail();
-        $classes = SchoolClass::orderBy('name')->get();
-        $subjects = $teacher->subjects()->orderBy('name')->get();
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $activeYear = AcademicYear::where('is_active', true)->first();
         
-        if ($subjects->isEmpty()) {
-            $subjects = Subject::orderBy('name')->get();
+        if ($activeYear) {
+            $assignedClassIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('class_id');
+            $classes = SchoolClass::whereIn('id', $assignedClassIds)->orderBy('name')->get();
+            
+            $assignedSubjectIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+        } else {
+            $classes = SchoolClass::orderBy('name')->get();
+            $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+            if ($subjects->isEmpty()) {
+                $subjects = Subject::orderBy('name')->get();
+            }
         }
 
         return view('guru.meetings.edit', compact('meeting', 'classes', 'subjects'));

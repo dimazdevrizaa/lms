@@ -19,7 +19,7 @@
 
     <!-- Tambah Mata Pelajaran Button -->
     <div class="mb-4">
-        <a href="{{ route('tatausaha.subjects.create') }}" class="btn btn-sm" style="background-color: #48A111; color: white; border: none;">
+        <a href="{{ route('admin.subjects.create') }}" class="btn btn-sm" style="background-color: #48A111; color: white; border: none;">
             ➕ Tambah Mata Pelajaran
         </a>
     </div>
@@ -35,7 +35,7 @@
                                 <th style="color: #25671E; font-weight: 600;">📖 Nama Mata Pelajaran</th>
                                 <th style="color: #25671E; font-weight: 600;">🔖 Kode</th>
                                 <th style="color: #25671E; font-weight: 600;">🧪 Jurusan</th>
-                                <th style="color: #25671E; font-weight: 600;">👨‍🏫 Guru</th>
+
                                 <th style="color: #25671E; font-weight: 600; text-align: center;">⚙️ Aksi</th>
                             </tr>
                         </thead>
@@ -55,18 +55,12 @@
                                             {{ $subject->major ?? 'Umum' }}
                                         </span>
                                     </td>
-                                    <td>
-                                        @if($subject->teacher)
-                                            <small class="text-muted">{{ $subject->teacher->user->name ?? '—' }}</small>
-                                        @else
-                                            <small class="text-muted">—</small>
-                                        @endif
-                                    </td>
+
                                     <td style="text-align: center;">
-                                        <a href="{{ route('tatausaha.subjects.edit', $subject) }}" class="btn btn-sm btn-outline-warning">
+                                        <a href="{{ route('admin.subjects.edit', $subject) }}" class="btn btn-sm btn-outline-warning">
                                             ✏️ Edit
                                         </a>
-                                        <form method="POST" action="{{ route('tatausaha.subjects.destroy', $subject) }}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus mata pelajaran ini?')">
+                                        <form method="POST" action="{{ route('admin.subjects.destroy', $subject) }}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus mata pelajaran ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ Hapus</button>
@@ -84,7 +78,7 @@
                 </div>
             @else
                 <div class="text-center py-5">
-                    <p class="text-muted mb-0">📭 Belum ada mata pelajaran. <a href="{{ route('tatausaha.subjects.create') }}">Tambah sekarang</a></p>
+                    <p class="text-muted mb-0">📭 Belum ada mata pelajaran. <a href="{{ route('admin.subjects.create') }}">Tambah sekarang</a></p>
                 </div>
             @endif
         </div>

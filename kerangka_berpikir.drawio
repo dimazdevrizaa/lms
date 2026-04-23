@@ -1,0 +1,81 @@
+<mxfile host="app.diagrams.net" modified="2026-04-06T13:24:00.000Z" agent="Mozilla/5.0" version="21.0.0" type="device">
+  <diagram id="kerangka-berpikir" name="Kerangka Berpikir">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Box 1: Literatur Review -->
+        <mxCell id="2" value="&lt;b&gt;Literatur Review&lt;/b&gt;&lt;br&gt;&lt;br&gt;(Sistem Informasi, Learning Management System,&lt;br&gt;Monitoring Akademik Orang Tua, Website,&lt;br&gt;Framework Laravel, UML, Database MySQL,&lt;br&gt;Metode Waterfall, Black Box Testing)" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fontFamily=Times New Roman;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="139" y="30" width="550" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 1→2 -->
+        <mxCell id="3" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="414" y="140" as="sourcePoint" />
+            <mxPoint x="414" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Box 2: Masalah -->
+        <mxCell id="4" value="&lt;b&gt;Masalah&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. Pengelolaan akademik SMAN 15 Padang masih dilakukan secara manual&lt;br&gt;2. Belum tersedia sistem terintegrasi untuk seluruh stakeholder&lt;br&gt;3. Orang tua tidak memiliki akses real-time terhadap informasi akademik anak" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fontFamily=Times New Roman;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="139" y="170" width="550" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 2→3 -->
+        <mxCell id="5" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="414" y="280" as="sourcePoint" />
+            <mxPoint x="414" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Box 3: Solusi -->
+        <mxCell id="6" value="&lt;b&gt;Solusi&lt;/b&gt;&lt;br&gt;&lt;br&gt;Perancangan dan implementasi Learning Management System&lt;br&gt;berbasis web dengan fitur monitoring orang tua untuk memantau&lt;br&gt;kehadiran, nilai, dan tugas siswa secara real-time" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fontFamily=Times New Roman;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="139" y="310" width="550" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 3→4 -->
+        <mxCell id="7" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="414" y="410" as="sourcePoint" />
+            <mxPoint x="414" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Box 4: Pengembangan Sistem -->
+        <mxCell id="8" value="&lt;b&gt;Pengembangan Sistem&lt;/b&gt;&lt;br&gt;&lt;br&gt;Analisis kebutuhan, perancangan sistem (UML &amp;amp; database),&lt;br&gt;implementasi aplikasi berbasis web menggunakan Laravel 12,&lt;br&gt;Tailwind CSS 4, dan MySQL, serta penerapan fitur&lt;br&gt;multi-role dan parent monitoring" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fontFamily=Times New Roman;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="139" y="440" width="550" height="110" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 4→5 -->
+        <mxCell id="9" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="414" y="550" as="sourcePoint" />
+            <mxPoint x="414" y="580" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Box 5: Uji Produk -->
+        <mxCell id="10" value="&lt;b&gt;Uji Produk&lt;/b&gt;&lt;br&gt;&lt;br&gt;Pengujian menggunakan metode Black Box Testing&lt;br&gt;(pengujian login multi-role, manajemen data, pencatatan&lt;br&gt;kehadiran, penugasan, penilaian, dan monitoring orang tua)" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fontFamily=Times New Roman;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="139" y="580" width="550" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 5→6 -->
+        <mxCell id="11" style="endArrow=block;endFill=1;strokeColor=#000000;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="414" y="680" as="sourcePoint" />
+            <mxPoint x="414" y="710" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Box 6: Tujuan -->
+        <mxCell id="12" value="&lt;b&gt;Tujuan&lt;/b&gt;&lt;br&gt;&lt;br&gt;1. Meningkatkan efisiensi pengelolaan akademik di SMAN 15 Padang&lt;br&gt;2. Mempermudah orang tua memantau perkembangan akademik&lt;br&gt;anak secara real-time dan transparan&lt;br&gt;3. Menjembatani komunikasi antara sekolah dan orang tua" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontSize=11;fontFamily=Times New Roman;strokeColor=#000000;fillColor=#FFFFFF;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="139" y="710" width="550" height="110" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

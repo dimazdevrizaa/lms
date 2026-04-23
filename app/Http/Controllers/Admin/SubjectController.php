@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\TataUsaha;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subject;
@@ -13,52 +13,46 @@ class SubjectController extends Controller
 {
     public function index(): View
     {
-        $subjects = Subject::with('teacher')->orderBy('name')->paginate(20);
+        $subjects = Subject::orderBy('name')->paginate(20);
 
-        return view('tatausaha.subjects.index', compact('subjects'));
+        return view('admin.subjects.index', compact('subjects'));
     }
 
     public function create(): View
     {
-        $teachers = Teacher::with('user')->orderBy('id')->get();
-
-        return view('tatausaha.subjects.create', compact('teachers'));
+        return view('admin.subjects.create');
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:subjects,name'],
+            'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:50'],
             'major' => ['required', 'string', 'max:20'],
-            'teacher_id' => ['nullable', 'exists:teachers,id'],
         ]);
 
         Subject::create($data);
 
-        return redirect()->route('tatausaha.subjects.index')
+        return redirect()->route('admin.subjects.index')
             ->with('success', 'Mata pelajaran berhasil ditambahkan.');
     }
 
     public function edit(Subject $subject): View
     {
-        $teachers = Teacher::with('user')->orderBy('id')->get();
-
-        return view('tatausaha.subjects.edit', compact('subject', 'teachers'));
+        return view('admin.subjects.edit', compact('subject'));
     }
 
     public function update(Request $request, Subject $subject): RedirectResponse
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:subjects,name,' . $subject->id],
+            'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:50'],
             'major' => ['required', 'string', 'max:20'],
-            'teacher_id' => ['nullable', 'exists:teachers,id'],
         ]);
 
         $subject->update($data);
 
-        return redirect()->route('tatausaha.subjects.index')
+        return redirect()->route('admin.subjects.index')
             ->with('success', 'Mata pelajaran berhasil diperbarui.');
     }
 
@@ -66,7 +60,7 @@ class SubjectController extends Controller
     {
         $subject->delete();
 
-        return redirect()->route('tatausaha.subjects.index')
+        return redirect()->route('admin.subjects.index')
             ->with('success', 'Mata pelajaran berhasil dihapus.');
     }
 }

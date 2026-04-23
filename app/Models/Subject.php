@@ -16,13 +16,8 @@ class Subject extends Model
         'name',
         'code',
         'major',
-        'teacher_id',
     ];
 
-    public function teacher(): BelongsTo
-    {
-        return $this->belongsTo(Teacher::class);
-    }
 
     public function teachingAssignments(): HasMany
     {

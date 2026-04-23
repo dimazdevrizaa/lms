@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use App\Models\Schedule;
+use App\Models\AcademicYear;
+use Carbon\Carbon;
 
 class MaterialController extends Controller
 {
@@ -43,18 +46,44 @@ class MaterialController extends Controller
             // Karena student_grades tidak punya teacher_id, kita pakai subject_id
             // Filter grade yang mata pelajarannya diampu oleh guru ini
             $q->whereIn('subject_id', function($query) use ($teacher) {
-                $query->select('id')->from('subjects')->where('teacher_id', $teacher->id);
+                $query->select('subject_id')->from('class_subject_teacher')->where('teacher_id', $teacher->id);
             });
         })->withCount('students')
             ->get()
             ->groupBy('major');
+
+        // Jadwal Mengajar Hari Ini
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        $todaySchedules = collect();
+        $todayIndo = '';
+
+        if ($activeYear) {
+            $daysIndo = [
+                0 => 'Minggu', 1 => 'Senin', 2 => 'Selasa',
+                3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu'
+            ];
+            $todayIndo = $daysIndo[now()->dayOfWeek];
+
+            if ($todayIndo !== 'Minggu') {
+                $todaySchedules = Schedule::where('teacher_id', $teacher->id)
+                    ->where('academic_year_id', $activeYear->id)
+                    ->where('day', $todayIndo)
+                    ->with(['schoolClass', 'timeSlot', 'subject'])
+                    ->get()
+                    ->sortBy(function($schedule) {
+                        return $schedule->timeSlot->slot_order;
+                    });
+            }
+        }
 
         return view('guru.dashboard', compact(
             'materialsCount',
             'assignmentsCount',
             'submissionsCount',
             'pendingGradesCount',
-            'assignedClasses'
+            'assignedClasses',
+            'todaySchedules',
+            'todayIndo'
         ));
     }
 
@@ -70,13 +99,12 @@ class MaterialController extends Controller
 
     public function create(): View
     {
-        $teacher = Teacher::where('user_id', Auth::id())->with('subjects')->firstOrFail();
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
         $classes = SchoolClass::orderBy('name')->get();
         
-        // Hanya ambil mata pelajaran yang diampu oleh guru ini
-        $subjects = $teacher->subjects()->orderBy('name')->get();
+        $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
         
-        // Jika guru tidak punya mata pelajaran spesifik (mungkin hanya guru baru/staf), ambil semua
         if ($subjects->isEmpty()) {
             $subjects = Subject::orderBy('name')->get();
         }
@@ -122,10 +150,11 @@ class MaterialController extends Controller
     {
         abort_unless($material->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
 
-        $teacher = Teacher::where('user_id', Auth::id())->with('subjects')->firstOrFail();
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
         $classes = SchoolClass::orderBy('name')->get();
         
-        $subjects = $teacher->subjects()->orderBy('name')->get();
+        $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+        $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
         if ($subjects->isEmpty()) {
             $subjects = Subject::orderBy('name')->get();
         }

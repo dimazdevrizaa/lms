@@ -19,8 +19,9 @@ use App\Http\Controllers\Siswa\StudentSubmissionController;
 use App\Http\Controllers\TataUsaha\ReportController;
 use App\Http\Controllers\TataUsaha\StudentController;
 use App\Http\Controllers\TataUsaha\TeacherController;
-use App\Http\Controllers\TataUsaha\SubjectController;
+use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\TataUsaha\TeachingAssignmentController;
+use App\Http\Controllers\TataUsaha\ScheduleController;
 
 Route::get('/', function () {
     if (! auth()->check()) {
@@ -61,6 +62,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', AdminUserController::class)->except(['show']);
         Route::resource('academic-years', AcademicYearController::class)->except(['show']);
         Route::resource('classes', AdminClassController::class)->except(['show']);
+        Route::resource('subjects', SubjectController::class);
         Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
     });
 
@@ -69,11 +71,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [ReportController::class, 'dashboard'])->name('dashboard');
         Route::resource('students', StudentController::class);
         Route::resource('teachers', TeacherController::class);
-        Route::resource('subjects', SubjectController::class);
-        Route::post('teaching-assignments/assign-all', [TeachingAssignmentController::class, 'assignAll'])->name('teaching-assignments.assign-all');
+
+        Route::get('teaching-assignments/print', [TeachingAssignmentController::class, 'printPdf'])->name('teaching-assignments.print');
         Route::resource('teaching-assignments', TeachingAssignmentController::class)->except(['show'])->parameters([
             'teaching-assignments' => 'teaching_assignment',
         ]);
+        // Jadwal Pelajaran
+        Route::prefix('schedules')->name('schedules.')->group(function () {
+            Route::get('/', [ScheduleController::class, 'index'])->name('index');
+            Route::get('/time-slots', [ScheduleController::class, 'timeSlots'])->name('time-slots');
+            Route::post('/time-slots', [ScheduleController::class, 'storeTimeSlot'])->name('time-slots.store');
+            Route::delete('/time-slots/{timeSlot}', [ScheduleController::class, 'deleteTimeSlot'])->name('time-slots.destroy');
+            Route::get('/{schoolClass}/edit', [ScheduleController::class, 'edit'])->name('edit');
+            Route::put('/{schoolClass}', [ScheduleController::class, 'update'])->name('update');
+            Route::get('/print', [ScheduleController::class, 'printSchedule'])->name('print');
+        });
+
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('reports/print', [ReportController::class, 'print'])->name('reports.print');
     });

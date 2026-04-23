@@ -26,6 +26,24 @@
                             @enderror
                         </div>
 
+                        <!-- Rentang Waktu -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-weight: 600; color: #25671E;">📅 Tanggal Mulai (Opsional)</label>
+                                <input type="date" class="form-control" style="border-color: #25671E;" name="start_date" value="{{ old('start_date') }}">
+                                @error('start_date')
+                                    <small class="text-danger d-block">{{ $message }}</small>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" style="font-weight: 600; color: #25671E;">📅 Tanggal Selesai (Opsional)</label>
+                                <input type="date" class="form-control" style="border-color: #25671E;" name="end_date" value="{{ old('end_date') }}">
+                                @error('end_date')
+                                    <small class="text-danger d-block">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
                         <!-- Status Aktif -->
                         <div class="mb-4">
                             <div class="form-check">
