@@ -68,22 +68,27 @@
                                 const meetingSelect = document.getElementById('meeting_id');
                                 const classSelect = document.getElementById('class_id');
                                 const subjectSelect = document.getElementById('subject_id');
+                                
+                                const classCol = classSelect.closest('.col-md-6');
+                                const subjectCol = subjectSelect.closest('.col-md-6');
 
                                 function updateFields() {
                                     const selectedOption = meetingSelect.options[meetingSelect.selectedIndex];
                                     if (selectedOption.value) {
+                                        // Auto-fill hidden values
                                         const classId = selectedOption.getAttribute('data-class');
                                         const subjectId = selectedOption.getAttribute('data-subject');
                                         
                                         if (classId) classSelect.value = classId;
                                         if (subjectId) subjectSelect.value = subjectId;
                                         
-                                        // Optional: Disable while meeting is selected to prevent mismatch
-                                        // classSelect.disabled = true;
-                                        // subjectSelect.disabled = true;
+                                        // Hide the dropdowns to keep UI clean
+                                        classCol.style.display = 'none';
+                                        subjectCol.style.display = 'none';
                                     } else {
-                                        // classSelect.disabled = false;
-                                        // subjectSelect.disabled = false;
+                                        // Show dropdowns for Materi Mandiri
+                                        classCol.style.display = 'block';
+                                        subjectCol.style.display = 'block';
                                     }
                                 }
 
@@ -125,10 +130,20 @@
                             @enderror
                         </div>
 
+                        <!-- YouTube Video -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #25671E;">🎥 Video YouTube (Opsional)</label>
+                            <input type="url" class="form-control" style="border-color: #25671E;" name="youtube_url" value="{{ old('youtube_url') }}" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                            <small class="text-muted">Masukkan link video YouTube jika ingin menyematkan video ke dalam materi</small>
+                            @error('youtube_url')
+                                <small class="text-danger d-block">{{ $message }}</small>
+                            @enderror
+                        </div>
+
                         <!-- Buttons -->
                         <div class="d-flex gap-2 mt-5">
                             <button class="btn btn-lg" style="background-color: #48A111; color: white; border: none;" type="submit">✓ Upload Materi</button>
-                            <a class="btn btn-lg btn-outline-secondary" href="{{ route('guru.materials.index') }}">Batal</a>
+                            <a class="btn btn-lg btn-outline-secondary" href="{{ request('meeting_id') ? route('guru.meetings.show', request('meeting_id')) : route('guru.materials.index') }}">Batal</a>
                         </div>
                     </form>
                 </div>

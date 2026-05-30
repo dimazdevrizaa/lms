@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class AssignmentSubmission extends Model
+class Question extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'assignment_id',
-        'student_id',
-        'file_path',
-        'answer_text',
-        'submitted_at',
-        'score',
-        'feedback',
+        'type',
+        'body',
+        'order',
+        'points',
+        'correct_answer',
     ];
 
     public function assignment(): BelongsTo
@@ -25,14 +25,13 @@ class AssignmentSubmission extends Model
         return $this->belongsTo(Assignment::class);
     }
 
-    public function student(): BelongsTo
+    public function options(): HasMany
     {
-        return $this->belongsTo(Student::class);
+        return $this->hasMany(QuestionOption::class)->orderBy('label');
     }
 
-    public function questionAnswers()
+    public function answers(): HasMany
     {
-        return $this->hasMany(QuestionAnswer::class, 'assignment_submission_id');
+        return $this->hasMany(QuestionAnswer::class);
     }
 }
-

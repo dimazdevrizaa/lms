@@ -14,11 +14,17 @@ class Assignment extends Model
         'class_id',
         'subject_id',
         'meeting_id',
+        'type',
         'title',
         'description',
         'due_at',
         'file_path',
     ];
+
+    public function isOnline(): bool
+    {
+        return $this->type === 'online';
+    }
 
     public function meeting()
     {
@@ -43,6 +49,11 @@ class Assignment extends Model
     public function submissions()
     {
         return $this->hasMany(AssignmentSubmission::class);
+    }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class)->orderBy('order');
     }
 }
 

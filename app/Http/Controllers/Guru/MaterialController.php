@@ -123,6 +123,7 @@ class MaterialController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'], // Max 10MB
+            'youtube_url' => ['nullable', 'url', 'max:255'],
         ]);
 
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
@@ -141,11 +142,19 @@ class MaterialController extends Controller
             'title' => $data['title'],
             'content' => $data['content'] ?? null,
             'file_path' => $filePath,
+            'youtube_url' => $data['youtube_url'] ?? null,
         ]);
 
         return redirect()->route('guru.materials.index')
             ->with('success', 'Materi berhasil diupload.');
     }
+
+    public function show(Material $material): View
+    {
+        abort_unless($material->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        return view('guru.materials.show', compact('material'));
+    }
+
     public function edit(Material $material): View
     {
         abort_unless($material->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
@@ -176,6 +185,7 @@ class MaterialController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string'],
             'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'youtube_url' => ['nullable', 'url', 'max:255'],
         ]);
 
         if ($request->hasFile('file')) {

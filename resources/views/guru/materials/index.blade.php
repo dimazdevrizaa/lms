@@ -29,7 +29,7 @@
                 <div class="col-md-6 mb-4">
                     <div class="card h-100 material-card overflow-hidden" 
                          style="cursor: pointer; border: none; border-left: 5px solid #25671E; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.05);"
-                         onclick="window.location='{{ route('guru.materials.edit', $m) }}'">
+                         onclick="window.location='{{ route('guru.materials.show', $m) }}'">
                         
                         <div class="card-body p-4">
                             <div class="d-flex justify-content-between align-items-start mb-3">
@@ -63,6 +63,9 @@
                         </div>
 
                         <div class="card-footer bg-white border-top-0 p-3 d-flex justify-content-end gap-2" onclick="event.stopPropagation();">
+                            <a href="{{ route('guru.materials.show', $m) }}" class="btn btn-sm btn-outline-success" title="Lihat Detail">
+                                <i class="fas fa-eye"></i> Lihat Detail
+                            </a>
                             <a href="{{ route('guru.materials.edit', $m) }}" class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="fas fa-edit"></i> Edit
                             </a>

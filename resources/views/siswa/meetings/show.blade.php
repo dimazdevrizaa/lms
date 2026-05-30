@@ -46,8 +46,8 @@
                     @forelse($meeting->materials as $m)
                         <div class="d-flex align-items-center p-3 mb-3 bg-light rounded border-start border-4 border-success item-card" 
                              style="cursor: pointer; transition: 0.2s;"
-                             onclick="window.open('{{ asset('storage/' . $m->file_path) }}', '_blank')">
-                            <i class="fas fa-file-pdf text-danger fa-2x me-3"></i>
+                             onclick="window.location='{{ route('siswa.materials.show', $m) }}'">
+                            <i class="fas fa-book-open text-success fa-2x me-3"></i>
                             <div class="flex-grow-1">
                                 <h6 class="mb-1 fw-bold">{{ $m->title }}</h6>
                                 <p class="text-muted small mb-0">{{ Str::limit($m->content, 50) }}</p>
@@ -96,11 +96,18 @@
                             @if($submission)
                                 <div class="alert alert-success py-2 px-3 small border-0 mb-0">
                                     <i class="fas fa-check-circle me-1"></i> Anda sudah mengumpulkan tugas ini.
+                                    @if($a->type === 'online')
+                                        <a href="{{ route('siswa.assignments.show', $a) }}" class="d-block mt-2 btn btn-sm btn-outline-success">Lihat Hasil</a>
+                                    @endif
                                 </div>
                             @elseif($a->due_at && \Carbon\Carbon::parse($a->due_at)->isPast())
                                 <div class="alert alert-danger py-2 px-3 small border-0 mb-0">
                                     <i class="fas fa-times-circle me-1"></i> Deadline sudah lewat.
                                 </div>
+                            @elseif($a->type === 'online')
+                                <a href="{{ route('siswa.assignments.show', $a) }}" class="btn btn-sm w-100" style="background-color: #48A111; color: white;">
+                                    <i class="fas fa-laptop me-1"></i> Kerjakan Online
+                                </a>
                             @else
                                 <form method="POST" action="{{ route('siswa.assignments.submit', $a) }}" enctype="multipart/form-data">
                                     @csrf

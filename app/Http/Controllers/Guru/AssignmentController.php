@@ -5,14 +5,19 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
 use App\Models\Meeting;
+use App\Models\Question;
+use App\Models\QuestionAnswer;
+use App\Models\QuestionOption;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\ClassSubjectTeacher;
+use App\Models\AssignmentSubmission;
 use App\Models\AcademicYear;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -63,34 +68,84 @@ class AssignmentController extends Controller
             'class_id' => ['required', 'exists:classes,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
             'meeting_id' => ['nullable', 'exists:meetings,id'],
+            'type' => ['required', 'in:pdf,online'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'due_at' => ['nullable', 'date'],
             'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            // Online questions come as JSON
+            'questions_json' => ['nullable', 'string'],
         ]);
 
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         abort_unless($teacherId, 403);
 
         $filePath = null;
-        if ($request->hasFile('file')) {
+        if ($data['type'] === 'pdf' && $request->hasFile('file')) {
             $filePath = $request->file('file')->store('assignments', 'public');
         }
 
-        Assignment::create([
-            'teacher_id' => $teacherId,
-            'class_id' => $data['class_id'],
-            'subject_id' => $data['subject_id'],
-            'meeting_id' => $data['meeting_id'],
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'due_at' => $data['due_at'] ?? null,
-            'file_path' => $filePath,
-        ]);
+        DB::beginTransaction();
+        try {
+            $assignment = Assignment::create([
+                'teacher_id' => $teacherId,
+                'class_id' => $data['class_id'],
+                'subject_id' => $data['subject_id'],
+                'meeting_id' => $data['meeting_id'],
+                'type' => $data['type'],
+                'title' => $data['title'],
+                'description' => $data['description'] ?? null,
+                'due_at' => $data['due_at'] ?? null,
+                'file_path' => $filePath,
+            ]);
 
-        return redirect()->route('guru.assignments.index')
+            // Create questions for online assignments
+            if ($data['type'] === 'online' && !empty($data['questions_json'])) {
+                $questions = json_decode($data['questions_json'], true);
+                
+                if (!is_array($questions) || count($questions) === 0) {
+                    throw new \Exception('Minimal 1 soal harus ditambahkan untuk tugas online.');
+                }
+
+                foreach ($questions as $index => $q) {
+                    $question = Question::create([
+                        'assignment_id' => $assignment->id,
+                        'type' => $q['type'],
+                        'body' => $q['body'],
+                        'order' => $index + 1,
+                        'points' => $q['points'] ?? 1,
+                        'correct_answer' => $q['type'] === 'isian_singkat' ? ($q['correct_answer'] ?? null) : null,
+                    ]);
+
+                    // Create options for pilihan_ganda
+                    if ($q['type'] === 'pilihan_ganda' && !empty($q['options'])) {
+                        foreach ($q['options'] as $opt) {
+                            QuestionOption::create([
+                                'question_id' => $question->id,
+                                'label' => $opt['label'],
+                                'body' => $opt['body'],
+                                'is_correct' => $opt['is_correct'] ?? false,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['questions_json' => $e->getMessage()]);
+        }
+
+        if ($data['meeting_id']) {
+            return redirect()->route('guru.meetings.show', $data['meeting_id'])
+                ->with('success', 'Tugas berhasil dibuat.');
+        }
+
+        return redirect()->route('guru.meetings.index')
             ->with('success', 'Tugas berhasil dibuat.');
     }
+
     public function edit(Assignment $assignment): View
     {
         abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
@@ -119,7 +174,14 @@ class AssignmentController extends Controller
 
         $meetings = Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get();
 
-        return view('guru.assignments.edit', compact('assignment', 'classes', 'subjects', 'meetings'));
+        // Load questions with options for online assignments
+        if ($assignment->isOnline()) {
+            $assignment->load('questions.options');
+        }
+
+        $hasSubmissions = $assignment->submissions()->count() > 0;
+
+        return view('guru.assignments.edit', compact('assignment', 'classes', 'subjects', 'meetings', 'hasSubmissions'));
     }
 
     public function update(Request $request, Assignment $assignment): RedirectResponse
@@ -135,18 +197,66 @@ class AssignmentController extends Controller
             'description' => ['nullable', 'string'],
             'due_at' => ['nullable', 'date'],
             'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'questions_json' => ['nullable', 'string'],
         ]);
 
-        if ($request->hasFile('file')) {
-            if ($assignment->file_path) {
-                Storage::disk('public')->delete($assignment->file_path);
+        DB::beginTransaction();
+        try {
+            if ($assignment->type === 'pdf' && $request->hasFile('file')) {
+                if ($assignment->file_path) {
+                    Storage::disk('public')->delete($assignment->file_path);
+                }
+                $data['file_path'] = $request->file('file')->store('assignments', 'public');
             }
-            $data['file_path'] = $request->file('file')->store('assignments', 'public');
+
+            $assignment->update($data);
+
+            // Update questions for online assignments (only if no submissions yet)
+            if ($assignment->isOnline() && !empty($data['questions_json']) && $assignment->submissions()->count() === 0) {
+                // Delete existing questions and recreate
+                $assignment->questions()->delete();
+                
+                $questions = json_decode($data['questions_json'], true);
+                
+                if (!is_array($questions) || count($questions) === 0) {
+                    throw new \Exception('Minimal 1 soal harus ditambahkan untuk tugas online.');
+                }
+
+                foreach ($questions as $index => $q) {
+                    $question = Question::create([
+                        'assignment_id' => $assignment->id,
+                        'type' => $q['type'],
+                        'body' => $q['body'],
+                        'order' => $index + 1,
+                        'points' => $q['points'] ?? 1,
+                        'correct_answer' => $q['type'] === 'isian_singkat' ? ($q['correct_answer'] ?? null) : null,
+                    ]);
+
+                    if ($q['type'] === 'pilihan_ganda' && !empty($q['options'])) {
+                        foreach ($q['options'] as $opt) {
+                            QuestionOption::create([
+                                'question_id' => $question->id,
+                                'label' => $opt['label'],
+                                'body' => $opt['body'],
+                                'is_correct' => $opt['is_correct'] ?? false,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->withErrors(['questions_json' => $e->getMessage()]);
         }
 
-        $assignment->update($data);
+        if ($assignment->meeting_id) {
+            return redirect()->route('guru.meetings.show', $assignment->meeting_id)
+                ->with('success', 'Tugas berhasil diperbarui.');
+        }
 
-        return redirect()->route('guru.assignments.index')
+        return redirect()->route('guru.meetings.index')
             ->with('success', 'Tugas berhasil diperbarui.');
     }
 
@@ -155,6 +265,10 @@ class AssignmentController extends Controller
         abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
 
         $assignment->load(['submissions.student.user', 'schoolClass']);
+
+        if ($assignment->isOnline()) {
+            $assignment->load(['questions.options', 'submissions.questionAnswers.question', 'submissions.questionAnswers.selectedOption']);
+        }
         
         return view('guru.assignments.show', compact('assignment'));
     }
@@ -163,10 +277,75 @@ class AssignmentController extends Controller
     {
         abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
 
+        $meetingId = $assignment->meeting_id;
         $assignment->delete();
 
-        return redirect()->route('guru.assignments.index')
+        if ($meetingId) {
+            return redirect()->route('guru.meetings.show', $meetingId)
+                ->with('success', 'Tugas berhasil dihapus.');
+        }
+
+        return redirect()->route('guru.meetings.index')
             ->with('success', 'Tugas berhasil dihapus.');
     }
-}
 
+    /**
+     * Grade a single question answer (for essay questions)
+     */
+    public function gradeQuestion(Request $request, QuestionAnswer $answer): RedirectResponse
+    {
+        // Verify the teacher owns this assignment
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        $assignment = $answer->question->assignment;
+        abort_unless($assignment->teacher_id == $teacherId, 403);
+
+        $data = $request->validate([
+            'score' => ['required', 'integer', 'min:0'],
+            'is_correct' => ['required', 'boolean'],
+        ]);
+
+        // Ensure score doesn't exceed max points for this question
+        $maxPoints = $answer->question->points;
+        if ($data['score'] > $maxPoints) {
+            $data['score'] = $maxPoints;
+        }
+
+        $answer->update([
+            'score' => $data['score'],
+            'is_correct' => $data['is_correct'],
+        ]);
+
+        // Recalculate total submission score
+        $submission = $answer->submission;
+        $totalScore = $submission->questionAnswers()->sum('score');
+        $totalPoints = $assignment->questions()->sum('points');
+        
+        // Calculate as percentage (0-100)
+        $percentage = $totalPoints > 0 ? round(($totalScore / $totalPoints) * 100) : 0;
+        $submission->update(['score' => $percentage]);
+
+        return back()->with('success', 'Nilai soal berhasil disimpan.');
+    }
+
+    /**
+     * Grade a full assignment submission (for PDF assignments)
+     */
+    public function gradeSubmission(Request $request, AssignmentSubmission $submission): RedirectResponse
+    {
+        // Verify the teacher owns this assignment
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless($submission->assignment->teacher_id == $teacherId, 403);
+
+        $data = $request->validate([
+            'score' => ['required', 'integer', 'min:0', 'max:100'],
+            'feedback' => ['nullable', 'string'],
+        ]);
+
+        $submission->update([
+            'score' => $data['score'],
+            'feedback' => $data['feedback'],
+        ]);
+
+        return back()->with('success', 'Nilai tugas berhasil disimpan.');
+    }
+}

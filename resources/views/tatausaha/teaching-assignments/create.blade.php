@@ -10,7 +10,7 @@
 
     <div class="row">
         <div class="col-lg-7">
-            <div class="card">
+            <div class="card" style="overflow: visible;">
                 <div class="card-body p-4">
                     <form method="POST" action="{{ route('tatausaha.teaching-assignments.store') }}">
                         @csrf

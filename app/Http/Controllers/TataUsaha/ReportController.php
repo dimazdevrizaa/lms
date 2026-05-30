@@ -24,7 +24,7 @@ class ReportController extends Controller
             ->get()
             ->groupBy('major');
 
-        return view('tata-usaha.dashboard', compact(
+        return view('tatausaha.dashboard', compact(
             'studentCount', 
             'teacherCount', 
             'classCount', 
@@ -38,7 +38,7 @@ class ReportController extends Controller
         $students = Student::with('schoolClass')->orderBy('id')->get();
         $teachers = Teacher::orderBy('id')->get();
 
-        return view('tata-usaha.reports.index', compact('students', 'teachers'));
+        return view('tatausaha.reports.index', compact('students', 'teachers'));
     }
 
     public function print(): View
@@ -46,7 +46,7 @@ class ReportController extends Controller
         $students = Student::with('schoolClass')->orderBy('id')->get();
         $teachers = Teacher::orderBy('id')->get();
 
-        return view('tata-usaha.reports.print', compact('students', 'teachers'));
+        return view('tatausaha.reports.print', compact('students', 'teachers'));
     }
 }
 

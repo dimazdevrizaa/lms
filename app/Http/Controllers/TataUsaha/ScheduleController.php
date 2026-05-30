@@ -5,11 +5,13 @@ namespace App\Http\Controllers\TataUsaha;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
 use App\Models\ClassSubjectTeacher;
+use App\Models\Meeting;
 use App\Models\Schedule;
 use App\Models\SchoolClass;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\TimeSlot;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -178,10 +180,18 @@ class ScheduleController extends Controller
             }
         }
 
+        // Auto-generate pertemuan berdasarkan jadwal dan tahun ajar
+        $meetingsCreated = $this->generateMeetingsFromSchedule($yearId, $schoolClass->id);
+
+        $successMsg = 'Jadwal kelas ' . $schoolClass->name . ' berhasil disimpan.';
+        if ($meetingsCreated > 0) {
+            $successMsg .= ' ' . $meetingsCreated . ' pertemuan otomatis telah dibuat.';
+        }
+
         return redirect()->route('tatausaha.schedules.edit', [
             'schoolClass' => $schoolClass->id,
             'academic_year_id' => $yearId,
-        ])->with('success', 'Jadwal kelas ' . $schoolClass->name . ' berhasil disimpan.');
+        ])->with('success', $successMsg);
     }
 
     /**
@@ -298,6 +308,112 @@ class ScheduleController extends Controller
         return view('tatausaha.schedules.print', compact(
             'classes', 'timeSlots', 'allSchedules', 'days', 'activeDays', 'academicYear'
         ));
+    }
+
+    /**
+     * Auto-generate pertemuan berdasarkan jadwal dan rentang tahun ajar.
+     * Menghitung semua tanggal dalam rentang tahun ajar yang sesuai
+     * dengan hari-hari di jadwal, lalu membuat Meeting untuk masing-masing.
+     *
+     * @return int Jumlah pertemuan yang baru dibuat
+     */
+    private function generateMeetingsFromSchedule(int $yearId, int $classId): int
+    {
+        $academicYear = AcademicYear::find($yearId);
+
+        // Jika tahun ajar tidak punya rentang tanggal, skip
+        if (!$academicYear || !$academicYear->start_date || !$academicYear->end_date) {
+            return 0;
+        }
+
+        // Mapping nama hari Indonesia ke Carbon dayOfWeekIso (1=Senin, 6=Sabtu)
+        $dayMap = [
+            'Senin'  => 1,
+            'Selasa' => 2,
+            'Rabu'   => 3,
+            'Kamis'  => 4,
+            'Jumat'  => 5,
+            'Sabtu'  => 6,
+        ];
+
+        // Ambil semua jadwal untuk kelas ini yang memiliki mapel & guru
+        $schedules = Schedule::where('academic_year_id', $yearId)
+            ->where('class_id', $classId)
+            ->whereNotNull('subject_id')
+            ->whereNotNull('teacher_id')
+            ->get();
+
+        if ($schedules->isEmpty()) {
+            return 0;
+        }
+
+        // Group by teacher_id + subject_id, kumpulkan hari-harinya
+        $groups = [];
+        foreach ($schedules as $schedule) {
+            $key = $schedule->teacher_id . '_' . $schedule->subject_id;
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'teacher_id'  => $schedule->teacher_id,
+                    'subject_id'  => $schedule->subject_id,
+                    'days'        => [],
+                ];
+            }
+            $dayIso = $dayMap[$schedule->day] ?? null;
+            if ($dayIso && !in_array($dayIso, $groups[$key]['days'])) {
+                $groups[$key]['days'][] = $dayIso;
+            }
+        }
+
+        $startDate = Carbon::parse($academicYear->start_date);
+        $endDate   = Carbon::parse($academicYear->end_date);
+        $created   = 0;
+
+        foreach ($groups as $group) {
+            // Generate semua tanggal dalam rentang yang jatuh pada hari-hari tersebut
+            $dates = [];
+            $current = $startDate->copy();
+
+            while ($current->lte($endDate)) {
+                if (in_array($current->dayOfWeekIso, $group['days'])) {
+                    $dates[] = $current->copy();
+                }
+                $current->addDay();
+            }
+
+            if (empty($dates)) {
+                continue;
+            }
+
+            // Cari nomor pertemuan terakhir yang sudah ada
+            $lastNumber = Meeting::where('teacher_id', $group['teacher_id'])
+                ->where('class_id', $classId)
+                ->where('subject_id', $group['subject_id'])
+                ->max('number') ?? 0;
+
+            // Buat pertemuan untuk setiap tanggal yang belum ada
+            foreach ($dates as $date) {
+                $exists = Meeting::where('teacher_id', $group['teacher_id'])
+                    ->where('class_id', $classId)
+                    ->where('subject_id', $group['subject_id'])
+                    ->where('date', $date->toDateString())
+                    ->exists();
+
+                if (!$exists) {
+                    $lastNumber++;
+                    Meeting::create([
+                        'teacher_id' => $group['teacher_id'],
+                        'class_id'   => $classId,
+                        'subject_id' => $group['subject_id'],
+                        'title'      => 'Pertemuan ' . $lastNumber,
+                        'date'       => $date->toDateString(),
+                        'number'     => $lastNumber,
+                    ]);
+                    $created++;
+                }
+            }
+        }
+
+        return $created;
     }
 
     /**

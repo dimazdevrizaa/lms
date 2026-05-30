@@ -16,7 +16,4 @@ pada saat ini tu menginput matapelajaran manual (tidak dropdwon)
 3. saya ingin ada halaman khusus untuk menentukan guru yang sesuai dengan mata pelajaran nya 
 
 tanggal 22-04-2026
-1. ketika TU selesai menginputkan jadwal pelajran pada setiap kelas, makan saya ingin 
-sistem langsung menyesuaikan dengan ruang kelas pada akun guru serta telah otomatis membuat pertemuan 
-yang menyesuaikan dengan tahun ajar dan jadwal pelajaran yang telah di buat oleh TU 
-
+1. ketika TU selesai menginputkan jadwal pelajaran pada setiap kelas maka saya ingin sistem langsung menyesuaikan dengan ruang kelas pada akun guru serta telah otomatis membuat pertemuan yang menyesuaikan dengan tahun ajar dan jadwal pelajaran yang telah di buat oleh TU

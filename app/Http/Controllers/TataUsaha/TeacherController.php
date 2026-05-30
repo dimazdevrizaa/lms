@@ -15,12 +15,12 @@ class TeacherController extends Controller
     {
         $teachers = Teacher::with('user')->paginate(20);
 
-        return view('tata-usaha.teachers.index', compact('teachers'));
+        return view('tatausaha.teachers.index', compact('teachers'));
     }
 
     public function create(): View
     {
-        return view('tata-usaha.teachers.create');
+        return view('tatausaha.teachers.create');
     }
 
     public function store(Request $request): RedirectResponse
@@ -50,7 +50,7 @@ class TeacherController extends Controller
     }
     public function edit(Teacher $teacher): View
     {
-        return view('tata-usaha.teachers.edit', compact('teacher'));
+        return view('tatausaha.teachers.edit', compact('teacher'));
     }
 
     public function update(Request $request, Teacher $teacher): RedirectResponse

@@ -29,14 +29,14 @@ class StudentController extends Controller
         $students = $query->paginate(20)->withQueryString();
         $classes = SchoolClass::orderBy('name')->get();
 
-        return view('tata-usaha.students.index', compact('students', 'classes'));
+        return view('tatausaha.students.index', compact('students', 'classes'));
     }
 
     public function create(): View
     {
         $classes = SchoolClass::orderBy('name')->get();
 
-        return view('tata-usaha.students.create', compact('classes'));
+        return view('tatausaha.students.create', compact('classes'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -69,7 +69,7 @@ class StudentController extends Controller
     {
         $classes = SchoolClass::orderBy('name')->get();
 
-        return view('tata-usaha.students.edit', compact('student', 'classes'));
+        return view('tatausaha.students.edit', compact('student', 'classes'));
     }
 
     public function update(Request $request, Student $student): RedirectResponse

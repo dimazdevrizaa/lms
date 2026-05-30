@@ -40,6 +40,11 @@
                                     @else
                                         <span class="badge" style="background-color: #dc3545;">⊘ Ditutup</span>
                                     @endif
+                                    @if($a->isOnline())
+                                        <span class="badge bg-primary"><i class="fas fa-laptop me-1"></i>Online</span>
+                                    @else
+                                        <span class="badge bg-secondary"><i class="fas fa-file-pdf me-1"></i>PDF</span>
+                                    @endif
                                 </div>
                                 <small class="text-muted"><i class="fas fa-calendar-check me-1"></i> {{ $a->created_at->format('d M Y') }}</small>
                             </div>

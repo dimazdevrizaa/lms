@@ -175,9 +175,14 @@
                                 <h6 class="mb-1">{{ $assignment->title }}</h6>
                                 <small class="text-muted d-block mb-1">Deadline: {{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}</small>
                             </div>
-                            <a href="{{ route('guru.assignments.edit', $assignment) }}" class="btn btn-sm btn-light" title="Edit Tugas">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('guru.assignments.show', $assignment) }}" class="btn btn-sm btn-outline-primary" title="Detail Tugas">
+                                    <i class="fas fa-eye"></i> Detail
+                                </a>
+                                <a href="{{ route('guru.assignments.edit', $assignment) }}" class="btn btn-sm btn-light" title="Edit Tugas">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </div>
                         </div>
                     @empty
                         <div class="text-center py-5 text-muted">

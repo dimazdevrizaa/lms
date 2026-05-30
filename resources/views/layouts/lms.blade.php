@@ -248,6 +248,14 @@
             margin-bottom: 2rem;
         }
 
+        /* Anti-Cheat: Disable text selection */
+        .anti-cheat-active {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
         h2, h3, h4, h5, h6 {
             color: var(--primary-color);
         }
@@ -536,6 +544,42 @@
             });
         }
     </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply unselectable class to body for global anti-cheat
+            document.body.classList.add('anti-cheat-active');
+
+            // Block Right Click
+            document.addEventListener('contextmenu', event => event.preventDefault());
+
+            // Block Copy, Cut, Paste
+            ['copy', 'cut', 'paste'].forEach(function(eventType) {
+                document.addEventListener(eventType, function(e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Block PrintScreen and common dev tools shortcuts
+            document.addEventListener('keyup', function(e) {
+                if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                    navigator.clipboard.writeText(''); // Clear clipboard
+                    alert('Screenshot dan Print Screen telah dinonaktifkan oleh sistem.');
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S, Ctrl+P
+                if (e.key === 'F12' || 
+                   (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'i' || e.key === 'j')) || 
+                   (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's' || e.key === 'P' || e.key === 'p'))) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+
+    @stack('modals')
 </body>
 </html>
 

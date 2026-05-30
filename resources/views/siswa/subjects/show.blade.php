@@ -64,11 +64,9 @@
                         <div class="card-body">
                             <h6 class="fw-bold mb-2">{{ $m->title }}</h6>
                             <p class="text-muted small mb-3">{{ Str::limit($m->content, 80) }}</p>
-                            @if($m->file_path)
-                                <a href="{{ asset('storage/' . $m->file_path) }}" target="_blank" class="btn btn-sm btn-outline-success w-100">
-                                    <i class="fas fa-file-pdf me-1"></i> Lihat PDF
-                                </a>
-                            @endif
+                            <a href="{{ route('siswa.materials.show', $m) }}" class="btn btn-sm btn-outline-success w-100">
+                                <i class="fas fa-book-open me-1"></i> Buka Materi
+                            </a>
                         </div>
                     </div>
                 </div>

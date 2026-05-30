@@ -97,6 +97,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('materials', MaterialController::class);
         Route::resource('meetings', MeetingController::class);
         Route::resource('assignments', AssignmentController::class);
+        Route::post('assignments/answers/{answer}/grade', [AssignmentController::class, 'gradeQuestion'])->name('assignments.grade-question');
+        Route::post('assignments/submissions/{submission}/grade', [AssignmentController::class, 'gradeSubmission'])->name('assignments.grade-submission');
         Route::resource('attendances', AttendanceController::class);
 
         // WALI KELAS - Classroom Management
@@ -131,8 +133,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/subjects', [StudentMaterialController::class, 'subjects'])->name('subjects.index');
         Route::get('/subjects/{subject}', [StudentMaterialController::class, 'subjectMeetings'])->name('subjects.show');
         Route::get('/meetings/{meeting}', [StudentMaterialController::class, 'meetingDetail'])->name('meetings.show');
+        Route::get('/materials/{material}', [StudentMaterialController::class, 'show'])->name('materials.show');
         
         Route::get('/assignments', [StudentSubmissionController::class, 'index'])->name('assignments.index');
+        Route::get('/assignments/{assignment}', [StudentSubmissionController::class, 'show'])->name('assignments.show');
         Route::post('/assignments/{assignment}/submit', [StudentSubmissionController::class, 'store'])->name('assignments.submit');
         Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('attendance.index');
     });

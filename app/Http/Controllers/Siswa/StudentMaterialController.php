@@ -36,7 +36,6 @@ class StudentMaterialController extends Controller
         }
 
         $subjects = Subject::whereIn('id', $subjectIdsFromAssignments)
-            ->with('teacher.user')
             ->orderBy('name')
             ->get();
 
@@ -80,5 +79,18 @@ class StudentMaterialController extends Controller
         $meeting->load(['materials', 'assignments', 'subject', 'teacher.user']);
 
         return view('siswa.meetings.show', compact('meeting', 'student'));
+    }
+
+    /**
+     * Menampilkan detail Materi (untuk melihat PDF & YouTube)
+     */
+    public function show(Material $material): View
+    {
+        $student = Student::where('user_id', Auth::id())->first();
+        abort_unless($student, 403);
+        
+        abort_if($material->class_id !== $student->class_id, 403);
+
+        return view('siswa.materials.show', compact('material', 'student'));
     }
 }

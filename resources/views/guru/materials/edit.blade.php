@@ -62,18 +62,34 @@
                                 const meetingSelect = document.getElementById('meeting_id');
                                 const classSelect = document.getElementById('class_id');
                                 const subjectSelect = document.getElementById('subject_id');
+                                
+                                const classCol = classSelect.closest('.col-md-6');
+                                const subjectCol = subjectSelect.closest('.col-md-6');
 
                                 function updateFields() {
                                     const selectedOption = meetingSelect.options[meetingSelect.selectedIndex];
                                     if (selectedOption.value) {
+                                        // Auto-fill hidden values
                                         const classId = selectedOption.getAttribute('data-class');
                                         const subjectId = selectedOption.getAttribute('data-subject');
                                         if (classId) classSelect.value = classId;
                                         if (subjectId) subjectSelect.value = subjectId;
+                                        
+                                        // Hide the dropdowns to keep UI clean
+                                        classCol.style.display = 'none';
+                                        subjectCol.style.display = 'none';
+                                    } else {
+                                        // Show dropdowns for Materi Mandiri
+                                        classCol.style.display = 'block';
+                                        subjectCol.style.display = 'block';
                                     }
                                 }
 
                                 meetingSelect.addEventListener('change', updateFields);
+                                
+                                if (meetingSelect.value) {
+                                    updateFields();
+                                }
                             });
                         </script>
 
@@ -108,6 +124,16 @@
                             <input type="file" class="form-control" style="border-color: #25671E;" name="file" accept=".pdf">
                             <small class="text-muted">Pilih file PDF baru jika ingin mengganti file lama (Maksimal 10MB)</small>
                             @error('file')
+                                <small class="text-danger d-block">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <!-- YouTube Video -->
+                        <div class="mb-4">
+                            <label class="form-label" style="font-weight: 600; color: #25671E;">🎥 Video YouTube (Opsional)</label>
+                            <input type="url" class="form-control" style="border-color: #25671E;" name="youtube_url" value="{{ old('youtube_url', $material->youtube_url) }}" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                            <small class="text-muted">Masukkan link video YouTube jika ingin menyematkan video ke dalam materi</small>
+                            @error('youtube_url')
                                 <small class="text-danger d-block">{{ $message }}</small>
                             @enderror
                         </div>

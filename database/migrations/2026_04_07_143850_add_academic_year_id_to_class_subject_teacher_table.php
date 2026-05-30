@@ -15,11 +15,12 @@ return new class extends Migration
             $table->foreignId('academic_year_id')->nullable()->constrained('academic_years')->cascadeOnDelete();
         });
 
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Schema::table('class_subject_teacher', function (Blueprint $table) {
+            // Add simple index so the foreign key constraint on class_id is not left without an index
+            // when we drop the unique constraint (which starts with class_id).
+            $table->index('class_id');
             $table->dropUnique('class_subject_teacher_class_id_subject_id_unique');
         });
-        \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         Schema::table('class_subject_teacher', function (Blueprint $table) {
             $table->unique(['class_id', 'subject_id', 'academic_year_id'], 'cls_sub_ay_unique');
