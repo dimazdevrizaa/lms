@@ -4,13 +4,18 @@
 
 @section('content')
     <!-- Header -->
-    <div class="mb-5">
-        <h1 class="h3 mb-2">✅ Input Kehadiran Siswa</h1>
-        @if(isset($meeting))
-            <p class="text-muted mb-0">Pertemuan ke-{{ $meeting->number }}: {{ $meeting->title }} | {{ $meeting->schoolClass->name }}</p>
-        @else
-            <p class="text-muted mb-0">Catat kehadiran siswa untuk kelas dan mata pelajaran tertentu</p>
-        @endif
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <a href="{{ isset($meeting) ? route('guru.attendances.index', ['class_id' => $meeting->class_id, 'subject_id' => $meeting->subject_id]) : route('guru.attendances.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+        <div>
+            <h1 class="h3 mb-1">✅ Input Kehadiran Siswa</h1>
+            @if(isset($meeting))
+                <p class="text-muted mb-0">Pertemuan ke-{{ $meeting->number }}: {{ $meeting->title }} | {{ $meeting->schoolClass->name }}</p>
+            @else
+                <p class="text-muted mb-0">Catat kehadiran siswa untuk kelas dan mata pelajaran tertentu</p>
+            @endif
+        </div>
     </div>
 
     <form method="POST" action="{{ route('guru.attendances.store') }}">
@@ -65,12 +70,11 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="d-grid gap-2 mb-4">
                     <button class="btn btn-lg" style="background-color: #25671E; color: white; border: none;" type="submit">
                         <i class="fas fa-save me-2"></i> Simpan Absensi
                     </button>
-                    <a class="btn btn-outline-secondary" href="{{ isset($meeting) ? route('guru.meetings.show', $meeting) : route('guru.attendances.index') }}">Batal</a>
+                    <a class="btn btn-outline-secondary" href="{{ isset($meeting) ? route('guru.attendances.index', ['class_id' => $meeting->class_id, 'subject_id' => $meeting->subject_id]) : route('guru.attendances.index') }}">Batal</a>
                 </div>
             </div>
 

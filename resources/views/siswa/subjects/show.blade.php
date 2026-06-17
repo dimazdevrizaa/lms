@@ -3,15 +3,19 @@
 @section('title', 'Daftar Pertemuan')
 
 @section('content')
-    <div class="mb-5">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-2">
-                <li class="breadcrumb-item"><a href="{{ route('siswa.subjects.index') }}" style="color: #48A111;">Mata Pelajaran</a></li>
-                <li class="breadcrumb-item active">{{ $subject->name }}</li>
-            </ol>
-        </nav>
-        <h1 class="h3 mb-1">🗓️ Daftar Pertemuan: {{ $subject->name }}</h1>
-        <p class="text-muted">Pilih pertemuan untuk melihat materi dan tugas hari ini</p>
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <a href="{{ route('siswa.subjects.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+        <div>
+            <nav aria-label="breadcrumb" class="mb-1">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ route('siswa.subjects.index') }}" style="color: #48A111;">Mata Pelajaran</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $subject->name }}</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0">🗓️ Daftar Pertemuan: {{ $subject->name }}</h1>
+        </div>
     </div>
 
     <div class="row">

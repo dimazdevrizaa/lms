@@ -6,11 +6,11 @@
     <!-- Header -->
     <div class="d-flex align-items-center justify-content-between mb-5">
         <div>
-            <h1 class="h3 mb-2">🏫 Ruang Kelas Saya</h1>
-            <p class="text-muted mb-0">Kelola materi, tugas, dan pertemuan berdasarkan Kelas & Mata Pelajaran</p>
+            <h1 class="h3 mb-2">📅 Pertemuan Kelas</h1>
+            <p class="text-muted mb-0">Pilih kelas dan mata pelajaran untuk melihat atau membuat pertemuan</p>
         </div>
         <a class="btn btn-sm" style="background-color: #48A111; color: white; border: none; box-shadow: 0 2px 8px rgba(72,161,17, 0.2);" href="{{ route('guru.meetings.create') }}">
-            <i class="fas fa-plus me-2"></i> Buat Ruang Kelas Baru
+            <i class="fas fa-plus me-2"></i> Buat Pertemuan Baru
         </a>
     </div>
 
@@ -18,9 +18,9 @@
         <div class="card text-center py-5 border-0 shadow-sm">
             <div class="card-body">
                 <i class="fas fa-chalkboard-teacher fa-4x mb-4 text-light"></i>
-                <h5 class="mb-3">📭 Belum ada data pembelajaran</h5>
-                <p class="text-muted mb-4">Anda belum memiliki pertemuan atau materi yang dibagikan.</p>
-                <a href="{{ route('guru.meetings.create') }}" class="btn btn-primary" style="background-color: #48A111; border: none;">Mulai Sesi Pembelajaran</a>
+                <h5 class="mb-3">📭 Belum ada pertemuan</h5>
+                <p class="text-muted mb-4">Anda belum membuat pertemuan kelas. Klik tombol di bawah untuk memulai.</p>
+                <a href="{{ route('guru.meetings.create') }}" class="btn btn-primary" style="background-color: #48A111; border: none;">Buat Pertemuan Pertama</a>
             </div>
         </div>
     @else

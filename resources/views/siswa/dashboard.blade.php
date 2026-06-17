@@ -123,6 +123,22 @@
                 </div>
             </div>
 
+            @if(Auth::user()->student)
+                <!-- Parent Access Code Card -->
+                <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #eef9ec, #dcfce7); border-left: 5px solid #25671E !important;">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-2" style="color: #25671E;"><i class="fas fa-user-shield me-2"></i> Akses Orang Tua</h6>
+                        <p class="small text-muted mb-3">Berikan kode atau link ini kepada orang tua Anda agar mereka dapat memantau kehadiran, nilai, dan perilaku Anda.</p>
+                        <div class="d-flex align-items-center gap-2 mb-2 allow-copy">
+                            <code class="bg-white border px-3 py-2 rounded text-dark fw-bold fs-6 flex-grow-1 text-center" style="letter-spacing: 1px;">{{ Auth::user()->student->parent_code }}</code>
+                            <button class="btn btn-primary btn-sm px-3 py-2" id="copyParentLink" data-code="{{ Auth::user()->student->parent_code }}">
+                                <i class="fas fa-copy"></i> Salin Kode
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Jadwal Section -->
             <div class="card">
                 <div class="card-body">
@@ -146,4 +162,22 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyBtn = document.getElementById('copyParentLink');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('Kode akses orang tua berhasil disalin: ' + code);
+                }).catch(err => {
+                    console.error('Gagal menyalin kode: ', err);
+                });
+            });
+        }
+    });
+</script>
+@endpush
 

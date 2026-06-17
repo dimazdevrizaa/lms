@@ -4,9 +4,14 @@
 
 @section('content')
     <!-- Header -->
-    <div class="mb-5">
-        <h1 class="h3 mb-2">➕ Tambah Mata Pelajaran Baru</h1>
-        <p class="text-muted mb-0">Daftarkan mata pelajaran baru ke dalam sistem</p>
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <a href="{{ route('admin.subjects.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+        <div>
+            <h1 class="h3 mb-1">➕ Tambah Mata Pelajaran Baru</h1>
+            <p class="text-muted mb-0">Daftarkan mata pelajaran baru ke dalam sistem</p>
+        </div>
     </div>
 
     <div class="row">

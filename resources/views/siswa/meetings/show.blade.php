@@ -11,7 +11,10 @@
                 <li class="breadcrumb-item active">Pertemuan {{ $meeting->number }}</li>
             </ol>
         </nav>
-        <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ route('siswa.subjects.show', $meeting->subject_id) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
             <div>
                 <span class="badge mb-2" style="background-color: #48A111; padding: 8px 15px;">Pertemuan ke-{{ $meeting->number }}</span>
                 <h1 class="h3 mb-1">{{ $meeting->title }}</h1>
@@ -20,9 +23,6 @@
                     <span><i class="fas fa-calendar-alt me-1"></i> {{ \Carbon\Carbon::parse($meeting->date)->format('d M Y') }}</span>
                 </div>
             </div>
-            <a href="{{ route('siswa.subjects.show', $meeting->subject_id) }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Kembali
-            </a>
         </div>
     </div>
 

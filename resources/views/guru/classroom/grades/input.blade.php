@@ -3,12 +3,14 @@
 @section('title', 'Input Nilai - ' . $class->name)
 
 @section('content')
-    <div class="mb-5">
-        <a href="{{ route('guru.classroom.grades', $class) }}" class="text-decoration-none text-muted small">
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <a href="{{ route('guru.classroom.grades', $class) }}" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
-        <h1 class="h3 mb-2 mt-2">📋 Input Nilai Siswa - {{ $class->name }}</h1>
-        <p class="text-muted mb-0">Masukkan nilai siswa untuk berbagai penilaian</p>
+        <div>
+            <h1 class="h3 mb-1">📋 Input Nilai Siswa - {{ $class->name }}</h1>
+            <p class="text-muted mb-0">Masukkan nilai siswa untuk berbagai penilaian</p>
+        </div>
     </div>
 
     <div class="row">

@@ -22,3 +22,33 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# ============================================
+# File dokumen skripsi & debug (bukan bagian LMS)
+# ============================================
+
+# File debug/test PHP
+check_data.php
+test_*.php
+verify_users.php
+
+# File Python helper skripsi
+generate_*.py
+search_*.py
+read_*.py
+
+# Output file helper
+docx_output.txt
+pdf_output.txt
+skipsi.txt
+audit.txt
+
+# Dokumen skripsi
+*.docx
+*.drawio
+lampiran_output/
+backup_presentasi/
+
+# File PDF besar di public
+/public/sumber*.pdf
+/public/presentasi.zip

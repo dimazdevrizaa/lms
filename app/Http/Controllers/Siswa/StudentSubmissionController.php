@@ -7,6 +7,7 @@ use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\QuestionAnswer;
 use App\Models\Student;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -70,6 +71,11 @@ class StudentSubmissionController extends Controller
     public function store(Request $request, Assignment $assignment): RedirectResponse
     {
         $student = Student::where('user_id', Auth::id())->firstOrFail();
+
+        // Enforce deadline — tolak submission jika deadline sudah lewat
+        if ($assignment->due_at && Carbon::parse($assignment->due_at)->isPast()) {
+            return back()->withErrors(['general' => 'Batas waktu pengumpulan tugas ini sudah lewat. Anda tidak dapat mengumpulkan tugas lagi.']);
+        }
 
         if ($assignment->isOnline()) {
             return $this->storeOnline($request, $assignment, $student);

@@ -5,18 +5,21 @@
 @section('content')
 <div class="schedule-editor-page">
     <!-- Header -->
+    <!-- Header -->
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-        <div>
-            <a href="{{ route('tatausaha.schedules.index', ['academic_year_id' => $selectedYearId]) }}" class="text-decoration-none small text-muted">
-                <i class="fas fa-arrow-left me-1"></i> Kembali ke Daftar Kelas
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ route('tatausaha.schedules.index', ['academic_year_id' => $selectedYearId]) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Kembali
             </a>
-            <h1 class="h3 mb-1 mt-2">📅 Jadwal Kelas {{ $schoolClass->name }}</h1>
-            <p class="text-muted mb-0">
-                @if($schoolClass->major)
-                    <span class="badge" style="background-color: #48A111; font-size: 0.7rem;">{{ $schoolClass->major }}</span>
-                @endif
-                Susun jadwal mingguan untuk kelas ini
-            </p>
+            <div>
+                <h1 class="h3 mb-1">📅 Jadwal Kelas {{ $schoolClass->name }}</h1>
+                <p class="text-muted mb-0">
+                    @if($schoolClass->major)
+                        <span class="badge" style="background-color: #48A111; font-size: 0.7rem;">{{ $schoolClass->major }}</span>
+                    @endif
+                    Susun jadwal mingguan untuk kelas ini
+                </p>
+            </div>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ route('tatausaha.schedules.print', ['academic_year_id' => $selectedYearId, 'class_id' => $schoolClass->id]) }}" 
@@ -118,10 +121,7 @@
         </div>
 
         <!-- Tombol Simpan -->
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            <a href="{{ route('tatausaha.schedules.index', ['academic_year_id' => $selectedYearId]) }}" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Kembali
-            </a>
+        <div class="d-flex justify-content-end align-items-center mt-4">
             <button type="submit" class="btn btn-lg shadow-sm" style="background: linear-gradient(135deg, #25671E, #48A111); color: white; border: none; border-radius: 12px; padding: 12px 40px;">
                 <i class="fas fa-save me-2"></i> Simpan Jadwal
             </button>

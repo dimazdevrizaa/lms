@@ -3,7 +3,12 @@
 @section('title', 'Edit User')
 
 @section('content')
-    <h1 class="h3 mb-3">Edit User</h1>
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+        <h1 class="h3 mb-0">Edit User</h1>
+    </div>
 
     <div class="card">
         <div class="card-body">
@@ -63,7 +68,6 @@
 
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary" type="submit">Update</button>
-                    <a class="btn btn-outline-secondary" href="{{ route('admin.users.index') }}">Kembali</a>
                 </div>
             </form>
         </div>

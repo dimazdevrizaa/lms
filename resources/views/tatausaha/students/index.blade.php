@@ -48,6 +48,7 @@
                     <th>Nama</th>
                     <th>Jurusan</th>
                     <th>Kelas</th>
+                    <th>Kode Akses Ortu</th>
                     <th class="text-end">Aksi</th>
                 </tr>
                 </thead>
@@ -62,6 +63,17 @@
                             </span>
                         </td>
                         <td>{{ $student->schoolClass?->name ?? '-' }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2 allow-copy">
+                                <code class="bg-light px-2 py-1 rounded text-dark" style="font-size: 0.85rem;">{{ $student->parent_code }}</code>
+                                <button class="btn btn-sm p-0 border-0 text-success copy-btn" data-code="{{ $student->parent_code }}" title="Salin Kode Ortu">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <a href="{{ route('parent.view', $student->parent_code) }}" target="_blank" class="btn btn-sm p-0 border-0 text-primary" title="Buka Halaman Pemantauan">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </td>
                         <td class="text-end">
                             <div class="d-flex justify-content-end gap-1">
                                 <a href="{{ route('tatausaha.students.edit', $student) }}" class="btn btn-sm btn-outline-primary">
@@ -91,4 +103,21 @@
         {{ $students->links() }}
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('Kode akses orang tua berhasil disalin: ' + code);
+                }).catch(err => {
+                    console.error('Gagal menyalin kode: ', err);
+                });
+            });
+        });
+    });
+</script>
+@endpush
 

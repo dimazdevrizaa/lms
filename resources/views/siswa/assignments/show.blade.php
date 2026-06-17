@@ -12,6 +12,10 @@
             <h1 class="h3 mb-0">{{ $submission ? '📊 Hasil Tugas' : '📝 Kerjakan Tugas' }}</h1>
         </div>
 
+        @php
+            $isDeadlinePassed = $assignment->due_at && \Carbon\Carbon::parse($assignment->due_at)->isPast();
+        @endphp
+
         <div class="card bg-light border-0">
             <div class="card-body p-4">
                 <h4 style="color: #25671E; font-weight: 700;">{{ $assignment->title }}</h4>
@@ -23,7 +27,14 @@
                     <span class="text-muted small"><i class="fas fa-list-ol me-1"></i> {{ $assignment->questions->count() }} soal</span>
                     <span class="text-muted small"><i class="fas fa-star me-1"></i> {{ $assignment->questions->sum('points') }} total poin</span>
                     @if($assignment->due_at)
-                        <span class="text-muted small"><i class="fas fa-clock me-1"></i> Deadline: {{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}</span>
+                        <span class="small {{ $isDeadlinePassed ? 'text-danger fw-bold' : 'text-muted' }}">
+                            <i class="fas fa-clock me-1"></i> Deadline: {{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}
+                            @if($isDeadlinePassed)
+                                <span class="badge bg-danger ms-1">Terlewat</span>
+                            @else
+                                ({{ \Carbon\Carbon::parse($assignment->due_at)->diffForHumans() }})
+                            @endif
+                        </span>
                     @endif
                 </div>
             </div>
@@ -122,6 +133,19 @@
                 </div>
             </div>
         @endforeach
+    @elseif($isDeadlinePassed)
+        {{-- Deadline passed and not submitted --}}
+        <div class="card mb-4" style="border-top: 4px solid #dc3545;">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-lock fa-3x text-danger mb-3"></i>
+                <h5 class="text-danger">⛔ Deadline Terlewat</h5>
+                <p class="text-muted mb-0">
+                    Batas waktu pengumpulan tugas ini sudah lewat pada 
+                    <strong>{{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}</strong>.<br>
+                    Anda tidak dapat mengerjakan tugas ini lagi.
+                </p>
+            </div>
+        </div>
     @else
         {{-- Not yet submitted: show answer form --}}
         <form method="POST" action="{{ route('siswa.assignments.submit', $assignment) }}" id="quizForm">

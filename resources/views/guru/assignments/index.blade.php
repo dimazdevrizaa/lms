@@ -14,6 +14,25 @@
         </a>
     </div>
 
+    <!-- Filter Kelas -->
+    @if(isset($teacherClasses) && $teacherClasses->count() > 0)
+        <div class="d-flex gap-2 mb-4 flex-wrap align-items-center">
+            <span class="text-muted small fw-bold me-1"><i class="fas fa-filter me-1"></i>Kelas:</span>
+            <a href="{{ route('guru.assignments.index') }}" 
+               class="btn btn-sm {{ !$selectedClassId ? 'text-white' : 'btn-outline-secondary' }}"
+               style="{{ !$selectedClassId ? 'background-color: #25671E; border-color: #25671E;' : '' }}">
+                Semua Kelas
+            </a>
+            @foreach($teacherClasses as $cls)
+                <a href="{{ route('guru.assignments.index', ['class_id' => $cls->id]) }}" 
+                   class="btn btn-sm {{ $selectedClassId == $cls->id ? 'text-white' : 'btn-outline-secondary' }}"
+                   style="{{ $selectedClassId == $cls->id ? 'background-color: #25671E; border-color: #25671E;' : '' }}">
+                    {{ $cls->name }}
+                </a>
+            @endforeach
+        </div>
+    @endif
+
     @if($assignments->isEmpty())
         <div class="card text-center py-5 border-0 shadow-sm">
             <div class="card-body">

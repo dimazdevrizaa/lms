@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
             <h1 class="mb-2">👨‍🏫 Selamat Datang, {{ Auth::user()->name }}</h1>
-            <p class="text-muted mb-0">Kelola materi dan tugas pembelajaran Anda</p>
+            <p class="text-muted mb-0">Berikut ringkasan kegiatan mengajar Anda</p>
         </div>
         <div class="text-muted small">
             {{ date('l, d F Y') }}
@@ -16,51 +16,51 @@
 
     <!-- Metrics Section -->
     <div class="row mb-5">
-        <!-- Materi Upload -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <h5 class="card-title">📚 Materi Upload</h5>
-                    <p class="h3 mb-0" style="color: #25671E; font-weight: 700;">{{ $materialsCount ?? 0 }}</p>
-                    <small class="text-muted">Materi pembelajaran aktif</small>
+        <!-- Pertemuan -->
+        <div class="col-md-3 col-6 mb-4">
+            <div class="card h-100 position-relative shadow-sm" style="border-top: 4px solid #25671E !important;">
+                <div class="card-body text-center py-4">
+                    <div class="mb-2"><i class="fas fa-calendar-alt fa-2x" style="color: #25671E; opacity: 0.6;"></i></div>
+                    <p class="display-5 fw-bold mb-1" style="color: #25671E;">{{ $meetingsCount ?? 0 }}</p>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Pertemuan</small>
                 </div>
                 <a href="{{ route('guru.meetings.index') }}" class="stretched-link"></a>
+            </div>
+        </div>
+
+        <!-- Materi Upload -->
+        <div class="col-md-3 col-6 mb-4">
+            <div class="card h-100 position-relative shadow-sm" style="border-top: 4px solid #48A111 !important;">
+                <div class="card-body text-center py-4">
+                    <div class="mb-2"><i class="fas fa-book fa-2x" style="color: #48A111; opacity: 0.6;"></i></div>
+                    <p class="display-5 fw-bold mb-1" style="color: #48A111;">{{ $materialsCount ?? 0 }}</p>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Materi Ajar</small>
+                </div>
+                <a href="{{ route('guru.materials.index') }}" class="stretched-link"></a>
             </div>
         </div>
 
         <!-- Tugas Aktif -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <h5 class="card-title">📋 Tugas Aktif</h5>
-                    <p class="h3 mb-0" style="color: #48A111; font-weight: 700;">{{ $assignmentsCount ?? 0 }}</p>
-                    <small class="text-muted">Total tugas dibuat</small>
+        <div class="col-md-3 col-6 mb-4">
+            <div class="card h-100 position-relative shadow-sm" style="border-top: 4px solid #F2B50B !important;">
+                <div class="card-body text-center py-4">
+                    <div class="mb-2"><i class="fas fa-file-alt fa-2x" style="color: #F2B50B; opacity: 0.6;"></i></div>
+                    <p class="display-5 fw-bold mb-1" style="color: #F2B50B;">{{ $assignmentsCount ?? 0 }}</p>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Tugas & Latihan</small>
                 </div>
-                <a href="{{ route('guru.meetings.index') }}" class="stretched-link"></a>
+                <a href="{{ route('guru.assignments.index') }}" class="stretched-link"></a>
             </div>
         </div>
 
-        <!-- Pengumpulan Tugas -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <h5 class="card-title">✅ Pengumpulan</h5>
-                    <p class="h3 mb-0" style="color: #F2B50B; font-weight: 700;">{{ $submissionsCount ?? 0 }}</p>
-                    <small class="text-muted">Total pengumpulan siswa</small>
+        <!-- Pending Koreksi -->
+        <div class="col-md-3 col-6 mb-4">
+            <div class="card h-100 position-relative shadow-sm" style="border-top: 4px solid {{ $pendingGradesCount > 0 ? '#dc3545' : '#48A111' }} !important;">
+                <div class="card-body text-center py-4">
+                    <div class="mb-2"><i class="fas fa-check-double fa-2x" style="color: {{ $pendingGradesCount > 0 ? '#dc3545' : '#48A111' }}; opacity: 0.6;"></i></div>
+                    <p class="display-5 fw-bold mb-1" style="color: {{ $pendingGradesCount > 0 ? '#dc3545' : '#48A111' }};">{{ $pendingGradesCount ?? 0 }}</p>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Belum Dinilai</small>
                 </div>
-                <a href="{{ route('guru.meetings.index') }}" class="stretched-link"></a>
-            </div>
-        </div>
-
-        <!-- Koreksi Pending -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <h5 class="card-title">⏳ Pending Koreksi</h5>
-                    <p class="h3 mb-0" style="color: #25671E; font-weight: 700;">{{ $pendingGradesCount ?? 0 }}</p>
-                    <small class="text-muted">Tugas menunggu penilaian</small>
-                </div>
-                <a href="{{ route('guru.meetings.index') }}" class="stretched-link"></a>
+                <a href="{{ route('guru.assignments.grading', ['filter' => 'pending']) }}" class="stretched-link"></a>
             </div>
         </div>
     </div>
@@ -142,7 +142,7 @@
                         @empty
                             <div class="py-4 text-center text-muted">
                                 <p>Belum ada kelas yang diampu.</p>
-                                <small>Gunakan menu Wali Kelas jika Anda ditunjuk sebagai Wali Kelas.</small>
+                                <small>Hubungi Tata Usaha untuk pendataan penugasan mengajar.</small>
                             </div>
                         @endforelse
                     </div>
@@ -150,42 +150,82 @@
             </div>
         </div>
 
-        <!-- Quick Actions Section -->
+        <!-- Right Column: Quick Actions + Tugas Perlu Dinilai -->
         <div class="col-md-5 mb-4">
-            <div class="card mb-4">
+            <!-- Aksi Cepat -->
+            <div class="card mb-4 border-0 shadow-sm" style="border-radius: 16px;">
                 <div class="card-body">
-                    <h5 class="card-title mb-4">⚡ Aksi Cepat</h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        @if(auth()->user()->teacher && auth()->user()->teacher->homeroomClasses()->count() > 0)
-                            <a href="{{ route('guru.classroom.index') }}" class="btn btn-sm btn-outline-info">📚 Kelola Kelas (Wali Kelas)</a>
+                    <h5 class="card-title fw-bold mb-4">⚡ Aksi Cepat</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('guru.meetings.create') }}" class="btn btn-outline-primary text-start py-3 px-4" style="border-radius: 12px;">
+                            <i class="fas fa-calendar-plus me-2"></i> Buat Pertemuan Baru
+                        </a>
+                        <a href="{{ route('guru.materials.create') }}" class="btn btn-outline-success text-start py-3 px-4" style="border-radius: 12px;">
+                            <i class="fas fa-upload me-2"></i> Upload Materi Ajar
+                        </a>
+                        <a href="{{ route('guru.assignments.create') }}" class="btn btn-outline-warning text-start py-3 px-4" style="border-radius: 12px;">
+                            <i class="fas fa-plus-circle me-2"></i> Buat Tugas / Latihan
+                        </a>
+                        @if($pendingGradesCount > 0)
+                            <a href="{{ route('guru.assignments.grading', ['filter' => 'pending']) }}" class="btn btn-danger text-start py-3 px-4" style="border-radius: 12px;">
+                                <i class="fas fa-check-double me-2"></i> Nilai Tugas Siswa
+                                <span class="badge bg-white text-danger ms-2">{{ $pendingGradesCount }} menunggu</span>
+                            </a>
+                        @else
+                            <a href="{{ route('guru.assignments.grading') }}" class="btn btn-outline-secondary text-start py-3 px-4" style="border-radius: 12px;">
+                                <i class="fas fa-check-double me-2"></i> Lihat Penilaian
+                            </a>
                         @endif
-                        <a href="{{ route('guru.meetings.index') }}" class="btn btn-sm btn-outline-primary">📚 Ruang Kelas (Materi & Tugas)</a>
-                        <a href="{{ route('guru.attendances.index') }}" class="btn btn-sm btn-outline-warning">✅ Catat Kehadiran</a>
+                        <a href="{{ route('guru.attendances.index') }}" class="btn btn-outline-info text-start py-3 px-4" style="border-radius: 12px;">
+                            <i class="fas fa-clipboard-check me-2"></i> Catat Kehadiran Siswa
+                        </a>
+                        @if(auth()->user()->teacher && auth()->user()->teacher->homeroomClasses()->count() > 0)
+                            <a href="{{ route('guru.classroom.index') }}" class="btn btn-outline-dark text-start py-3 px-4" style="border-radius: 12px;">
+                                <i class="fas fa-users me-2"></i> Kelola Kelas Perwalian
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>
 
-            <!-- Notifikasi Section -->
-            <div class="card">
+            <!-- Tugas Terbaru yang Perlu Dinilai -->
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">🔔 Notifikasi</h5>
-                    <div class="small">
-                        <div class="mb-3 pb-3 border-bottom">
-                            <span class="badge" style="background-color: #48A111;">Baru</span>
-                            <p class="mb-0 mt-2">5 siswa belum mengumpulkan tugas</p>
-                        </div>
-                        <div class="mb-3 pb-3 border-bottom">
-                            <span class="badge" style="background-color: #F2B50B;">Info</span>
-                            <p class="mb-0 mt-2">Jadwal penilaian UTS 10 Maret</p>
-                        </div>
-                        <div>
-                            <span class="badge" style="background-color: #25671E;">Reminder</span>
-                            <p class="mb-0 mt-2">Masukan nilai untuk tugas minggu lalu</p>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title fw-bold mb-0">📬 Perlu Dinilai</h5>
+                        @if($pendingGradesCount > 0)
+                            <a href="{{ route('guru.assignments.grading', ['filter' => 'pending']) }}" class="small text-decoration-none" style="color: #48A111;">
+                                Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        @endif
                     </div>
+                    @if($recentPendingAssignments->isEmpty())
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-3x mb-3" style="color: #48A111; opacity: 0.3;"></i>
+                            <p class="text-muted mb-0">Semua tugas sudah dinilai! 🎉</p>
+                        </div>
+                    @else
+                        @foreach($recentPendingAssignments as $assignment)
+                            @php
+                                $ungradedCount = $assignment->submissions->whereNull('score')->count();
+                            @endphp
+                            <a href="{{ route('guru.assignments.show', $assignment) }}" class="d-block text-decoration-none mb-3 p-3 rounded-3 border" style="transition: all 0.2s; background: #fafafa;">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 fw-bold" style="color: #25671E; font-size: 0.9rem;">{{ $assignment->title }}</h6>
+                                        <div class="d-flex gap-2 small text-muted">
+                                            <span>{{ $assignment->schoolClass?->name ?? '-' }}</span>
+                                            <span>•</span>
+                                            <span>{{ $assignment->subject?->name ?? '-' }}</span>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 0.7rem;">{{ $ungradedCount }} belum dinilai</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 @endsection
-

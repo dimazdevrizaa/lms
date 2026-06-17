@@ -6,7 +6,7 @@
     <!-- Header -->
     <div class="mb-5">
         <div class="d-flex align-items-center gap-3 mb-3">
-            <a href="{{ $assignment->meeting_id ? route('guru.meetings.show', $assignment->meeting_id) : route('guru.meetings.index') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ route('guru.assignments.index') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
             <h1 class="h3 mb-0">📋 Detail Tugas & Pengumpulan</h1>

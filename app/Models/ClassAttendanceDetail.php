@@ -19,7 +19,7 @@ class ClassAttendanceDetail extends Model
 
     public function attendance(): BelongsTo
     {
-        return $this->belongsTo(ClassAttendance::class);
+        return $this->belongsTo(ClassAttendance::class, 'class_attendance_id');
     }
 
     public function student(): BelongsTo

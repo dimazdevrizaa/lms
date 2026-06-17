@@ -29,6 +29,8 @@
             @forelse($assignments as $assignment)
                 @php
                     $isSubmitted = in_array($assignment->id, $submittedIds ?? []);
+                    $isDeadlinePassed = $assignment->due_at && \Carbon\Carbon::parse($assignment->due_at)->isPast();
+                    $isDeadlineSoon = $assignment->due_at && !$isDeadlinePassed && \Carbon\Carbon::parse($assignment->due_at)->diffInHours(now()) <= 24;
                 @endphp
                 <div class="col-md-6 mb-4">
                     <div class="card h-100" style="border-top: 4px solid {{ $assignment->isOnline() ? '#0d6efd' : '#25671E' }};">
@@ -45,13 +47,17 @@
                                         @endif
                                         @if($isSubmitted)
                                             <span class="badge bg-success"><i class="fas fa-check me-1"></i>Sudah Dikumpulkan</span>
+                                        @elseif($isDeadlinePassed)
+                                            <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Tidak Dikumpulkan</span>
                                         @endif
                                     </div>
                                 </div>
-                                @if($assignment->due_at && \Carbon\Carbon::parse($assignment->due_at)->isFuture())
+                                @if(!$assignment->due_at)
+                                    <span class="badge" style="background-color: #48A111;">✓ Aktif</span>
+                                @elseif(!$isDeadlinePassed)
                                     <span class="badge" style="background-color: #48A111;">✓ Aktif</span>
                                 @else
-                                    <span class="badge" style="background-color: #F2B50B;">⊘ Ditutup</span>
+                                    <span class="badge bg-danger">⊘ Ditutup</span>
                                 @endif
                             </div>
 
@@ -60,10 +66,19 @@
 
                             <!-- Deadline -->
                             @if($assignment->due_at)
-                                <div class="alert alert-light border-left-4" style="border-left-color: #25671E; padding: 10px; margin-bottom: 15px;">
+                                <div class="alert {{ $isDeadlinePassed ? 'alert-danger' : ($isDeadlineSoon ? 'alert-warning' : 'alert-light') }} border-0" style="padding: 10px; margin-bottom: 15px; border-left: 4px solid {{ $isDeadlinePassed ? '#dc3545' : ($isDeadlineSoon ? '#ffc107' : '#25671E') }} !important;">
                                     <small>
-                                        <strong>⏰ Deadline:</strong>
+                                        @if($isDeadlinePassed)
+                                            <strong>⛔ Deadline Terlewat:</strong>
+                                        @elseif($isDeadlineSoon)
+                                            <strong>⚠️ Deadline Segera:</strong>
+                                        @else
+                                            <strong>⏰ Deadline:</strong>
+                                        @endif
                                         {{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}
+                                        @if(!$isDeadlinePassed)
+                                            <br><span class="text-muted">({{ \Carbon\Carbon::parse($assignment->due_at)->diffForHumans() }})</span>
+                                        @endif
                                     </small>
                                 </div>
                             @endif
@@ -75,6 +90,10 @@
                                         <a href="{{ route('siswa.assignments.show', $assignment) }}" class="btn w-100" style="background-color: #25671E; color: white; border: none;">
                                             <i class="fas fa-chart-bar me-1"></i> Lihat Hasil
                                         </a>
+                                    @elseif($isDeadlinePassed)
+                                        <button class="btn w-100 btn-secondary" disabled>
+                                            <i class="fas fa-lock me-1"></i> Deadline Terlewat
+                                        </button>
                                     @else
                                         <a href="{{ route('siswa.assignments.show', $assignment) }}" class="btn w-100" style="background-color: #0d6efd; color: white; border: none;">
                                             <i class="fas fa-pen me-1"></i> Kerjakan Online
@@ -90,18 +109,24 @@
                                         </div>
                                     @endif
 
-                                    <form method="POST" action="{{ route('siswa.assignments.submit', $assignment) }}" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Jawaban Teks (Opsional)</label>
-                                            <textarea class="form-control" name="answer_text" placeholder="Ketik jawaban Anda di sini..." rows="2" style="border-color: #25671E;"></textarea>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">Upload PDF (Opsional)</label>
-                                            <input type="file" class="form-control form-control-sm" name="file" accept=".pdf" style="border-color: #25671E;">
-                                        </div>
-                                        <button class="btn w-100" style="background-color: #48A111; color: white; border: none;" type="submit">✓ Kirim Tugas</button>
-                                    </form>
+                                    @if($isDeadlinePassed && !$isSubmitted)
+                                        <button class="btn w-100 btn-secondary" disabled>
+                                            <i class="fas fa-lock me-1"></i> Deadline Terlewat — Tidak Bisa Mengumpulkan
+                                        </button>
+                                    @else
+                                        <form method="POST" action="{{ route('siswa.assignments.submit', $assignment) }}" enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Jawaban Teks (Opsional)</label>
+                                                <textarea class="form-control" name="answer_text" placeholder="Ketik jawaban Anda di sini..." rows="2" style="border-color: #25671E;"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold">Upload PDF (Opsional)</label>
+                                                <input type="file" class="form-control form-control-sm" name="file" accept=".pdf" style="border-color: #25671E;">
+                                            </div>
+                                            <button class="btn w-100" style="background-color: #48A111; color: white; border: none;" type="submit">✓ Kirim Tugas</button>
+                                        </form>
+                                    @endif
                                 @endif
                             @else
                                 <div class="alert alert-info small mb-0">

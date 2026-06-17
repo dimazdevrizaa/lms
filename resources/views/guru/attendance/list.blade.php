@@ -6,16 +6,20 @@
     <!-- Header -->
     <div class="mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-2">
-                        <li class="breadcrumb-item"><a href="{{ route('guru.attendances.index') }}" style="color: #48A111;">Riwayat Mapel</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ $currentClass->name }}</li>
-                    </ol>
-                </nav>
-                <h1 class="h3 mb-0">📜 Riwayat Presensi: {{ $currentClass->name }}</h1>
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('guru.attendances.index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <div>
+                    <nav aria-label="breadcrumb" class="mb-0">
+                        <ol class="breadcrumb mb-1">
+                            <li class="breadcrumb-item"><a href="{{ route('guru.attendances.index') }}" style="color: #48A111;">Riwayat Mapel</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ $currentClass->name }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">📜 Riwayat Presensi: {{ $currentClass->name }}</h1>
+                </div>
             </div>
-            <a href="{{ route('guru.attendances.index') }}" class="btn btn-outline-secondary">Kembali</a>
         </div>
         <p class="text-muted"><i class="fas fa-book me-1"></i> Mata Pelajaran: {{ $currentSubject->name }}</p>
     </div>

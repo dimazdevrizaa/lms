@@ -75,4 +75,13 @@
             <button type="submit" class="btn-login">
                 {{ __('Login') }}
             </button>
+        </div>
+    </form>
+
+    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #E5E7EB; text-align: center;">
+        <p style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.75rem;">Apakah Anda Orang Tua Siswa?</p>
+        <a href="{{ route('parent.index') }}" class="btn-login" style="background-color: #F2B50B; color: #25671E; width: 100%; justify-content: center; text-decoration: none; display: inline-flex; border: 1px solid #e5b004; font-weight: 600;">
+            🔑 Pantau Aktivitas Anak (Orang Tua)
+        </a>
+    </div>
 </x-guest-layout>

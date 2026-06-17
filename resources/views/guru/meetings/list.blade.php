@@ -10,14 +10,14 @@
                 <li class="breadcrumb-item active">{{ $currentClass->name }} - {{ $currentSubject->name }}</li>
             </ol>
         </nav>
-        <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <a class="btn btn-outline-secondary btn-sm" href="{{ route('guru.meetings.index') }}">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
             <div>
-                <h1 class="h3 mb-2">🗓️ Daftar Pertemuan: {{ $currentClass->name }}</h1>
+                <h1 class="h3 mb-0">🗓️ Daftar Pertemuan: {{ $currentClass->name }}</h1>
                 <p class="text-muted mb-0">Kelola semua pertemuan untuk mata pelajaran **{{ $currentSubject->name }}**</p>
             </div>
-            <a class="btn btn-outline-secondary" href="{{ route('guru.meetings.index') }}">
-                <i class="fas fa-arrow-left me-1"></i> Kembali
-            </a>
         </div>
     </div>
 

@@ -96,6 +96,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [MaterialController::class, 'dashboard'])->name('dashboard');
         Route::resource('materials', MaterialController::class);
         Route::resource('meetings', MeetingController::class);
+        Route::get('assignments/grading', [AssignmentController::class, 'grading'])->name('assignments.grading');
         Route::resource('assignments', AssignmentController::class);
         Route::post('assignments/answers/{answer}/grade', [AssignmentController::class, 'gradeQuestion'])->name('assignments.grade-question');
         Route::post('assignments/submissions/{submission}/grade', [AssignmentController::class, 'gradeSubmission'])->name('assignments.grade-submission');
@@ -140,6 +141,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/assignments/{assignment}/submit', [StudentSubmissionController::class, 'store'])->name('assignments.submit');
         Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('attendance.index');
     });
+});
+
+// PARENT MONITORING PORTAL
+Route::prefix('ortu')->name('parent.')->group(function () {
+    Route::get('/', [App\Http\Controllers\ParentController::class, 'index'])->name('index');
+    Route::post('/access', [App\Http\Controllers\ParentController::class, 'access'])->middleware('throttle:5,1')->name('access');
+    Route::get('/dashboard', [App\Http\Controllers\ParentController::class, 'dashboard'])->name('dashboard');
+    Route::get('/view/{code}', [App\Http\Controllers\ParentController::class, 'viewDirect'])->middleware('throttle:10,1')->name('view');
+    Route::post('/logout', [App\Http\Controllers\ParentController::class, 'logout'])->name('logout');
 });
 
 require __DIR__.'/auth.php';

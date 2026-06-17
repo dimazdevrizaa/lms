@@ -6,17 +6,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'user_id',
         'nis',
         'phone',
         'class_id',
+        'parent_code',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($student) {
+            if (empty($student->parent_code)) {
+                do {
+                    // 10 karakter alfanumerik acak — lebih aman dari brute force
+                    $code = 'ORTU-' . strtoupper(\Illuminate\Support\Str::random(10));
+                } while (static::where('parent_code', $code)->exists());
+                $student->parent_code = $code;
+            }
+        });
+    }
 
     public function user(): BelongsTo
     {

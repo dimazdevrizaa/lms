@@ -3,14 +3,14 @@
 @section('title', 'Detail Kehadiran')
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-5">
-        <div>
-            <h1 class="h3 mb-2">🔍 Detail Kehadiran</h1>
-            <p class="text-muted mb-0">Informasi lengkap kehadiran siswa pada sesi ini</p>
-        </div>
-        <a class="btn btn-outline-secondary" href="{{ route('guru.attendances.index') }}">
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <a class="btn btn-outline-secondary btn-sm" href="{{ route('guru.attendances.index', ['class_id' => $attendance->class_id, 'subject_id' => $attendance->subject_id]) }}">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
+        <div>
+            <h1 class="h3 mb-0">🔍 Detail Kehadiran</h1>
+            <p class="text-muted mb-0">Informasi lengkap kehadiran siswa pada sesi ini</p>
+        </div>
     </div>
 
     <div class="row">

@@ -6,20 +6,24 @@
     <!-- Header -->
     <div class="mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-2">
-                        <li class="breadcrumb-item"><a href="{{ route('guru.meetings.index') }}" style="color: #48A111;">Pertemuan</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Detail</li>
-                    </ol>
-                </nav>
-                <h1 class="h3 mb-0">🗓️ Pertemuan ke-{{ $meeting->number }}: {{ $meeting->title }}</h1>
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ route('guru.meetings.index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <div>
+                    <nav aria-label="breadcrumb" class="mb-0">
+                        <ol class="breadcrumb mb-1">
+                            <li class="breadcrumb-item"><a href="{{ route('guru.meetings.index') }}" style="color: #48A111;">Pertemuan</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Detail</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">🗓️ Pertemuan ke-{{ $meeting->number }}: {{ $meeting->title }}</h1>
+                </div>
             </div>
             <div class="d-flex gap-2">
                 <a href="{{ route('guru.meetings.edit', $meeting) }}" class="btn btn-outline-primary">
                     <i class="fas fa-edit"></i> Edit
                 </a>
-                <a href="{{ route('guru.meetings.index') }}" class="btn btn-outline-secondary">Kembali</a>
             </div>
         </div>
         <div class="d-flex gap-3 text-muted">

@@ -23,14 +23,83 @@ use Illuminate\View\View;
 
 class AssignmentController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         abort_unless($teacherId, 403);
 
-        $assignments = Assignment::where('teacher_id', $teacherId)->latest()->paginate(20);
+        $query = Assignment::where('teacher_id', $teacherId)
+            ->with(['schoolClass', 'subject', 'meeting', 'submissions']);
 
-        return view('guru.assignments.index', compact('assignments'));
+        // Filter by class
+        if ($request->filled('class_id')) {
+            $query->where('class_id', $request->class_id);
+        }
+
+        $assignments = $query->latest()->paginate(20)->appends($request->query());
+
+        // Get teacher's classes for filter
+        $teacherClasses = SchoolClass::whereHas('assignments', function($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId);
+        })->orderBy('name')->get();
+
+        $selectedClassId = $request->class_id;
+
+        return view('guru.assignments.index', compact('assignments', 'teacherClasses', 'selectedClassId'));
+    }
+
+    public function grading(Request $request): View
+    {
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless($teacherId, 403);
+
+        $query = Assignment::where('teacher_id', $teacherId)
+            ->with(['submissions.student.user', 'schoolClass', 'subject'])
+            ->withCount('submissions');
+
+        // Filter by class
+        if ($request->filled('class_id')) {
+            $query->where('class_id', $request->class_id);
+        }
+
+        // Filter by grading status
+        $filter = $request->get('filter');
+        if ($filter === 'pending') {
+            $query->whereHas('submissions', function ($q) {
+                $q->whereNull('score');
+            });
+        } elseif ($filter === 'graded') {
+            $query->whereHas('submissions', function ($q) {
+                $q->whereNotNull('score');
+            })->whereDoesntHave('submissions', function ($q) {
+                $q->whereNull('score');
+            });
+        }
+
+        $assignments = $query->latest()->paginate(20)->appends($request->query());
+
+        // Summary stats (filtered by class too if selected)
+        $statsQuery = Assignment::where('teacher_id', $teacherId);
+        if ($request->filled('class_id')) {
+            $statsQuery->where('class_id', $request->class_id);
+        }
+        $allAssignments = $statsQuery->with('submissions')->get();
+        $totalAssignments = $allAssignments->count();
+        $totalSubmissions = $allAssignments->sum(fn($a) => $a->submissions->count());
+        $pendingGrading = $allAssignments->sum(fn($a) => $a->submissions->whereNull('score')->count());
+        $gradedSubmissions = $totalSubmissions - $pendingGrading;
+
+        // Get teacher's classes for filter
+        $teacherClasses = SchoolClass::whereHas('assignments', function($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId);
+        })->orderBy('name')->get();
+
+        $selectedClassId = $request->class_id;
+
+        return view('guru.assignments.grading', compact(
+            'assignments', 'totalAssignments', 'totalSubmissions', 'pendingGrading', 'gradedSubmissions',
+            'teacherClasses', 'selectedClassId'
+        ));
     }
 
     public function create(): View
@@ -137,12 +206,7 @@ class AssignmentController extends Controller
             return back()->withInput()->withErrors(['questions_json' => $e->getMessage()]);
         }
 
-        if ($data['meeting_id']) {
-            return redirect()->route('guru.meetings.show', $data['meeting_id'])
-                ->with('success', 'Tugas berhasil dibuat.');
-        }
-
-        return redirect()->route('guru.meetings.index')
+        return redirect()->route('guru.assignments.index')
             ->with('success', 'Tugas berhasil dibuat.');
     }
 
@@ -251,12 +315,7 @@ class AssignmentController extends Controller
             return back()->withInput()->withErrors(['questions_json' => $e->getMessage()]);
         }
 
-        if ($assignment->meeting_id) {
-            return redirect()->route('guru.meetings.show', $assignment->meeting_id)
-                ->with('success', 'Tugas berhasil diperbarui.');
-        }
-
-        return redirect()->route('guru.meetings.index')
+        return redirect()->route('guru.assignments.index')
             ->with('success', 'Tugas berhasil diperbarui.');
     }
 
@@ -280,12 +339,7 @@ class AssignmentController extends Controller
         $meetingId = $assignment->meeting_id;
         $assignment->delete();
 
-        if ($meetingId) {
-            return redirect()->route('guru.meetings.show', $meetingId)
-                ->with('success', 'Tugas berhasil dihapus.');
-        }
-
-        return redirect()->route('guru.meetings.index')
+        return redirect()->route('guru.assignments.index')
             ->with('success', 'Tugas berhasil dihapus.');
     }
 

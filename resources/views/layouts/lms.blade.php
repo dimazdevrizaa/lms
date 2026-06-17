@@ -256,6 +256,13 @@
             -ms-user-select: none;
         }
 
+        .allow-copy, .allow-copy * {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+        }
+
         h2, h3, h4, h5, h6 {
             color: var(--primary-color);
         }
@@ -379,6 +386,87 @@
         .fa-arrow-left, .fa-arrow-right, .fa-chevron-left, .fa-chevron-right {
             font-size: 0.875em !important;
         }
+
+        /* Shimmer effect for skeleton loading */
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .skeleton-wrapper {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Page Transition States */
+        body.page-loading .main-content > *:not(#skeleton-loader) {
+            display: none !important;
+        }
+
+        body.page-loading .skeleton-wrapper {
+            display: flex !important;
+        }
+
+        .skeleton-item {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: 8px;
+        }
+
+        /* Specific skeleton structures */
+        .skeleton-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        .skeleton-title {
+            width: 60%;
+            height: 32px;
+            margin-bottom: 0.5rem;
+        }
+
+        .skeleton-subtitle {
+            width: 35%;
+            height: 20px;
+        }
+
+        .skeleton-card {
+            height: 200px;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .skeleton-line {
+            height: 16px;
+            margin-bottom: 0.75rem;
+            border-radius: 4px;
+        }
+
+        .skeleton-line.w-80 { width: 80%; }
+        .skeleton-line.w-70 { width: 70%; }
+        .skeleton-line.w-90 { width: 90%; }
+        .skeleton-line.w-50 { width: 50%; }
+        .skeleton-line.w-30 { width: 30%; }
+
+        .skeleton-table-row {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -445,15 +533,30 @@
 
                 @elseif(auth()->user()->role === 'guru')
                     <li class="sidebar-header">Utama</li>
-                    <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}"><i class="fas fa-home"></i> Dashboard</a></li>
                     
-                    <li class="sidebar-header">Pembelajaran</li>
-                    <li><a href="{{ route('guru.meetings.index') }}" class="{{ request()->routeIs('guru.meetings.*') || request()->routeIs('guru.materials.*') || request()->routeIs('guru.assignments.*') ? 'active' : '' }}"><i class="fas fa-chalkboard-teacher"></i> Ruang Kelas (Materi & Tugas)</a></li>
-                    <li><a href="{{ route('guru.attendances.index') }}" class="{{ request()->routeIs('guru.attendances.*') ? 'active' : '' }}"><i class="fas fa-clipboard-list"></i> Absensi Mapel</a></li>
+                    <li class="sidebar-header">Kegiatan Mengajar</li>
+                    <li><a href="{{ route('guru.meetings.index') }}" class="{{ request()->routeIs('guru.meetings.*') ? 'active' : '' }}"><i class="fas fa-calendar-alt"></i> Pertemuan Kelas</a></li>
+                    <li><a href="{{ route('guru.materials.index') }}" class="{{ request()->routeIs('guru.materials.*') ? 'active' : '' }}"><i class="fas fa-book"></i> Materi Ajar</a></li>
+                    <li><a href="{{ route('guru.assignments.index') }}" class="{{ request()->routeIs('guru.assignments.index') || request()->routeIs('guru.assignments.create') || request()->routeIs('guru.assignments.edit') || request()->routeIs('guru.assignments.show') ? 'active' : '' }}"><i class="fas fa-file-alt"></i> Tugas & Latihan</a></li>
+                    <li>
+                        <a href="{{ route('guru.assignments.grading') }}" class="{{ request()->routeIs('guru.assignments.grading') ? 'active' : '' }}">
+                            <i class="fas fa-check-double"></i> Penilaian
+                            @php
+                                $pendingCount = \App\Models\AssignmentSubmission::whereHas('assignment', function($q) {
+                                    $q->where('teacher_id', auth()->user()->teacher?->id);
+                                })->whereNull('score')->count();
+                            @endphp
+                            @if($pendingCount > 0)
+                                <span class="badge rounded-pill ms-auto" style="background-color: #dc3545; font-size: 0.65rem;">{{ $pendingCount }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li><a href="{{ route('guru.attendances.index') }}" class="{{ request()->routeIs('guru.attendances.*') ? 'active' : '' }}"><i class="fas fa-clipboard-check"></i> Absensi</a></li>
 
                     @if(auth()->user()->teacher && auth()->user()->teacher->homeroomClasses()->count() > 0)
                         <li class="sidebar-header">Wali Kelas</li>
-                        <li><a href="{{ route('guru.classroom.index') }}" class="{{ request()->routeIs('guru.classroom.*') ? 'active' : '' }}"><i class="fas fa-users"></i> Kelola Kelas</a></li>
+                        <li><a href="{{ route('guru.classroom.index') }}" class="{{ request()->routeIs('guru.classroom.*') ? 'active' : '' }}"><i class="fas fa-users"></i> Kelola Kelas Perwalian</a></li>
                     @endif
 
                 @elseif(auth()->user()->role === 'siswa')
@@ -493,6 +596,69 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
+
+            <!-- Skeleton Page Transition Loader -->
+            <div id="skeleton-loader" class="skeleton-wrapper">
+                <!-- Header Skeleton -->
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="skeleton-item skeleton-circle"></div>
+                    <div class="flex-grow-1">
+                        <div class="skeleton-item skeleton-title"></div>
+                        <div class="skeleton-item skeleton-subtitle"></div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <!-- Card Skeleton -->
+                        <div class="skeleton-item skeleton-card"></div>
+                        
+                        <!-- Lines Skeletons -->
+                        <div class="card p-4 border-0 shadow-sm mb-4">
+                            <div class="skeleton-item skeleton-line w-90"></div>
+                            <div class="skeleton-item skeleton-line w-80"></div>
+                            <div class="skeleton-item skeleton-line w-70"></div>
+                            <div class="skeleton-item skeleton-line w-50"></div>
+                        </div>
+                        
+                        <!-- Table/Row Skeletons -->
+                        <div class="card p-4 border-0 shadow-sm">
+                            <div class="skeleton-table-row">
+                                <div class="skeleton-item skeleton-circle" style="width: 32px; height: 32px;"></div>
+                                <div class="flex-grow-1 d-flex flex-column gap-2 justify-content-center">
+                                    <div class="skeleton-item skeleton-line w-30" style="margin-bottom: 0;"></div>
+                                    <div class="skeleton-item skeleton-line w-50" style="margin-bottom: 0;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-table-row">
+                                <div class="skeleton-item skeleton-circle" style="width: 32px; height: 32px;"></div>
+                                <div class="flex-grow-1 d-flex flex-column gap-2 justify-content-center">
+                                    <div class="skeleton-item skeleton-line w-30" style="margin-bottom: 0;"></div>
+                                    <div class="skeleton-item skeleton-line w-50" style="margin-bottom: 0;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-table-row border-0">
+                                <div class="skeleton-item skeleton-circle" style="width: 32px; height: 32px;"></div>
+                                <div class="flex-grow-1 d-flex flex-column gap-2 justify-content-center">
+                                    <div class="skeleton-item skeleton-line w-30" style="margin-bottom: 0;"></div>
+                                    <div class="skeleton-item skeleton-line w-50" style="margin-bottom: 0;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <!-- Sidebar Card Skeleton -->
+                        <div class="card p-4 border-0 shadow-sm mb-4">
+                            <div class="skeleton-item skeleton-title w-50 mb-3" style="height: 24px;"></div>
+                            <div class="skeleton-item skeleton-line w-90"></div>
+                            <div class="skeleton-item skeleton-line w-80"></div>
+                            <div class="skeleton-item skeleton-line w-90"></div>
+                            <div class="skeleton-item skeleton-line w-70"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             @yield('content')
         </div>
@@ -556,6 +722,14 @@
             // Block Copy, Cut, Paste
             ['copy', 'cut', 'paste'].forEach(function(eventType) {
                 document.addEventListener(eventType, function(e) {
+                    if (e.target && (
+                        e.target.tagName === 'INPUT' || 
+                        e.target.tagName === 'TEXTAREA' || 
+                        e.target.closest('.allow-copy') || 
+                        window.copyAllowed === true
+                    )) {
+                        return;
+                    }
                     e.preventDefault();
                 });
             });
@@ -579,7 +753,62 @@
         });
     </script>
 
+    <!-- Skeleton Page Transition Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show skeleton loading animation during page transitions
+            window.addEventListener('beforeunload', function () {
+                document.body.classList.add('page-loading');
+            });
+
+            // Handle page show (e.g. from back-forward cache) to hide loading state
+            window.addEventListener('pageshow', function (event) {
+                if (event.persisted) {
+                    document.body.classList.remove('page-loading');
+                }
+            });
+
+            // Intercept form submissions
+            document.querySelectorAll('form').forEach(form => {
+                const target = form.getAttribute('target');
+                if (target !== '_blank') {
+                    form.addEventListener('submit', function () {
+                        // Small delay to allow HTML5 validation check to run first
+                        setTimeout(() => {
+                            if (form.checkValidity()) {
+                                document.body.classList.add('page-loading');
+                            }
+                        }, 50);
+                    });
+                }
+            });
+
+            // Intercept links to show loading immediately
+            document.querySelectorAll('a').forEach(link => {
+                const href = link.getAttribute('href');
+                const target = link.getAttribute('target');
+                if (href && 
+                    !href.startsWith('#') && 
+                    !href.startsWith('javascript:') && 
+                    !href.startsWith('mailto:') && 
+                    !href.startsWith('tel:') && 
+                    target !== '_blank' && 
+                    !link.hasAttribute('download') &&
+                    !link.classList.contains('no-loader')) {
+                    
+                    link.addEventListener('click', function (e) {
+                        // Only intercept left clicks without modifier keys
+                        if (e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
+                            document.body.classList.add('page-loading');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
     @stack('modals')
+    @stack('scripts')
 </body>
 </html>
 

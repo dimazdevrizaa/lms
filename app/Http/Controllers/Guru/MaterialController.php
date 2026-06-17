@@ -24,18 +24,24 @@ class MaterialController extends Controller
         $teacher = Teacher::where('user_id', Auth::id())->first();
         abort_unless($teacher, 403);
 
+        $meetingsCount = \App\Models\Meeting::where('teacher_id', $teacher->id)->count();
         $materialsCount = Material::where('teacher_id', $teacher->id)->count();
         $assignmentsCount = \App\Models\Assignment::where('teacher_id', $teacher->id)->count();
         
-        // Total pengumpulan dari semua tugas guru ini
-        $submissionsCount = \App\Models\AssignmentSubmission::whereHas('assignment', function($q) use ($teacher) {
-            $q->where('teacher_id', $teacher->id);
-        })->count();
-
         // Pengumpulan yang belum dinilai (score is null)
         $pendingGradesCount = \App\Models\AssignmentSubmission::whereHas('assignment', function($q) use ($teacher) {
             $q->where('teacher_id', $teacher->id);
         })->whereNull('score')->count();
+
+        // Tugas terbaru yang punya submission belum dinilai (untuk panel "Perlu Dinilai")
+        $recentPendingAssignments = \App\Models\Assignment::where('teacher_id', $teacher->id)
+            ->whereHas('submissions', function($q) {
+                $q->whereNull('score');
+            })
+            ->with(['submissions', 'schoolClass', 'subject'])
+            ->latest()
+            ->take(5)
+            ->get();
 
         // Ambil daftar kelas dari materi/tugas yang pernah dibuat
         $assignedClasses = SchoolClass::whereHas('materials', function($q) use ($teacher) {
@@ -77,24 +83,40 @@ class MaterialController extends Controller
         }
 
         return view('guru.dashboard', compact(
+            'meetingsCount',
             'materialsCount',
             'assignmentsCount',
-            'submissionsCount',
             'pendingGradesCount',
+            'recentPendingAssignments',
             'assignedClasses',
             'todaySchedules',
             'todayIndo'
         ));
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         abort_unless($teacherId, 403);
 
-        $materials = Material::where('teacher_id', $teacherId)->latest()->paginate(20);
+        $query = Material::where('teacher_id', $teacherId)
+            ->with(['schoolClass', 'subject', 'meeting']);
 
-        return view('guru.materials.index', compact('materials'));
+        // Filter by class
+        if ($request->filled('class_id')) {
+            $query->where('class_id', $request->class_id);
+        }
+
+        $materials = $query->latest()->paginate(20)->appends($request->query());
+
+        // Get teacher's classes for filter dropdown
+        $teacherClasses = SchoolClass::whereHas('materials', function($q) use ($teacherId) {
+            $q->where('teacher_id', $teacherId);
+        })->orderBy('name')->get();
+
+        $selectedClassId = $request->class_id;
+
+        return view('guru.materials.index', compact('materials', 'teacherClasses', 'selectedClassId'));
     }
 
     public function create(): View

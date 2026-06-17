@@ -3,12 +3,14 @@
 @section('title', 'Input Absensi - ' . $class->name)
 
 @section('content')
-    <div class="mb-5">
-        <a href="{{ route('guru.classroom.attendance', $class) }}" class="text-decoration-none text-muted small">
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <a href="{{ route('guru.classroom.attendance', $class) }}" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
-        <h1 class="h3 mb-2 mt-2">🖊️ Input Absensi - {{ $class->name }}</h1>
-        <p class="text-muted mb-0">Catat absensi harian kelas perwalian Anda</p>
+        <div>
+            <h1 class="h3 mb-1">🖊️ Input Absensi - {{ $class->name }}</h1>
+            <p class="text-muted mb-0">Catat absensi harian kelas perwalian Anda</p>
+        </div>
     </div>
 
     <form method="POST" action="{{ route('guru.classroom.attendance.store', $class) }}">

@@ -3,12 +3,12 @@
 @section('title', 'Detail Absensi Kelas - ' . $class->name)
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-5">
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <a href="{{ route('guru.classroom.attendance', $class) }}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
         <div>
-            <a href="{{ route('guru.classroom.attendance', $class) }}" class="text-decoration-none text-muted small">
-                <i class="fas fa-arrow-left"></i> Kembali ke Daftar
-            </a>
-            <h1 class="h3 mb-2 mt-2">🔍 Detail Absensi Harian</h1>
+            <h1 class="h3 mb-1">🔍 Detail Absensi Harian</h1>
             <p class="text-muted mb-0">Kelas {{ $class->name }} - {{ $attendance->date->translatedFormat('d F Y') }}</p>
         </div>
     </div>

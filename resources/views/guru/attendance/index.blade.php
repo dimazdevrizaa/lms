@@ -5,7 +5,7 @@
 @section('content')
     <!-- Header -->
     <div class="mb-5">
-        <h1 class="h3 mb-2">📜 Riwayat Presensi Mapel</h1>
+        <h1 class="h3 mb-2">📋 Absensi / Presensi</h1>
         <p class="text-muted mb-0">Pilih kelas untuk melihat riwayat kehadiran siswa</p>
     </div>
 
