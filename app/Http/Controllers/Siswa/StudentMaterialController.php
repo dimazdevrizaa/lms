@@ -30,8 +30,15 @@ class StudentMaterialController extends Controller
 
         // Prioritas 2 (fallback): Jika belum ada penugasan, ambil dari meeting/material
         if ($subjectIdsFromAssignments->isEmpty()) {
-            $subjectIdsFromMeetings = Meeting::where('class_id', $student->class_id)->pluck('subject_id');
-            $subjectIdsFromMaterials = Material::where('class_id', $student->class_id)->pluck('subject_id');
+            $subjectIdsFromMeetings = Meeting::where('class_id', $student->class_id)->where('is_visible', true)->pluck('subject_id');
+            $subjectIdsFromMaterials = Material::where('class_id', $student->class_id)
+                ->where(function ($query) {
+                    $query->whereNull('meeting_id')
+                        ->orWhereHas('meeting', function ($q) {
+                            $q->where('is_visible', true);
+                        });
+                })
+                ->pluck('subject_id');
             $subjectIdsFromAssignments = $subjectIdsFromMeetings->merge($subjectIdsFromMaterials)->unique();
         }
 
@@ -47,11 +54,12 @@ class StudentMaterialController extends Controller
      */
     public function subjectMeetings(Subject $subject): View
     {
-        $student = Student::where('user_id', Auth::id())->first();
+        $student = Student::where('user_id', Auth::id())->with('schoolClass')->first();
         abort_unless($student, 403);
 
         $meetings = Meeting::where('class_id', $student->class_id)
             ->where('subject_id', $subject->id)
+            ->where('is_visible', true)
             ->with(['teacher.user'])
             ->orderBy('number', 'asc')
             ->get();
@@ -75,10 +83,22 @@ class StudentMaterialController extends Controller
         
         // Pastikan pertemuan ini memang untuk kelas si siswa
         abort_if($meeting->class_id !== $student->class_id, 403);
+        abort_unless($meeting->is_visible, 404);
 
         $meeting->load(['materials', 'assignments', 'subject', 'teacher.user']);
 
-        return view('siswa.meetings.show', compact('meeting', 'student'));
+        $discussionPosts = \App\Models\ForumPost::where('meeting_id', $meeting->id)
+            ->with([
+                'user',
+                'comments' => function($q) { $q->whereNull('parent_id')->with('user'); },
+                'comments.replies.user',
+                'comments.replies.replies.user',
+                'comments.replies.replies.replies.user'
+            ])
+            ->latest()
+            ->get();
+
+        return view('siswa.meetings.show', compact('meeting', 'student', 'discussionPosts'));
     }
 
     /**
@@ -90,6 +110,9 @@ class StudentMaterialController extends Controller
         abort_unless($student, 403);
         
         abort_if($material->class_id !== $student->class_id, 403);
+        if ($material->meeting_id) {
+            abort_unless($material->meeting?->is_visible, 404);
+        }
 
         return view('siswa.materials.show', compact('material', 'student'));
     }

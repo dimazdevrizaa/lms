@@ -6,479 +6,33 @@
     <link rel="icon" type="image/jpeg" href="{{ asset('images/logo.jpg') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#25671e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/images/logo-192.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- TomSelect CSS for beautiful dropdowns -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #25671E;
-            --secondary-color: #48A111;
-            --accent-color: #F2B50B;
-            --light-color: #F7F0F0;
-            --sidebar-width: 260px;
-            --sidebar-width-mobile: 0;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--light-color) !important;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, .navbar-brand, .sidebar-header {
-            font-family: 'Outfit', sans-serif;
-        }
-
-        /* Top Navbar */
-        .navbar {
-            background: rgba(37, 103, 30, 0.95) !important;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1050;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.25rem;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            transition: all 200ms ease-in-out;
-        }
-
-        .nav-link:hover {
-            color: var(--accent-color) !important;
-        }
-
-        .navbar-text {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-        }
-
-        .btn-outline-light {
-            color: rgba(255, 255, 255, 0.9);
-            border-color: rgba(255, 255, 255, 0.9);
-        }
-
-        .btn-outline-light:hover {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
-            color: var(--primary-color);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 56px;
-            width: var(--sidebar-width);
-            height: calc(100vh - 56px);
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(0, 0, 0, 0.05);
-            overflow-y: auto;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1040;
-        }
-
-        .sidebar-nav {
-            list-style: none;
-            padding: 1rem 0;
-        }
-
-        .sidebar-nav li {
-            margin: 0;
-        }
-
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            padding: 0.85rem 1.5rem;
-            color: #64748b;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            margin: 0.25rem 1rem;
-            border-radius: 12px;
-        }
-
-        .sidebar-nav a:hover {
-            background-color: var(--secondary-color);
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .sidebar-nav a.active {
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(37, 103, 30, 0.2);
-        }
-
-        .sidebar-nav i {
-            width: 1.5rem;
-            text-align: center;
-            margin-right: 1rem;
-            font-size: 1.1rem;
-        }
-
-        .sidebar-header {
-            padding: 2rem 2.5rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        /* Main content wrapper */
-        .main-wrapper {
-            display: flex;
-            flex: 1;
-            margin-top: 56px;
-        }
-
-        .sidebar-placeholder {
-            width: var(--sidebar-width);
-            flex-shrink: 0;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 2.5rem;
-            overflow-y: auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Background Watermark Logo */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 50%; 
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 350px; 
-            height: 350px;
-            background-image: url('{{ asset("images/logo.jpg") }}');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: contain;
-            opacity: 0.05;
-            z-index: -999;
-            pointer-events: none;
-        }
-
-        /* Toggle button */
-        .sidebar-toggle {
-            display: none;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            border-radius: 4px;
-            margin-right: 1rem;
-        }
-
-        .sidebar-toggle:hover {
-            background-color: var(--secondary-color);
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 0.5rem !important;
-            }
-
-            .sidebar-toggle {
-                display: block;
-            }
-
-            .sidebar-placeholder {
-                display: none;
-            }
-
-            .sidebar {
-                width: 100%;
-                max-width: 280px;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.show {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                padding: 1.5rem;
-            }
-
-            .navbar-brand {
-                font-size: 1rem;
-            }
-
-            .navbar-text {
-                display: none;
-            }
-        }
-
-        /* General styles */
-        h1 {
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-bottom: 2rem;
-        }
-
-        /* Anti-Cheat: Disable text selection */
-        .anti-cheat-active {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .allow-copy, .allow-copy * {
-            user-select: text !important;
-            -webkit-user-select: text !important;
-            -moz-user-select: text !important;
-            -ms-user-select: text !important;
-        }
-
-        h2, h3, h4, h5, h6 {
-            color: var(--primary-color);
-        }
-
-        .card {
-            border: none;
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-            cursor: pointer;
-        }
-
-        .card-title {
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1.25rem;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .card-body .display-5 {
-            color: var(--primary-color);
-            font-weight: 800;
-            font-family: 'Outfit', sans-serif;
-            letter-spacing: -1px;
-        }
-
-        .alert-success {
-            background-color: rgba(72, 161, 17, 0.1);
-            border-color: var(--secondary-color);
-            color: var(--primary-color);
-        }
-
-        .alert-danger {
-            background-color: rgba(220, 38, 38, 0.1);
-            border-color: #DC2626;
-            color: #991B1B;
-        }
-
-        .table {
-            color: var(--primary-color);
-        }
-
-        .table thead {
-            background-color: rgba(37, 103, 30, 0.05);
-            border-bottom: 2px solid var(--primary-color);
-        }
-
-        .table thead th {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-
-        .badge {
-            background-color: var(--secondary-color) !important;
-        }
-
-        .badge-primary {
-            background-color: var(--primary-color) !important;
-        }
-
-        .badge-secondary {
-            background-color: var(--secondary-color) !important;
-        }
-
-        .badge-warning {
-            background-color: var(--accent-color) !important;
-            color: var(--primary-color) !important;
-        }
-
-        /* Scrollbar */
-        .sidebar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: var(--secondary-color);
-            border-radius: 3px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-color);
-        }
-
-        /* Batasi ukuran ikon panah agar tidak membesar */
-        .fa-arrow-left, .fa-arrow-right, .fa-chevron-left, .fa-chevron-right {
-            font-size: 0.875em !important;
-        }
-
-        /* Shimmer effect for skeleton loading */
-        @keyframes shimmer {
-            0% {
-                background-position: -200% 0;
-            }
-            100% {
-                background-position: 200% 0;
-            }
-        }
-
-        .skeleton-wrapper {
-            display: none;
-            flex-direction: column;
-            gap: 1.5rem;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        /* Page Transition States */
-        body.page-loading .main-content > *:not(#skeleton-loader) {
-            display: none !important;
-        }
-
-        body.page-loading .skeleton-wrapper {
-            display: flex !important;
-        }
-
-        .skeleton-item {
-            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite linear;
-            border-radius: 8px;
-        }
-
-        /* Specific skeleton structures */
-        .skeleton-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-        }
-
-        .skeleton-title {
-            width: 60%;
-            height: 32px;
-            margin-bottom: 0.5rem;
-        }
-
-        .skeleton-subtitle {
-            width: 35%;
-            height: 20px;
-        }
-
-        .skeleton-card {
-            height: 200px;
-            border-radius: 16px;
-            margin-bottom: 1.5rem;
-        }
-
-        .skeleton-line {
-            height: 16px;
-            margin-bottom: 0.75rem;
-            border-radius: 4px;
-        }
-
-        .skeleton-line.w-80 { width: 80%; }
-        .skeleton-line.w-70 { width: 70%; }
-        .skeleton-line.w-90 { width: 90%; }
-        .skeleton-line.w-50 { width: 50%; }
-        .skeleton-line.w-30 { width: 30%; }
-
-        .skeleton-table-row {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem 0;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-    </style>
+    <!-- Main LMS CSS stylesheet -->
+    <link rel="stylesheet" href="{{ asset('css/lms.css') }}">
+    @stack('styles')
 </head>
 <body>
     <!-- Top Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark flex-nowrap">
         <div class="d-flex align-items-center flex-grow-1">
             <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Menu">
                 <i class="fas fa-bars"></i>
             </button>
             <a class="navbar-brand" href="{{ url('/') }}">
-                <span style="color: var(--accent-color); margin-right: 0.5rem;">📚</span>
-                LMS SMA 15 Padang
+                {{-- ponytail: school logo replacement --}}
+                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover; margin-right: 0.5rem; background: #fff; padding: 2px;">
+                LMS SMA 15<span class="d-none d-sm-inline"> Padang</span>
             </a>
         </div>
 
@@ -486,13 +40,50 @@
             @guest
                 <a class="nav-link ms-2" href="{{ route('login') }}">Login</a>
             @else
-                <span class="navbar-text me-2">
-                    {{ auth()->user()->name }}
-                </span>
-                <form method="POST" action="{{ route('logout') }}" class="m-0">
-                    @csrf
-                    <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
-                </form>
+                @php
+                    $unreadNotificationsCount = \App\Models\Notification::where('user_id', auth()->id())
+                        ->whereNull('read_at')
+                        ->count();
+                @endphp
+                <a href="{{ route('notifications.index') }}" class="btn btn-link text-white position-relative p-1 me-2 me-md-3 shadow-none no-loader" title="Notifikasi" style="text-decoration: none;">
+                    <i class="fas fa-bell" style="font-size: 1.15rem;"></i>
+                    @if($unreadNotificationsCount > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem; padding: 0.25em 0.5em; margin-top: 4px; margin-left: -2px;">
+                            {{ $unreadNotificationsCount }}
+                        </span>
+                    @endif
+                </a>
+                {{-- ponytail: dropdown profile menu --}}
+                <div class="dropdown">
+                    <button class="btn btn-link text-white dropdown-toggle d-flex align-items-center gap-2 shadow-none border-0 p-0 text-decoration-none" 
+                            type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-white text-success fw-bold" 
+                             style="width: 32px; height: 32px; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                        </div>
+                        <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuButton" style="border-radius: var(--radius-md);">
+                        <li class="px-3 py-2 border-bottom">
+                            <span class="d-block fw-bold text-dark" style="font-size: 0.85rem;">{{ auth()->user()->name }}</span>
+                            <small class="text-muted" style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->role) }}</small>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ route('profile.edit') }}" style="font-size: 0.9rem;">
+                                <i class="fas fa-user-cog text-muted"></i> Pengaturan Profil
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                                @csrf
+                                <button type="submit" class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger" style="font-size: 0.9rem; border: none; background: none; width: 100%; text-align: left;">
+                                    <i class="fas fa-sign-out-alt"></i> Keluar
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             @endguest
         </div>
     </nav>
@@ -566,6 +157,7 @@
                     <li class="sidebar-header">Akademik</li>
                     <li><a href="{{ route('siswa.subjects.index') }}" class="{{ request()->routeIs('siswa.subjects.*') || request()->routeIs('siswa.meetings.*') ? 'active' : '' }}"><i class="fas fa-book-open"></i> Mata Pelajaran</a></li>
                     <li><a href="{{ route('siswa.attendance.index') }}" class="{{ request()->routeIs('siswa.attendance.*') ? 'active' : '' }}"><i class="fas fa-clipboard-check"></i> Riwayat Kehadiran</a></li>
+                    <li><a href="{{ route('siswa.directory') }}" class="{{ request()->routeIs('siswa.directory') ? 'active' : '' }}"><i class="fas fa-users"></i> Teman Kelas & Guru</a></li>
                 @endif
             </ul>
         </aside>
@@ -678,6 +270,14 @@
                         direction: "asc"
                     }
                 });
+
+                // Auto-submit GET filter forms on change
+                const form = el.form;
+                if (form && form.getAttribute('method')?.toLowerCase() === 'get') {
+                    el.addEventListener('change', function() {
+                        form.submit();
+                    });
+                }
             });
         });
 
@@ -771,7 +371,9 @@
             // Intercept form submissions
             document.querySelectorAll('form').forEach(form => {
                 const target = form.getAttribute('target');
-                if (target !== '_blank') {
+                const method = (form.getAttribute('method') || 'get').toLowerCase();
+                // Exclude GET forms from page-loading overlay as they are fast and can be aborted by display:none
+                if (target !== '_blank' && method !== 'get') {
                     form.addEventListener('submit', function () {
                         // Small delay to allow HTML5 validation check to run first
                         setTimeout(() => {
@@ -807,8 +409,319 @@
         });
     </script>
 
+    <!-- Custom Confirmation Modal (ponytail: global alert replacement) -->
+    <div class="modal fade" id="customConfirmModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden; background: #ffffff;">
+                <div class="modal-body p-4 text-center">
+                    <div class="confirm-icon-wrapper mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; border-radius: 50%; transition: all 0.2s ease;">
+                        <i style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.15rem;">Konfirmasi Tindakan</h5>
+                    <p class="text-muted small mb-4 px-2" id="customConfirmMessage" style="font-family: 'Inter', sans-serif; line-height: 1.5; font-size: 0.88rem;"></p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="button" class="btn btn-light px-3 py-2 border w-50" style="border-radius: 10px; font-weight: 600; font-size: 0.85rem;" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn px-3 py-2 w-50 text-white" id="customConfirmYesBtn" style="border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: none;"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal (ponytail: global alert dialog replacement) -->
+    <div class="modal fade" id="customAlertModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" style="z-index: 10000;">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden; background: #ffffff;">
+                <div class="modal-body p-4 text-center">
+                    <div class="alert-icon-wrapper mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 64px; height: 64px; border-radius: 50%; transition: all 0.2s ease;">
+                        <i style="font-size: 1.5rem;"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.15rem;">Pemberitahuan</h5>
+                    <p class="text-muted small mb-4 px-2" id="customAlertMessage" style="font-family: 'Inter', sans-serif; line-height: 1.5; font-size: 0.88rem;"></p>
+                    <button type="button" class="btn px-3 py-2 w-100 text-white" data-bs-dismiss="modal" style="border-radius: 10px; font-weight: 600; font-size: 0.85rem; border: none; background-color: var(--primary);">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ponytail: global alert override
+        const nativeAlert = window.alert;
+        window.alert = function(message) {
+            if (window.showCustomAlert) {
+                window.showCustomAlert(message);
+            } else {
+                nativeAlert(message);
+            }
+        };
+
+        // ponytail: global non-blocking confirm modal implementation
+        document.addEventListener('DOMContentLoaded', function() {
+            // ponytail: alert modal setup
+            const alertModalEl = document.getElementById('customAlertModal');
+            if (alertModalEl) {
+                const alertModal = new bootstrap.Modal(alertModalEl);
+                const alertMessageEl = document.getElementById('customAlertMessage');
+                const alertIconWrapper = alertModalEl.querySelector('.alert-icon-wrapper');
+                const alertIconElement = alertIconWrapper.querySelector('i');
+
+                window.showCustomAlert = function(message) {
+                    alertMessageEl.textContent = message;
+
+                    const lowerMsg = message.toLowerCase();
+                    if (lowerMsg.includes('sukses') || lowerMsg.includes('berhasil') || lowerMsg.includes('salin')) {
+                        alertIconWrapper.style.backgroundColor = 'rgba(25, 135, 84, 0.08)';
+                        alertIconWrapper.style.color = '#198754';
+                        alertIconElement.className = 'fas fa-check-circle';
+                    } else if (lowerMsg.includes('nonaktif') || lowerMsg.includes('blokir') || lowerMsg.includes('sistem')) {
+                        alertIconWrapper.style.backgroundColor = 'rgba(220, 53, 69, 0.08)';
+                        alertIconWrapper.style.color = '#dc3545';
+                        alertIconElement.className = 'fas fa-shield-alt';
+                    } else {
+                        alertIconWrapper.style.backgroundColor = 'rgba(255, 193, 7, 0.08)';
+                        alertIconWrapper.style.color = '#ffc107';
+                        alertIconElement.className = 'fas fa-exclamation-circle';
+                    }
+
+                    alertModal.show();
+                };
+            }
+
+            const confirmModalEl = document.getElementById('customConfirmModal');
+            if (!confirmModalEl) return;
+
+            const confirmModal = new bootstrap.Modal(confirmModalEl);
+            const iconWrapper = confirmModalEl.querySelector('.confirm-icon-wrapper');
+            const iconElement = iconWrapper.querySelector('i');
+            const yesBtn = document.getElementById('customConfirmYesBtn');
+            const messageEl = document.getElementById('customConfirmMessage');
+
+            let onConfirmCallback = null;
+            window.isCustomConfirming = false;
+
+            // Override native confirm globally
+            const nativeConfirm = window.confirm;
+            window.confirm = function(message) {
+                if (window.isCustomConfirming) {
+                    return true;
+                }
+                return nativeConfirm(message);
+            };
+
+            window.showCustomConfirm = function(message, callback) {
+                onConfirmCallback = callback;
+                messageEl.textContent = message;
+
+                // Adjust style dynamically based on message content
+                const lowerMsg = message.toLowerCase();
+                if (lowerMsg.includes('hapus') || lowerMsg.includes('delete') || lowerMsg.includes('destroy') || lowerMsg.includes('keluar') || lowerMsg.includes('batal')) {
+                    // Danger/Delete style
+                    iconWrapper.style.backgroundColor = 'rgba(220, 53, 69, 0.08)';
+                    iconWrapper.style.color = '#dc3545';
+                    iconElement.className = 'fas fa-exclamation-triangle';
+                    yesBtn.className = 'btn btn-danger px-3 py-2 w-50';
+                    yesBtn.style.backgroundColor = '#dc3545';
+                    yesBtn.textContent = 'Ya, Hapus';
+                } else if (lowerMsg.includes('kirim') || lowerMsg.includes('simpan') || lowerMsg.includes('isi') || lowerMsg.includes('regenerate')) {
+                    // Success/Action style
+                    iconWrapper.style.backgroundColor = 'rgba(25, 135, 84, 0.08)';
+                    iconWrapper.style.color = '#198754';
+                    iconElement.className = 'fas fa-check-circle';
+                    yesBtn.className = 'btn btn-success px-3 py-2 w-50';
+                    yesBtn.style.backgroundColor = '#198754';
+                    yesBtn.textContent = 'Ya, Lanjutkan';
+                } else {
+                    // Default/Warning style
+                    iconWrapper.style.backgroundColor = 'rgba(255, 193, 7, 0.08)';
+                    iconWrapper.style.color = '#ffc107';
+                    iconElement.className = 'fas fa-question-circle';
+                    yesBtn.className = 'btn btn-warning text-dark px-3 py-2 w-50';
+                    yesBtn.style.backgroundColor = '#ffc107';
+                    yesBtn.textContent = 'Ya, Lanjutkan';
+                }
+
+                confirmModal.show();
+            };
+
+            yesBtn.addEventListener('click', function() {
+                confirmModal.hide();
+                if (onConfirmCallback) {
+                    onConfirmCallback();
+                }
+            });
+
+            // Intercept form submissions with confirm() in capturing phase
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                const onsubmitAttr = form.getAttribute('onsubmit');
+
+                if (onsubmitAttr && onsubmitAttr.includes('confirm(')) {
+                    if (form.dataset.confirmed === 'true') {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const match = onsubmitAttr.match(/confirm\(['"](.*?)['"]\)/);
+                    const message = match ? match[1] : 'Apakah Anda yakin?';
+
+                    window.showCustomConfirm(message, function() {
+                        form.dataset.confirmed = 'true';
+                        setTimeout(() => {
+                            if (form.checkValidity()) {
+                                document.body.classList.add('page-loading');
+                            }
+                        }, 50);
+                        form.submit();
+                    });
+                }
+            }, true);
+
+            // Intercept inline onclick confirm calls
+            document.addEventListener('click', function(e) {
+                const button = e.target.closest('[onclick*="confirm("]');
+                if (!button) return;
+
+                if (button.dataset.confirmed === 'true') {
+                    return;
+                }
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const onclickAttr = button.getAttribute('onclick');
+                const match = onclickAttr.match(/confirm\(['"](.*?)['"]\)/);
+                const message = match ? match[1] : 'Apakah Anda yakin?';
+
+                window.showCustomConfirm(message, function() {
+                    button.dataset.confirmed = 'true';
+                    window.isCustomConfirming = true;
+                    button.click();
+                    setTimeout(() => {
+                        button.dataset.confirmed = 'false';
+                        window.isCustomConfirming = false;
+                    }, 500);
+                });
+            }, true);
+        });
+    </script>
+
     @stack('modals')
     @stack('scripts')
+
+    @auth
+    <script>
+        // PWA and Web Push Notification Setup
+        const VAPID_PUBLIC_KEY = "{{ env('VAPID_PUBLIC_KEY') }}";
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/\-/g, '+')
+                .replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                        
+                        if (Notification.permission === 'granted') {
+                            subscribeUserToPush(registration);
+                        } else if (Notification.permission === 'default') {
+                            setTimeout(() => {
+                                window.showCustomConfirm('Aktifkan notifikasi browser agar Anda mendapatkan info tugas & nilai terbaru secara langsung?', function() {
+                                    Notification.requestPermission().then(function(permission) {
+                                        if (permission === 'granted') {
+                                            subscribeUserToPush(registration);
+                                        }
+                                    });
+                                });
+                            }, 5000);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        function subscribeUserToPush(registration) {
+            if (!VAPID_PUBLIC_KEY) {
+                console.warn('VAPID Public Key missing. Cannot subscribe to Web Push.');
+                return;
+            }
+
+            const subscribeOptions = {
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+            };
+
+            registration.pushManager.subscribe(subscribeOptions)
+                .then(function(pushSubscription) {
+                    fetch("{{ route('push.subscribe') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify(pushSubscription)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log('Subscribed to Web Push successfully.');
+                    })
+                    .catch(err => {
+                        console.error('Failed to send push subscription to server:', err);
+                    });
+                })
+                .catch(function(error) {
+                    console.error('Failed to subscribe user to push:', error);
+                });
+        }
+
+        // Live notification polling for tab count badge
+        let lastCheck = localStorage.getItem('last_notification_check') || new Date().toISOString();
+        localStorage.setItem('last_notification_check', new Date().toISOString());
+
+        function pollNotifications() {
+            fetch(`/notifications/poll?since=${encodeURIComponent(lastCheck)}`)
+                .then(res => res.json())
+                .then(data => {
+                    lastCheck = new Date().toISOString();
+                    localStorage.setItem('last_notification_check', lastCheck);
+
+                    const badge = document.querySelector('.navbar .btn-link .badge');
+                    const bellContainer = document.querySelector('.navbar .btn-link');
+                    
+                    if (badge) {
+                        if (data.unread_count > 0) {
+                            badge.textContent = data.unread_count;
+                        } else {
+                            badge.remove();
+                        }
+                    } else if (data.unread_count > 0 && bellContainer) {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger';
+                        newBadge.style.cssText = 'font-size: 0.65rem; padding: 0.25em 0.5em; margin-top: 4px; margin-left: -2px;';
+                        newBadge.textContent = data.unread_count;
+                        bellContainer.appendChild(newBadge);
+                    }
+                })
+                .catch(err => console.error('Error polling notifications:', err));
+        }
+
+        setInterval(pollNotifications, 30000);
+    </script>
+    @endauth
 </body>
 </html>
 

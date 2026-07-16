@@ -7,6 +7,8 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class TeacherController extends Controller
@@ -32,12 +34,15 @@ class TeacherController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
         ]);
 
+        $tempPassword = Str::random(8);
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt('password'),
-            'role' => 'guru',
+            'password' => bcrypt($tempPassword),
         ]);
+        $user->role = 'guru';
+        $user->save();
 
         Teacher::create([
             'user_id' => $user->id,
@@ -46,7 +51,7 @@ class TeacherController extends Controller
         ]);
 
         return redirect()->route('tatausaha.teachers.index')
-            ->with('success', 'Data guru berhasil dibuat (password default: password).');
+            ->with('success', "Data guru berhasil dibuat. Password sementara: {$tempPassword} — minta guru segera mengganti password.");
     }
     public function edit(Teacher $teacher): View
     {
@@ -60,7 +65,7 @@ class TeacherController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $teacher->user_id],
             'nip' => ['nullable', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:50'],
-            'password' => ['nullable', 'string', 'min:6'],
+            'password' => ['nullable', 'string', Password::min(8)->mixedCase()->numbers()],
         ]);
 
         $userData = [

@@ -25,8 +25,8 @@ class Student extends Model
         static::creating(function ($student) {
             if (empty($student->parent_code)) {
                 do {
-                    // 10 karakter alfanumerik acak — lebih aman dari brute force
-                    $code = 'ORTU-' . strtoupper(\Illuminate\Support\Str::random(10));
+                    // ponytail: 6 random alphanumeric characters (no prefix)
+                    $code = strtoupper(\Illuminate\Support\Str::random(6));
                 } while (static::where('parent_code', $code)->exists());
                 $student->parent_code = $code;
             }

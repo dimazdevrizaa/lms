@@ -16,8 +16,11 @@ class Meeting extends Model
         'subject_id',
         'title',
         'description',
+        'video_link',
         'date',
         'number',
+        'video_link_status',
+        'is_visible',
     ];
 
     public function teacher()

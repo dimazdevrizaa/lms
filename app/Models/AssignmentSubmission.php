@@ -35,5 +35,10 @@ class AssignmentSubmission extends Model
     {
         return $this->hasMany(QuestionAnswer::class, 'assignment_submission_id');
     }
+
+    public function comments()
+    {
+        return $this->hasMany(SubmissionComment::class, 'assignment_submission_id')->orderBy('created_at', 'asc');
+    }
 }
 

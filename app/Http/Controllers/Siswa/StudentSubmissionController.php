@@ -23,6 +23,12 @@ class StudentSubmissionController extends Controller
 
         $assignments = Assignment::query()
             ->when($student?->class_id, fn ($q, $classId) => $q->where('class_id', $classId))
+            ->where(function ($query) {
+                $query->whereNull('meeting_id')
+                    ->orWhereHas('meeting', function ($q) {
+                        $q->where('is_visible', true);
+                    });
+            })
             ->latest('due_at')
             ->get();
 
@@ -48,6 +54,11 @@ class StudentSubmissionController extends Controller
         // Verify student belongs to this class
         abort_unless($assignment->class_id == $student->class_id, 403);
 
+        // Verify meeting visibility if associated with one
+        if ($assignment->meeting_id) {
+            abort_unless($assignment->meeting?->is_visible, 404);
+        }
+
         $assignment->load('questions.options');
 
         // Check if already submitted
@@ -57,7 +68,7 @@ class StudentSubmissionController extends Controller
 
         $answers = [];
         if ($submission) {
-            $submission->load('questionAnswers.selectedOption');
+            $submission->load(['questionAnswers.selectedOption', 'comments.user']);
             // Index answers by question_id for easy lookup
             $answers = $submission->questionAnswers->keyBy('question_id');
         }
@@ -71,6 +82,14 @@ class StudentSubmissionController extends Controller
     public function store(Request $request, Assignment $assignment): RedirectResponse
     {
         $student = Student::where('user_id', Auth::id())->firstOrFail();
+
+        // Verify student belongs to this class
+        abort_unless($assignment->class_id == $student->class_id, 403);
+
+        // Verify meeting visibility if associated with one
+        if ($assignment->meeting_id) {
+            abort_unless($assignment->meeting?->is_visible, 404);
+        }
 
         // Enforce deadline — tolak submission jika deadline sudah lewat
         if ($assignment->due_at && Carbon::parse($assignment->due_at)->isPast()) {
@@ -96,7 +115,7 @@ class StudentSubmissionController extends Controller
 
         $filePath = null;
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('submissions', 'public');
+            $filePath = $request->file('file')->store('submissions', 'local');
         }
 
         $submission = AssignmentSubmission::where('assignment_id', $assignment->id)
@@ -105,7 +124,7 @@ class StudentSubmissionController extends Controller
 
         if ($submission) {
             if ($filePath && $submission->file_path) {
-                Storage::disk('public')->delete($submission->file_path);
+                Storage::disk('local')->delete($submission->file_path);
             }
             $submission->update([
                 'answer_text' => $data['answer_text'] ?? $submission->answer_text,
@@ -120,6 +139,21 @@ class StudentSubmissionController extends Controller
                 'file_path' => $filePath,
                 'submitted_at' => now(),
             ]);
+        }
+
+        // Notify Teacher of submission
+        try {
+            $teacherUser = $assignment->teacher?->user;
+            if ($teacherUser) {
+                \App\Models\Notification::create([
+                    'user_id' => $teacherUser->id,
+                    'title' => '📥 Tugas Dikumpulkan: ' . Auth::user()->name,
+                    'message' => Auth::user()->name . ' telah mengumpulkan tugas ' . $assignment->title . '.',
+                    'url' => route('guru.assignments.show', $assignment->id),
+                ]);
+            }
+        } catch (\Exception $ne) {
+            // Ignore
         }
 
         return back()->with('success', 'Tugas berhasil dikirim.');
@@ -241,7 +275,55 @@ class StudentSubmissionController extends Controller
             return back()->withInput()->withErrors(['general' => 'Terjadi kesalahan saat menyimpan jawaban: ' . $e->getMessage()]);
         }
 
+        // Notify Teacher of submission
+        try {
+            $teacherUser = $assignment->teacher?->user;
+            if ($teacherUser) {
+                \App\Models\Notification::create([
+                    'user_id' => $teacherUser->id,
+                    'title' => '📥 Tugas Dikumpulkan: ' . Auth::user()->name,
+                    'message' => Auth::user()->name . ' telah mengumpulkan tugas ' . $assignment->title . '.',
+                    'url' => route('guru.assignments.show', $assignment->id),
+                ]);
+            }
+        } catch (\Exception $ne) {
+            // Ignore
+        }
+
         return redirect()->route('siswa.assignments.show', $assignment)
             ->with('success', 'Jawaban berhasil dikirim!');
+    }
+
+    public function unsubmit(Assignment $assignment): RedirectResponse
+    {
+        $student = Student::where('user_id', Auth::id())->firstOrFail();
+
+        // Verify student belongs to this class
+        abort_unless($assignment->class_id == $student->class_id, 403);
+
+        // Verify meeting visibility if associated with one
+        if ($assignment->meeting_id) {
+            abort_unless($assignment->meeting?->is_visible, 404);
+        }
+        
+        $submission = AssignmentSubmission::where('assignment_id', $assignment->id)
+            ->where('student_id', $student->id)
+            ->firstOrFail();
+
+        if ($submission->score !== null) {
+            return back()->withErrors(['general' => 'Tugas sudah dinilai oleh guru dan tidak dapat dibatalkan.']);
+        }
+
+        if ($assignment->type !== 'pdf') {
+            abort(403, 'Hanya tugas tipe PDF yang dapat dibatalkan pengirimannya.');
+        }
+
+        if ($submission->file_path) {
+            Storage::disk('local')->delete($submission->file_path);
+        }
+
+        $submission->delete();
+
+        return back()->with('success', 'Pengiriman tugas berhasil dibatalkan.');
     }
 }

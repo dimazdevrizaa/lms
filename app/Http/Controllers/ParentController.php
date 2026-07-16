@@ -10,13 +10,15 @@ use App\Models\AssignmentSubmission;
 use App\Models\BehaviorRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ParentController extends Controller
 {
     /**
      * Durasi timeout sesi orang tua (dalam menit).
+     * 180 hari = 180 * 24 * 60 = 259200 menit
      */
-    private const SESSION_TIMEOUT_MINUTES = 30;
+    private const SESSION_TIMEOUT_MINUTES = 259200;
 
     public function index()
     {
@@ -45,9 +47,10 @@ class ParentController extends Controller
         if (!$student) {
             // Log failed access attempt for security monitoring
             Log::warning('Parent portal: failed access attempt', [
-                'code' => substr($code, 0, 6) . '****',
+                'code_hash' => $this->codeHash($code),
                 'ip' => $request->ip(),
                 'user_agent' => $request->userAgent(),
+                'endpoint' => 'access',
             ]);
 
             return back()->withErrors(['parent_code' => 'Kode akses orang tua tidak valid atau tidak ditemukan.']);
@@ -57,6 +60,7 @@ class ParentController extends Controller
         Log::info('Parent portal: successful access', [
             'student_id' => $student->id,
             'ip' => $request->ip(),
+            'endpoint' => 'access',
         ]);
 
         session([
@@ -67,6 +71,10 @@ class ParentController extends Controller
         return redirect()->route('parent.dashboard')->with('success', 'Berhasil masuk ke dashboard pemantauan orang tua.');
     }
 
+    /**
+     * Show confirmation page for direct link access.
+     * Does NOT set session - requires explicit POST confirmation.
+     */
     public function viewDirect($code)
     {
         $code = strtoupper(trim($code));
@@ -74,12 +82,49 @@ class ParentController extends Controller
 
         if (!$student) {
             Log::warning('Parent portal: invalid direct link access', [
-                'code' => substr($code, 0, 6) . '****',
+                'code_hash' => $this->codeHash($code),
                 'ip' => request()->ip(),
+                'endpoint' => 'view',
             ]);
 
             return redirect()->route('parent.index')->withErrors(['parent_code' => 'Link akses tidak valid.']);
         }
+
+        // Show confirmation page instead of directly granting access
+        return view('parent.confirm', [
+            'student_name' => $student->user->name,
+            'code' => $code,
+        ]);
+    }
+
+    /**
+     * Process confirmed direct link access (POST only).
+     */
+    public function viewDirectConfirm(Request $request)
+    {
+        $request->validate([
+            'parent_code' => 'required|string',
+        ]);
+
+        $code = strtoupper(trim($request->parent_code));
+        $student = Student::where('parent_code', $code)->first();
+
+        if (!$student) {
+            Log::warning('Parent portal: invalid direct link confirm', [
+                'code_hash' => $this->codeHash($code),
+                'ip' => $request->ip(),
+                'endpoint' => 'view.confirm',
+            ]);
+
+            return redirect()->route('parent.index')->withErrors(['parent_code' => 'Link akses tidak valid.']);
+        }
+
+        // Log successful access
+        Log::info('Parent portal: successful direct link access', [
+            'student_id' => $student->id,
+            'ip' => $request->ip(),
+            'endpoint' => 'view.confirm',
+        ]);
 
         session([
             'parent_student_id' => $student->id,
@@ -158,6 +203,56 @@ class ParentController extends Controller
     }
 
     /**
+     * Regenerate parent access code for a student.
+     * Only accessible by authenticated users (guru/tatausaha).
+     */
+    public function regenerateCode(Student $student)
+    {
+        $oldCode = $student->parent_code;
+
+        do {
+            // ponytail: 6 random alphanumeric characters (no prefix)
+            $code = strtoupper(Str::random(6));
+        } while (Student::where('parent_code', $code)->exists());
+
+        $student->update(['parent_code' => $code]);
+
+        Log::info('Parent portal: code regenerated', [
+            'student_id' => $student->id,
+            'old_code' => substr($oldCode ?? '', 0, 6) . '****',
+            'new_code' => substr($code, 0, 6) . '****',
+            'by_user' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Kode akses orang tua berhasil diperbarui.');
+    }
+
+    /**
+     * Reveal parent access code to authorized staff in a separate page.
+     */
+    public function revealCode(Student $student)
+    {
+        $user = auth()->user();
+
+        abort_unless($user && in_array($user->role, ['admin', 'guru', 'tatausaha'], true), 403);
+
+        if (!$student->parent_code) {
+            abort(404);
+        }
+
+        Log::info('Parent portal: code revealed to staff', [
+            'student_id' => $student->id,
+            'by_user' => $user->id,
+            'by_role' => $user->role,
+            'ip' => request()->ip(),
+        ]);
+
+        return view('parent.reveal', [
+            'student' => $student->load('user'),
+            'code' => $student->parent_code,
+        ]);
+    }
+    /**
      * Check if parent session has expired due to inactivity.
      */
     private function isSessionExpired(): bool
@@ -177,5 +272,14 @@ class ParentController extends Controller
     private function clearParentSession(): void
     {
         session()->forget(['parent_student_id', 'parent_last_activity']);
+    }
+
+    private function codeHash(string $code): string
+    {
+        if ($code === '') {
+            return 'empty';
+        }
+
+        return hash('sha256', $code);
     }
 }

@@ -45,7 +45,7 @@ class DemoDataSeeder extends Seeder
 
             $subject = Subject::updateOrCreate(
                 ['code' => $data['code']],
-                ['name' => $data['name'], 'major' => $data['major'], 'teacher_id' => $teacher->id]
+                ['name' => $data['name'], 'major' => $data['major']]
             );
 
             $teachers[$data['code']] = $teacher;
@@ -78,7 +78,8 @@ class DemoDataSeeder extends Seeder
         // IPS: Sejarah -> X IPS 1
         // Umum: Bahasa Inggris -> semua kelas
         foreach ($subjects as $code => $subject) {
-            if (!$subject->teacher_id) continue;
+            $teacher = $teachers[$code] ?? null;
+            if (!$teacher) continue;
 
             foreach ($classes as $class) {
                 $classMajor = strtoupper($class->major ?? '');
@@ -94,8 +95,8 @@ class DemoDataSeeder extends Seeder
                 if (!$match) continue;
 
                 ClassSubjectTeacher::firstOrCreate(
-                    ['class_id' => $class->id, 'subject_id' => $subject->id],
-                    ['teacher_id' => $subject->teacher_id]
+                    ['class_id' => $class->id, 'subject_id' => $subject->id, 'academic_year_id' => $year->id],
+                    ['teacher_id' => $teacher->id]
                 );
             }
         }

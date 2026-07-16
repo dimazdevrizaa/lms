@@ -7,7 +7,7 @@
                 </h2>
             </div>
             <div class="text-sm text-gray-600">
-                {{ date('l, d F Y') }}
+                {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
             </div>
         </div>
     </x-slot>

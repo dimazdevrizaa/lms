@@ -25,7 +25,9 @@ class StudentDashboardController extends Controller
                 'materialsCount' => 0,
                 'attendanceRate' => 0,
                 'averageGrade' => 0,
-                'recentAssignments' => collect()
+                'recentAssignments' => collect(),
+                'todaySchedules' => collect(),
+                'todayDayName' => 'Senin'
             ]);
         }
 
@@ -51,13 +53,69 @@ class StudentDashboardController extends Controller
             ->take(5)
             ->get();
 
+        // ponytail: map English day names to Indonesian
+        $daysMap = [
+            'Monday' => 'Senin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Kamis',
+            'Friday' => 'Jumat',
+            'Saturday' => 'Sabtu',
+            'Sunday' => 'Minggu',
+        ];
+        $todayDayName = $daysMap[date('l')] ?? 'Senin';
+
+        $activeYear = \App\Models\AcademicYear::where('is_active', true)->first();
+
+        $todaySchedules = collect();
+        if ($activeYear) {
+            $todaySchedules = \App\Models\Schedule::where('class_id', $student->class_id)
+                ->where('academic_year_id', $activeYear->id)
+                ->where('day', $todayDayName)
+                ->with(['timeSlot', 'subject', 'teacher.user'])
+                ->get()
+                ->sortBy(function ($schedule) {
+                    return $schedule->timeSlot->slot_order ?? 0;
+                });
+        }
+
         return view('siswa.dashboard', compact(
             'submissionCount',
             'materialsCount',
             'attendanceRate',
             'averageGrade',
-            'recentAssignments'
+            'recentAssignments',
+            'todaySchedules',
+            'todayDayName'
         ));
+    }
+
+    public function directory(): View
+    {
+        $user = Auth::user();
+        $student = Student::where('user_id', $user->id)->with('schoolClass.homeroomTeacher.user')->first();
+
+        if (!$student) {
+            abort(404, 'Data siswa tidak ditemukan.');
+        }
+
+        $schoolClass = $student->schoolClass;
+
+        // Teman Sekelas
+        $classmates = Student::where('class_id', $student->class_id)
+            ->where('id', '!=', $student->id)
+            ->with('user')
+            ->get();
+
+        // Wali Kelas
+        $homeroomTeacher = $schoolClass->homeroomTeacher;
+
+        // Guru Mapel
+        $subjectTeachers = \App\Models\ClassSubjectTeacher::where('class_id', $student->class_id)
+            ->with(['teacher.user', 'subject'])
+            ->get();
+
+        return view('siswa.directory', compact('schoolClass', 'classmates', 'homeroomTeacher', 'subjectTeachers'));
     }
 }
 

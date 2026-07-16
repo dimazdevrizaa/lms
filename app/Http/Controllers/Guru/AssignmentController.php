@@ -151,7 +151,7 @@ class AssignmentController extends Controller
 
         $filePath = null;
         if ($data['type'] === 'pdf' && $request->hasFile('file')) {
-            $filePath = $request->file('file')->store('assignments', 'public');
+            $filePath = $request->file('file')->store('assignments', 'local');
         }
 
         DB::beginTransaction();
@@ -201,9 +201,30 @@ class AssignmentController extends Controller
             }
 
             DB::commit();
+
+            // Create notifications for all students in class
+            try {
+                $students = \App\Models\Student::where('class_id', $assignment->class_id)->get();
+                $subjectName = $assignment->subject ? $assignment->subject->name : 'Mata Pelajaran';
+                foreach ($students as $student) {
+                    \App\Models\Notification::create([
+                        'user_id' => $student->user_id,
+                        'title' => '📝 Tugas Baru: ' . $assignment->title,
+                        'message' => 'Guru telah menambahkan tugas baru untuk mata pelajaran ' . $subjectName . '.',
+                        'url' => route('siswa.assignments.show', $assignment->id),
+                    ]);
+                }
+            } catch (\Exception $ne) {
+                // Silently ignore notification creation failures
+            }
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->withErrors(['questions_json' => $e->getMessage()]);
+        }
+
+        if ($assignment->meeting_id) {
+            return redirect()->route('guru.meetings.show', $assignment->meeting_id)
+                ->with('success', 'Tugas berhasil dibuat.');
         }
 
         return redirect()->route('guru.assignments.index')
@@ -268,9 +289,9 @@ class AssignmentController extends Controller
         try {
             if ($assignment->type === 'pdf' && $request->hasFile('file')) {
                 if ($assignment->file_path) {
-                    Storage::disk('public')->delete($assignment->file_path);
+                    Storage::disk('local')->delete($assignment->file_path);
                 }
-                $data['file_path'] = $request->file('file')->store('assignments', 'public');
+                $data['file_path'] = $request->file('file')->store('assignments', 'local');
             }
 
             $assignment->update($data);
@@ -315,6 +336,11 @@ class AssignmentController extends Controller
             return back()->withInput()->withErrors(['questions_json' => $e->getMessage()]);
         }
 
+        if ($assignment->meeting_id) {
+            return redirect()->route('guru.meetings.show', $assignment->meeting_id)
+                ->with('success', 'Tugas berhasil diperbarui.');
+        }
+
         return redirect()->route('guru.assignments.index')
             ->with('success', 'Tugas berhasil diperbarui.');
     }
@@ -323,7 +349,7 @@ class AssignmentController extends Controller
     {
         abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
 
-        $assignment->load(['submissions.student.user', 'schoolClass']);
+        $assignment->load(['submissions.student.user', 'submissions.comments.user', 'schoolClass']);
 
         if ($assignment->isOnline()) {
             $assignment->load(['questions.options', 'submissions.questionAnswers.question', 'submissions.questionAnswers.selectedOption']);
@@ -339,6 +365,12 @@ class AssignmentController extends Controller
         $meetingId = $assignment->meeting_id;
         $assignment->delete();
 
+        // ponytail: redirect back to meeting details if assignment belonged to one
+        if ($meetingId) {
+            return redirect()->route('guru.meetings.show', $meetingId)
+                ->with('success', 'Tugas berhasil dihapus.');
+        }
+
         return redirect()->route('guru.assignments.index')
             ->with('success', 'Tugas berhasil dihapus.');
     }
@@ -346,7 +378,7 @@ class AssignmentController extends Controller
     /**
      * Grade a single question answer (for essay questions)
      */
-    public function gradeQuestion(Request $request, QuestionAnswer $answer): RedirectResponse
+    public function gradeQuestion(Request $request, QuestionAnswer $answer)
     {
         // Verify the teacher owns this assignment
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
@@ -378,6 +410,29 @@ class AssignmentController extends Controller
         $percentage = $totalPoints > 0 ? round(($totalScore / $totalPoints) * 100) : 0;
         $submission->update(['score' => $percentage]);
 
+        // Create notification for student
+        try {
+            $studentUser = $submission->student->user;
+            \App\Models\Notification::create([
+                'user_id' => $studentUser->id,
+                'title' => '⭐ Nilai Tugas Diperbarui: ' . $assignment->title,
+                'message' => 'Nilai Anda untuk tugas ' . $assignment->title . ' telah diperbarui menjadi: ' . $percentage . '.',
+                'url' => route('siswa.assignments.show', $assignment->id),
+            ]);
+        } catch (\Exception $ne) {
+            // Silently ignore
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Nilai soal berhasil disimpan.',
+                'score' => $data['score'],
+                'is_correct' => $data['is_correct'],
+                'total_score' => $percentage,
+            ]);
+        }
+
         return back()->with('success', 'Nilai soal berhasil disimpan.');
     }
 
@@ -399,6 +454,19 @@ class AssignmentController extends Controller
             'score' => $data['score'],
             'feedback' => $data['feedback'],
         ]);
+
+        // Create notification for student
+        try {
+            $studentUser = $submission->student->user;
+            \App\Models\Notification::create([
+                'user_id' => $studentUser->id,
+                'title' => '⭐ Nilai Tugas Dirilis: ' . $submission->assignment->title,
+                'message' => 'Nilai Anda untuk tugas ' . $submission->assignment->title . ' telah dirilis dengan nilai: ' . $data['score'] . '.',
+                'url' => route('siswa.assignments.show', $submission->assignment_id),
+            ]);
+        } catch (\Exception $ne) {
+            // Silently ignore
+        }
 
         return back()->with('success', 'Nilai tugas berhasil disimpan.');
     }

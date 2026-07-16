@@ -3,43 +3,45 @@
 @section('title', 'Ruang Kelas (Materi & Tugas)')
 
 @section('content')
-    <!-- Header -->
-    <div class="d-flex align-items-center justify-content-between mb-5">
+    <!-- Header Banner -->
+    <div class="header-banner mb-5 p-4 rounded-4 text-white d-flex align-items-center justify-content-between reveal" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); box-shadow: 0 4px 24px rgba(37, 103, 30, 0.12); border-radius: 20px;">
         <div>
-            <h1 class="h3 mb-2">📅 Pertemuan Kelas</h1>
-            <p class="text-muted mb-0">Pilih kelas dan mata pelajaran untuk melihat atau membuat pertemuan</p>
+            <h1 class="h2 mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;">📅 Pertemuan Kelas</h1>
+            <p class="mb-0 text-white-50">Pilih kelas dan mata pelajaran untuk melihat atau membuat pertemuan</p>
         </div>
-        <a class="btn btn-sm" style="background-color: #48A111; color: white; border: none; box-shadow: 0 2px 8px rgba(72,161,17, 0.2);" href="{{ route('guru.meetings.create') }}">
-            <i class="fas fa-plus me-2"></i> Buat Pertemuan Baru
+        <a class="btn btn-light px-4 py-2 shadow-sm d-flex align-items-center gap-2" style="border-radius: 12px; font-weight: 600; color: var(--primary);" href="{{ route('guru.meetings.create') }}">
+            <i class="fas fa-plus"></i> Buat Pertemuan Baru
         </a>
     </div>
 
     @if($meetingGroups->isEmpty())
-        <div class="card text-center py-5 border-0 shadow-sm">
-            <div class="card-body">
-                <i class="fas fa-chalkboard-teacher fa-4x mb-4 text-light"></i>
-                <h5 class="mb-3">📭 Belum ada pertemuan</h5>
-                <p class="text-muted mb-4">Anda belum membuat pertemuan kelas. Klik tombol di bawah untuk memulai.</p>
-                <a href="{{ route('guru.meetings.create') }}" class="btn btn-primary" style="background-color: #48A111; border: none;">Buat Pertemuan Pertama</a>
+        <div class="empty-state py-5 reveal text-center">
+            <div class="empty-state-icon mb-4">
+                <i class="fas fa-chalkboard-teacher fa-4x text-success" style="opacity: 0.6;"></i>
             </div>
+            <h4 class="empty-state-text" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;">📭 Belum Ada Pertemuan</h4>
+            <p class="text-muted mb-4 max-w-md mx-auto">Anda belum membuat pertemuan kelas. Klik tombol di bawah untuk memulai pertemuan pertama Anda.</p>
+            <a href="{{ route('guru.meetings.create') }}" class="btn btn-success px-4 py-2" style="background-color: var(--primary); border: none; border-radius: 12px; font-weight: 600;">
+                Buat Pertemuan Pertama
+            </a>
         </div>
     @else
         @foreach($meetingGroups as $major => $subjectGroups)
-            <div class="mb-5">
+            <div class="mb-5 reveal">
                 <div class="d-flex align-items-center mb-4">
-                    <div class="p-2 px-3 rounded-pill text-white fw-bold {{ $major == 'IPA' ? 'bg-primary' : ($major == 'IPS' ? 'bg-warning text-dark' : 'bg-secondary') }}">
+                    <span class="badge {{ $major == 'IPA' ? 'bg-primary-subtle text-primary border border-primary-subtle' : ($major == 'IPS' ? 'bg-warning-subtle text-warning-emphasis border border-warning-subtle' : 'bg-secondary-subtle text-secondary border border-secondary-subtle') }} px-3 py-2 rounded-pill fw-bold" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem;">
                         <i class="fas {{ $major == 'IPA' ? 'fa-atom' : ($major == 'IPS' ? 'fa-landmark' : 'fa-folder') }} me-2"></i> JURUSAN {{ strtoupper($major) }}
-                    </div>
-                    <div class="flex-grow-1 ms-3 border-top opacity-10"></div>
+                    </span>
+                    <div class="flex-grow-1 ms-3 border-top" style="border-color: rgba(37, 103, 30, 0.08) !important;"></div>
                 </div>
 
                 @foreach($subjectGroups as $subjectName => $groups)
                     <div class="ms-lg-4 mb-4">
                         <div class="d-flex align-items-center mb-3">
-                            <h5 class="mb-0 fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">
-                                <i class="fas fa-bookmark text-muted me-2 small"></i> {{ $subjectName }}
+                            <h5 class="mb-0 fw-bold text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                                <i class="fas fa-bookmark text-success me-2 small"></i> {{ $subjectName }}
                             </h5>
-                            <span class="ms-3 badge rounded-pill bg-light text-muted border px-2 py-1" style="font-size: 0.65rem;">
+                            <span class="ms-3 badge rounded-pill bg-light text-muted border px-2 py-1" style="font-size: 0.75rem;">
                                 {{ $groups->count() }} Kelas
                             </span>
                         </div>
@@ -47,26 +49,26 @@
                         <div class="row">
                             @foreach($groups as $group)
                                 <div class="col-md-6 col-lg-4 mb-4">
-                                    <div class="card h-100 class-group-card border-0 shadow-sm" 
-                                         style="cursor: pointer; border-radius: 18px; transition: all 0.3s ease; border-left: 4px solid {{ $major == 'IPA' ? '#0d6efd' : ($major == 'IPS' ? '#ffc107' : '#25671E') }};"
-                                         onclick="window.location='{{ route('guru.meetings.index', ['class_id' => $group->class_id, 'subject_id' => $group->subject_id]) }}'">
+                                    <div class="content-card class-group-card h-100 border-0 shadow-sm" 
+                                         style="cursor: pointer; border-left: 4px solid {{ $major == 'IPA' ? 'var(--primary)' : ($major == 'IPS' ? 'var(--accent)' : 'var(--secondary)') }}; transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);"
+                                         onclick="window.location='{{ route('guru.meetings.class-meetings', ['classSlug' => $group->schoolClass->slug, 'subjectSlug' => $group->subject->slug]) }}'">
                                         
-                                        <div class="card-body p-3">
+                                        <div class="content-card-body p-4">
                                             <div class="d-flex align-items-center justify-content-between mb-2">
                                                 <div class="d-flex align-items-center">
-                                                    <div class="p-2 rounded-circle me-3" style="background-color: {{ $major == 'IPA' ? '#f0f7ff' : ($major == 'IPS' ? '#fffdf0' : '#f0fdf4') }};">
+                                                    <div class="p-2 rounded-circle me-3" style="background-color: {{ $major == 'IPA' ? 'rgba(27, 94, 32, 0.06)' : ($major == 'IPS' ? 'rgba(249, 168, 37, 0.06)' : 'rgba(67, 160, 71, 0.06)') }}; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">
                                                         <i class="fas fa-users-viewfinder {{ $major == 'IPA' ? 'text-primary' : ($major == 'IPS' ? 'text-warning' : 'text-success') }} small"></i>
                                                     </div>
-                                                    <h6 class="mb-0 fw-bold">{{ $group->schoolClass?->name ?? 'Tanpa Kelas' }}</h6>
+                                                    <h6 class="mb-0 fw-bold text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ $group->schoolClass?->name ?? 'Tanpa Kelas' }}</h6>
                                                 </div>
-                                                <div class="badge bg-light text-muted small border">{{ $group->total_meetings }} Sesi</div>
+                                                <span class="badge bg-light text-muted small border rounded-pill px-2 py-1" style="font-size: 0.7rem;">{{ $group->total_meetings }} Sesi</span>
                                             </div>
                                             
-                                            <div class="card-footer bg-transparent border-0 p-0 mt-3 d-flex gap-2">
-                                                <a href="{{ route('guru.meetings.index', ['class_id' => $group->class_id, 'subject_id' => $group->subject_id]) }}" class="btn btn-sm flex-grow-1 rounded-pill py-2" style="font-size: 0.75rem; background-color: {{ $major == 'IPA' ? '#f0f7ff' : ($major == 'IPS' ? '#fffdf0' : '#f0fdf4') }}; color: {{ $major == 'IPA' ? '#0d6efd' : ($major == 'IPS' ? '#d39e00' : '#25671E') }}; border: 1px solid {{ $major == 'IPA' ? '#cfe2ff' : ($major == 'IPS' ? '#ffecb5' : '#dcfce7') }};">
-                                                    Buka <i class="fas fa-arrow-right ms-1"></i>
+                                            <div class="d-flex gap-2 mt-4 pt-3 border-top" style="border-color: rgba(37, 103, 30, 0.04) !important;">
+                                                <a href="{{ route('guru.meetings.class-meetings', ['classSlug' => $group->schoolClass->slug, 'subjectSlug' => $group->subject->slug]) }}" class="btn btn-sm flex-grow-1 rounded-pill py-2 d-flex align-items-center justify-content-center gap-1" style="font-size: 0.8rem; font-weight: 600; background-color: {{ $major == 'IPA' ? 'rgba(27, 94, 32, 0.06)' : ($major == 'IPS' ? 'rgba(249, 168, 37, 0.06)' : 'rgba(67, 160, 71, 0.06)') }}; color: {{ $major == 'IPA' ? 'var(--primary-light)' : ($major == 'IPS' ? 'var(--accent)' : 'var(--secondary)') }}; border: 1px solid transparent;">
+                                                    Buka Kelas <i class="fas fa-arrow-right small"></i>
                                                 </a>
-                                                <a href="{{ route('guru.meetings.create', ['class_id' => $group->class_id, 'subject_id' => $group->subject_id]) }}" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Tambah Sesi">
+                                                <a href="{{ route('guru.meetings.class-meetings.create', ['classSlug' => $group->schoolClass->slug, 'subjectSlug' => $group->subject->slug]) }}" class="btn btn-sm btn-outline-success rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; border-color: rgba(37, 103, 30, 0.15); color: var(--primary);" title="Tambah Sesi" onclick="event.stopPropagation(); text-decoration: none;">
                                                     <i class="fas fa-plus small"></i>
                                                 </a>
                                             </div>
@@ -81,14 +83,14 @@
         @endforeach
     @endif
 
-        <style>
-            .class-group-card:hover {
-                transform: translateY(-10px);
-                box-shadow: 0 15px 30px rgba(37, 103, 30, 0.15) !important;
-            }
-            .class-group-card:hover .btn {
-                background-color: #48A111 !important;
-                color: white !important;
-            }
-        </style>
+    <style>
+        .class-group-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(37, 103, 30, 0.08) !important;
+        }
+        .class-group-card:hover .btn-sm.flex-grow-1 {
+            background-color: var(--primary) !important;
+            color: white !important;
+        }
+    </style>
 @endsection

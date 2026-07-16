@@ -3,39 +3,51 @@
 @section('title', $material->title)
 
 @section('content')
-    <div class="mb-4">
-        <div class="d-flex align-items-center gap-3 mb-3">
+    <!-- ponytail: responsive header block -->
+    <div class="mb-4 reveal">
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-3 mb-3">
             @if($material->meeting)
-                <a href="{{ route('siswa.meetings.show', $material->meeting) }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Kembali
+                <a href="{{ route('siswa.meetings.show', $material->meeting) }}" class="btn btn-outline-secondary-theme btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Kembali
                 </a>
             @else
-                <a href="{{ route('siswa.subjects.show', $material->subject_id) }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-arrow-left"></i> Kembali
+                <a href="{{ route('siswa.subjects.show', $material->subject_id) }}" class="btn btn-outline-secondary-theme btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Kembali
                 </a>
             @endif
-            <h1 class="h3 mb-0">Materi Pembelajaran</h1>
+            <h1 class="h3 mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: var(--primary);">Materi Pembelajaran</h1>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm mb-4" style="border-top: 4px solid #48A111;">
-        <div class="card-body p-4">
-            <h3 class="fw-bold mb-3" style="color: #25671E;">{{ $material->title }}</h3>
-            
-            <div class="d-flex gap-3 flex-wrap mb-4 pb-4 border-bottom">
-                <span class="badge bg-light text-dark border"><i class="fas fa-book me-1"></i> {{ $material->subject->name }}</span>
-                <span class="badge bg-light text-dark border"><i class="fas fa-chalkboard-user me-1"></i> {{ $material->teacher->user->name }}</span>
+    <div class="content-card mb-5 reveal reveal-delay-1">
+        <div class="content-card-header" style="padding-bottom: 0;">
+            <div class="content-card-header-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h5 class="content-card-title" style="font-size: 1.35rem; font-weight: 800; line-height: 1.4;">{{ $material->title }}</h5>
+        </div>
+        <div class="content-card-body">
+            <!-- ponytail: premium, responsive metadata row instead of bulky badges -->
+            <div class="d-flex flex-wrap align-items-center gap-2 pb-3 mb-4 border-bottom" style="font-size: 0.9rem; color: var(--text-body);">
+                <span class="d-flex align-items-center gap-2"><i class="fas fa-book text-success"></i> <strong>{{ $material->subject->name }}</strong></span>
+                <span class="mx-2 text-muted opacity-50 d-none d-sm-inline">&bull;</span>
+                <span class="d-flex align-items-center gap-2"><i class="fas fa-chalkboard-user text-primary"></i> {{ $material->teacher->user->name }}</span>
                 @if($material->meeting)
-                    <span class="badge bg-light text-dark border"><i class="fas fa-calendar-day me-1"></i> Pertemuan {{ $material->meeting->number }}</span>
+                    <span class="mx-2 text-muted opacity-50 d-none d-sm-inline">&bull;</span>
+                    <span class="d-flex align-items-center gap-2"><i class="fas fa-calendar-day text-warning"></i> Pertemuan {{ $material->meeting->number }}</span>
                 @endif
-                <span class="badge bg-light text-dark border"><i class="fas fa-clock me-1"></i> {{ $material->created_at->format('d M Y, H:i') }}</span>
+                <span class="mx-2 text-muted opacity-50 d-none d-sm-inline">&bull;</span>
+                <span class="d-flex align-items-center gap-2"><i class="fas fa-clock text-info"></i> {{ $material->created_at->format('d M Y, H:i') }}</span>
             </div>
 
+            <!-- ponytail: modern wrapped video frame -->
             @if($material->youtube_url)
-                <div class="mb-5">
+                <div class="mb-5 reveal reveal-delay-2">
                     @if($material->youtube_embed_url)
-                        <div class="ratio ratio-16x9 bg-dark rounded overflow-hidden shadow-sm" style="max-width: 800px; margin: 0 auto;">
-                            <iframe src="{{ $material->youtube_embed_url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <div class="p-2 rounded-4 border shadow-sm bg-light" style="max-width: 800px; margin: 0 auto; border-color: rgba(27, 94, 32, 0.08) !important;">
+                            <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
+                                <iframe src="{{ $material->youtube_embed_url }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            </div>
                         </div>
                     @else
                         <div class="alert alert-warning">
@@ -45,37 +57,44 @@
                 </div>
             @endif
 
+            <!-- ponytail: editorial-style body content container -->
             @if($material->content)
-                <div class="mb-5">
-                    <div class="p-4 bg-light rounded text-dark" style="font-size: 1.05rem; line-height: 1.6;">
+                <div class="mb-5 reveal reveal-delay-3">
+                    <h5 class="fw-bold mb-3" style="color: var(--primary); font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-align-left me-2"></i> Deskripsi Materi</h5>
+                    <div class="p-4 rounded-3" style="background: rgba(27, 94, 32, 0.015); font-size: 1.05rem; line-height: 1.8; border: 1px solid rgba(27, 94, 32, 0.05); color: #333;">
                         {!! nl2br(e($material->content)) !!}
                     </div>
                 </div>
             @endif
 
+            <!-- ponytail: embedded PDF viewer frame for easy reading -->
             @if($material->file_path)
-                <div class="mt-4 pt-4 border-top">
-                    <h5 class="fw-bold mb-3" style="color: #25671E;"><i class="fas fa-file-pdf text-danger me-2"></i> Lampiran Dokumen</h5>
-                    <div class="d-flex align-items-center p-3 bg-light rounded border item-hover-card" 
-                         style="max-width: 400px; cursor: pointer; transition: 0.2s;"
-                         onclick="window.open('{{ asset('storage/' . $material->file_path) }}', '_blank')">
-                        <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold">Dokumen Materi.pdf</div>
-                            <small class="text-muted">Klik untuk membuka</small>
+                <div class="mt-5 pt-4 border-top reveal reveal-delay-4">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h5 class="fw-bold mb-0" style="color: var(--primary); font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-file-pdf text-danger me-2"></i> Lampiran Dokumen</h5>
+                        <a href="{{ route('materials.view-file', $material) }}" target="_blank" class="small text-decoration-none d-none d-md-inline" style="color: var(--secondary); font-weight: 600;">
+                            <i class="fas fa-external-link-alt me-1"></i> Buka di Tab Baru
+                        </a>
+                    </div>
+                    
+                    <!-- Mobile Fallback Card (Mobile browsers block inline PDF iframes) -->
+                    <div class="d-block d-md-none mb-3">
+                        <div class="card p-4 border text-center shadow-sm" style="border-radius: var(--radius-md) !important; background: rgba(27, 94, 32, 0.015); border-color: rgba(27, 94, 32, 0.08) !important;">
+                            <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                            <h6 class="fw-bold text-dark mb-1">Materi PDF</h6>
+                            <p class="text-muted small mb-4">Browser mobile tidak dapat menampilkan PDF secara langsung di halaman.</p>
+                            <a href="{{ route('materials.view-file', $material) }}" target="_blank" class="btn btn-sm btn-outline-primary-theme w-100 py-2.5 fw-bold" style="background: var(--primary) !important; color: white !important; border: none; border-radius: var(--radius-sm);">
+                                <i class="fas fa-external-link-alt me-1"></i> Buka Dokumen PDF
+                            </a>
                         </div>
-                        <span class="btn btn-success btn-sm">Buka</span>
+                    </div>
+
+                    <!-- Desktop PDF Iframe -->
+                    <div class="d-none d-md-block border rounded-3 shadow-sm overflow-hidden" style="height: 600px; background-color: #f8f9fa; border-color: rgba(27, 94, 32, 0.08) !important;">
+                        <iframe src="{{ route('materials.view-file', $material) }}" width="100%" height="100%" style="border: none;"></iframe>
                     </div>
                 </div>
             @endif
         </div>
     </div>
-    
-    <style>
-        .item-hover-card:hover {
-            transform: translateY(-3px);
-            background-color: #e9ecef !important;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-    </style>
 @endsection

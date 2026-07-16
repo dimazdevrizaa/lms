@@ -4,26 +4,42 @@
 
 @section('content')
     <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a href="{{ route('guru.materials.index') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-        <div>
-            <h1 class="h3 mb-1">📚 Edit Materi Pembelajaran</h1>
-            <p class="text-muted mb-0">Perbarui konten materi pembelajaran Anda</p>
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3 reveal">
+        <div class="d-flex align-items-center gap-3">
+            @php
+                $backUrl = $material->meeting_id 
+                    ? route('guru.meetings.show', $material->meeting_id) 
+                    : route('guru.materials.index');
+            @endphp
+            <a href="{{ $backUrl }}" class="btn btn-outline-secondary-theme btn-sm" style="border-radius: var(--radius-sm);">
+                <i class="fas fa-arrow-left me-1"></i> Kembali
+            </a>
+            <div>
+                <h1 class="mb-1 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.75rem;">📚 Edit Materi Pembelajaran</h1>
+                <p class="text-muted mb-0">Perbarui konten materi pembelajaran Anda</p>
+            </div>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-body p-4">
+        <div class="col-lg-8 mb-4 reveal reveal-delay-1">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <div class="content-card-header-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h5 class="content-card-title mb-0">Formulir Edit Materi</h5>
+                </div>
+                <div class="content-card-body">
                     <form method="POST" action="{{ route('guru.materials.update', $material) }}" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+
                         <!-- Pertemuan, Kelas & Mata Pelajaran -->
                         <div class="row mb-4">
                             <div class="col-md-12 mb-4">
-                                <label class="form-label" style="font-weight: 600; color: #25671E;">🗓️ Pilih Pertemuan (Opsional)</label>
-                                <select class="form-select" style="border-color: #F2B50B; border-width: 2px;" name="meeting_id" id="meeting_id">
+                                <label class="form-label fw-bold" style="color: var(--primary);">🗓️ Pilih Pertemuan (Opsional)</label>
+                                <select class="form-select" style="border: 2px solid var(--accent); border-radius: var(--radius-sm);" name="meeting_id" id="meeting_id">
                                     <option value="">-- Tanpa Pertemuan (Materi Mandiri) --</option>
                                     @foreach($meetings as $meeting)
                                         <option value="{{ $meeting->id }}" 
@@ -36,9 +52,9 @@
                                 </select>
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-weight: 600; color: #25671E;">🎓 Kelas</label>
-                                <select class="form-select" style="border-color: #25671E;" name="class_id" id="class_id" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold" style="color: var(--primary);">🎓 Kelas</label>
+                                <select class="form-select" name="class_id" id="class_id" required style="border-radius: var(--radius-sm);">
                                     <option value="">-- Pilih Kelas --</option>
                                     @foreach($classes as $class)
                                         <option value="{{ $class->id }}" @selected(old('class_id', $material->class_id) == $class->id)>{{ $class->name }}</option>
@@ -49,9 +65,9 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label class="form-label" style="font-weight: 600; color: #25671E;">📖 Mata Pelajaran</label>
-                                <select class="form-select" style="border-color: #25671E;" name="subject_id" id="subject_id" required>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold" style="color: var(--primary);">📖 Mata Pelajaran</label>
+                                <select class="form-select" name="subject_id" id="subject_id" required style="border-radius: var(--radius-sm);">
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->id }}" @selected(old('subject_id', $material->subject_id) == $subject->id || $subjects->count() == 1)>{{ $subject->name }}</option>
                                     @endforeach
@@ -100,8 +116,8 @@
 
                         <!-- Judul Materi -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📝 Judul Materi</label>
-                            <input class="form-control" style="border-color: #25671E;" name="title" value="{{ old('title', $material->title) }}" required>
+                            <label class="form-label fw-bold" style="color: var(--primary);">📝 Judul Materi</label>
+                            <input class="form-control" name="title" value="{{ old('title', $material->title) }}" required style="border-radius: var(--radius-sm);">
                             @error('title')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -109,8 +125,8 @@
 
                         <!-- Konten -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📄 Konten Materi (Opsional)</label>
-                            <textarea class="form-control" style="border-color: #25671E;" name="content" rows="6">{{ old('content', $material->content) }}</textarea>
+                            <label class="form-label fw-bold" style="color: var(--primary);">📄 Konten Materi (Opsional)</label>
+                            <textarea class="form-control" name="content" rows="6" style="border-radius: var(--radius-sm);">{{ old('content', $material->content) }}</textarea>
                             @error('content')
                                 <small class="text-danger d-block">{{ $message }}</small>
                             @enderror
@@ -118,15 +134,35 @@
 
                         <!-- File PDF -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📤 File PDF Materi</label>
+                            <label class="form-label fw-bold" style="color: var(--primary);">📤 File PDF Materi</label>
                             @if($material->file_path)
-                                <div class="mb-2">
-                                    <a href="{{ asset('storage/' . $material->file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-file-pdf me-1"></i> Lihat PDF Saat Ini
-                                    </a>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="small text-muted"><i class="fas fa-file-pdf text-danger me-1"></i> Preview PDF saat ini:</span>
+                                        <a href="{{ route('materials.view-file', $material) }}" target="_blank" class="small text-decoration-none d-none d-md-inline" style="color: var(--secondary); font-weight: 600;">
+                                            <i class="fas fa-external-link-alt me-1"></i> Buka di Tab Baru
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Mobile Fallback Card (Mobile browsers block inline PDF iframes) -->
+                                    <div class="d-block d-md-none mb-3">
+                                        <div class="card p-4 border text-center shadow-sm" style="border-radius: var(--radius-md) !important; background: rgba(27, 94, 32, 0.015); border-color: rgba(27, 94, 32, 0.08) !important;">
+                                            <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                                            <h6 class="fw-bold text-dark mb-1">Materi PDF</h6>
+                                            <p class="text-muted small mb-4">Browser mobile tidak dapat menampilkan PDF secara langsung di halaman.</p>
+                                            <a href="{{ route('materials.view-file', $material) }}" target="_blank" class="btn btn-sm btn-outline-primary-theme w-100 py-2.5 fw-bold" style="background: var(--primary) !important; color: white !important; border: none; border-radius: var(--radius-sm);">
+                                                <i class="fas fa-external-link-alt me-1"></i> Buka Dokumen PDF
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Desktop PDF Iframe -->
+                                    <div class="d-none d-md-block border rounded shadow-sm overflow-hidden" style="height: 500px; background-color: #f8f9fa;">
+                                        <iframe src="{{ route('materials.view-file', $material) }}" width="100%" height="100%" style="border: none;"></iframe>
+                                    </div>
                                 </div>
                             @endif
-                            <input type="file" class="form-control" style="border-color: #25671E;" name="file" accept=".pdf">
+                            <input type="file" class="form-control" name="file" accept=".pdf" style="border-radius: var(--radius-sm);">
                             <small class="text-muted">Pilih file PDF baru jika ingin mengganti file lama (Maksimal 10MB)</small>
                             @error('file')
                                 <small class="text-danger d-block">{{ $message }}</small>
@@ -135,8 +171,8 @@
 
                         <!-- YouTube Video -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🎥 Video YouTube (Opsional)</label>
-                            <input type="url" class="form-control" style="border-color: #25671E;" name="youtube_url" value="{{ old('youtube_url', $material->youtube_url) }}" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+                            <label class="form-label fw-bold" style="color: var(--primary);">🎥 Video YouTube (Opsional)</label>
+                            <input type="url" class="form-control" name="youtube_url" value="{{ old('youtube_url', $material->youtube_url) }}" placeholder="Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ" style="border-radius: var(--radius-sm);">
                             <small class="text-muted">Masukkan link video YouTube jika ingin menyematkan video ke dalam materi</small>
                             @error('youtube_url')
                                 <small class="text-danger d-block">{{ $message }}</small>
@@ -145,8 +181,8 @@
 
                         <!-- Buttons -->
                         <div class="d-flex gap-2 mt-5">
-                            <button class="btn btn-lg" style="background-color: #48A111; color: white; border: none;" type="submit">✓ Update Materi</button>
-                            <a class="btn btn-lg btn-outline-secondary" href="{{ route('guru.materials.index') }}">Batal</a>
+                            <button class="btn btn-lg btn-primary px-4" style="border-radius: var(--radius-md);" type="submit">✓ Update Materi</button>
+                            <a class="btn btn-lg btn-outline-secondary-theme" href="{{ $backUrl }}" style="border-radius: var(--radius-md);">Batal</a>
                         </div>
                     </form>
                 </div>

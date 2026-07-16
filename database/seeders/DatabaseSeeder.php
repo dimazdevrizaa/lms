@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\AdminStaff;
 use App\Models\AcademicYear;
+use App\Models\ClassSubjectTeacher;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Subject;
@@ -67,7 +68,13 @@ class DatabaseSeeder extends Seeder
 
         $subject = Subject::updateOrCreate(
             ['name' => 'Matematika'],
-            ['code' => 'MTK', 'teacher_id' => $teacher->id],
+            ['code' => 'MTK'],
+        );
+
+        // Create teaching assignment via pivot table
+        ClassSubjectTeacher::updateOrCreate(
+            ['class_id' => $class->id, 'subject_id' => $subject->id, 'academic_year_id' => $year->id],
+            ['teacher_id' => $teacher->id],
         );
 
         // 4. Siswa Account

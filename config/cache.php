@@ -114,4 +114,20 @@ return [
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Allowed Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | This option lists the classes that are allowed to be serialized when
+    | serializing models or database query values. By default, no classes
+    | are allowed to prevent PHP object injection vulnerabilities.
+    |
+    | You may specify "true" to allow all classes.
+    |
+    */
+
+    'serializable_classes' => true,
+
 ];
+

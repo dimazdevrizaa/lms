@@ -3,54 +3,77 @@
 @section('title', 'Data Siswa - ' . $class->name)
 
 @section('content')
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a href="{{ route('guru.classroom.index') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Kembali
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-3 mb-5 reveal">
+        <a href="{{ route('guru.classroom.index') }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; border-radius: 10px;">
+            <i class="fas fa-arrow-left"></i>
         </a>
         <div>
-            <h1 class="h3 mb-1">👥 Data Siswa Kelas {{ $class->name }}</h1>
-            <p class="text-muted mb-0">Total: <strong>{{ $students->count() }} siswa</strong></p>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ route('guru.classroom.index') }}" style="color: var(--primary-light); text-decoration: none;">Kelas Saya</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Data Siswa</li>
+                </ol>
+            </nav>
+            <h1 class="h3 mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: var(--primary);">Data Siswa Kelas {{ $class->name }}</h1>
+            <p class="text-muted mb-0">Total terdaftar: <strong>{{ $students->count() }} siswa</strong></p>
         </div>
     </div>
 
     @if($students->count() > 0)
-        <div class="card">
-            <div class="card-body p-4">
+        <div class="content-card reveal-delay-1">
+            <div class="content-card-header bg-white py-3">
+                <div class="content-card-header-icon" style="background-color: rgba(27, 94, 32, 0.08); color: var(--primary);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h5 class="content-card-title" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;">Daftar Siswa Aktif</h5>
+            </div>
+            <div class="content-card-body p-4">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead style="background-color: #F7F0F0; border-bottom: 2px solid #25671E;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th style="color: #25671E; font-weight: 600;">No.</th>
-                                <th style="color: #25671E; font-weight: 600;">🆔 NIS</th>
-                                <th style="color: #25671E; font-weight: 600;">👤 Nama</th>
-                                <th style="color: #25671E; font-weight: 600;">📞 No. HP</th>
-                                <th style="color: #25671E; font-weight: 600;">🔑 Akses Ortu</th>
+                                <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">No.</th>
+                                <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">🆔 NIS</th>
+                                <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">👤 Nama</th>
+                                <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">📞 No. HP</th>
+                                <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">🔑 Akses Ortu</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($students as $index => $student)
                                 <tr>
-                                    <td><strong>{{ $index + 1 }}</strong></td>
+                                    <td><strong class="text-dark">{{ $index + 1 }}</strong></td>
                                     <td>
-                                        <span class="badge" style="background-color: #F2B50B; color: #25671E;">
+                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-bold" style="border-radius: 8px; font-size: 0.75rem;">
                                             {{ $student->nis }}
                                         </span>
                                     </td>
                                     <td>
-                                        <strong style="color: #25671E;">{{ $student->user->name }}</strong>
+                                        <span class="fw-bold text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ $student->user->name }}</span>
                                     </td>
                                     <td>
-                                        <small class="text-muted">{{ $student->phone ?? '—' }}</small>
+                                        <span class="text-muted" style="font-size: 0.85rem;">{{ $student->phone ?? '-' }}</span>
                                     </td>
                                     <td>
-                                        <div class="d-flex align-items-center gap-2 allow-copy">
-                                            <code class="bg-light px-2 py-1 rounded text-dark" style="font-size: 0.85rem;">{{ $student->parent_code }}</code>
-                                            <button class="btn btn-sm p-0 border-0 text-success copy-btn" data-code="{{ $student->parent_code }}" title="Salin Link Ortu">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
-                                            <a href="{{ route('parent.view', $student->parent_code) }}" target="_blank" class="btn btn-sm p-0 border-0 text-primary" title="Buka Link Ortu">
-                                                <i class="fas fa-external-link-alt"></i>
-                                            </a>
+                                        <div class="d-flex align-items-center gap-2">
+                                            @if ($student->parent_code)
+                                                <code class="bg-light px-2 py-1 rounded text-dark fw-bold border" style="font-size: 0.8rem; border-radius: 6px;">{{ substr($student->parent_code, 0, 2) . str_repeat('*', max(strlen($student->parent_code) - 2, 4)) }}</code>
+                                                <form action="{{ route('parent.code.reveal', $student) }}" method="POST" class="d-inline" target="_blank">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm p-1 border-0 text-primary" title="Lihat Kode di Tab Baru" style="background: transparent;">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="text-muted small">-</span>
+                                            @endif
+                                            <form action="{{ route('parent.code.regenerate', $student) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ $student->parent_code ? 'Kode akses lama akan tidak berlaku lagi. Lanjutkan?' : 'Buat kode akses baru. Lanjutkan?' }}')">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm p-1 border-0 text-warning" title="{{ $student->parent_code ? 'Perbarui Kode Ortu' : 'Buat Kode Ortu' }}">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -61,25 +84,14 @@
             </div>
         </div>
     @else
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> Belum ada siswa di kelas ini.
+        <div class="alert alert-info border-0 shadow-sm p-4 reveal" role="alert" style="border-radius: 12px; background-color: rgba(67, 160, 71, 0.08); color: var(--primary);">
+            <div class="d-flex align-items-center gap-3">
+                <i class="fas fa-info-circle fa-2x"></i>
+                <div>
+                    <h5 class="fw-bold mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif;">Belum Ada Siswa</h5>
+                    <p class="mb-0 small text-muted">Belum ada data siswa terdaftar di dalam kelas ini.</p>
+                </div>
+            </div>
         </div>
     @endif
 @endsection
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const code = this.getAttribute('data-code');
-                navigator.clipboard.writeText(code).then(() => {
-                    alert('Kode akses orang tua berhasil disalin: ' + code);
-                }).catch(err => {
-                    console.error('Gagal menyalin kode: ', err);
-                });
-            });
-        });
-    });
-</script>
-@endpush

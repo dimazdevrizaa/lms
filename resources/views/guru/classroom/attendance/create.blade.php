@@ -3,13 +3,17 @@
 @section('title', 'Input Absensi - ' . $class->name)
 
 @section('content')
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a href="{{ route('guru.classroom.attendance', $class) }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-        <div>
-            <h1 class="h3 mb-1">🖊️ Input Absensi - {{ $class->name }}</h1>
-            <p class="text-muted mb-0">Catat absensi harian kelas perwalian Anda</p>
+    <div class="page-header-banner reveal">
+        <div class="page-header-banner-inner">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 style="font-family: 'Plus Jakarta Sans', sans-serif;">🖊️ Input Absensi - {{ $class->name }}</h1>
+                    <p>Catat absensi harian kelas perwalian Anda</p>
+                </div>
+                <a href="{{ route('guru.classroom.attendance', $class) }}" class="btn btn-outline-light d-inline-flex align-items-center gap-2">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+            </div>
         </div>
     </div>
 
@@ -18,60 +22,71 @@
 
         <div class="row">
             <div class="col-lg-4">
-                <div class="card mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-4">Konfigurasi</h5>
-                        
+                <div class="content-card reveal reveal-delay-1">
+                    <div class="content-card-header">
+                        <div class="content-card-header-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h5 class="content-card-title">Konfigurasi</h5>
+                    </div>
+                    <div class="content-card-body">
                         <!-- Tanggal Absensi -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📅 Tanggal</label>
-                            <input class="form-control" style="border-color: #25671E;" type="date" name="date" value="{{ old('date', $today) }}" required>
+                            <label class="form-label" style="font-weight: 600;">📅 Tanggal</label>
+                            <input class="form-control" type="date" name="date" value="{{ old('date', $today) }}" required>
                             @error('date')
-                                <small class="text-danger">{{ $message }}</small>
+                                <small class="text-danger mt-1 d-block">{{ $message }}</small>
                             @enderror
                         </div>
 
-                        <div class="alert alert-info border-0 small">
-                            <i class="fas fa-info-circle me-1"></i>
-                            Absensi ini adalah absensi kehadiran harian kelas.
+                        <div class="alert alert-info border-0 shadow-sm d-flex align-items-start gap-2" style="border-radius: var(--radius-md);">
+                            <i class="fas fa-info-circle mt-1"></i>
+                            <div>
+                                <span class="fw-semibold d-block">Informasi</span>
+                                <span class="small opacity-75">Absensi ini adalah absensi kehadiran harian kelas.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="d-grid gap-2 mb-4">
-                    <button class="btn btn-lg" style="background-color: #25671E; color: white; border: none;" type="submit">
-                        <i class="fas fa-check-circle me-2"></i> Simpan Absensi
+                <div class="d-grid gap-3 mb-4 reveal reveal-delay-2">
+                    <button class="btn btn-primary btn-lg w-100" type="submit">
+                        <i class="fas fa-check-circle"></i> Simpan Absensi
                     </button>
-                    <a class="btn btn-outline-secondary" href="{{ route('guru.classroom.attendance', $class) }}">Batal</a>
+                    <a class="btn btn-outline-secondary w-100" href="{{ route('guru.classroom.attendance', $class) }}">Batal</a>
                 </div>
             </div>
 
             <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="card-title mb-0">Status Kehadiran Siswa</h5>
-                            <button type="button" class="btn btn-sm btn-outline-success" id="markAllHadir">
-                                <i class="fas fa-check-double me-1"></i> Semua Hadir
-                            </button>
+                <div class="content-card reveal reveal-delay-2">
+                    <div class="content-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="content-card-header-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5 class="content-card-title">Status Kehadiran Siswa</h5>
                         </div>
-
+                        <button type="button" class="btn btn-sm btn-outline-primary-theme" id="markAllHadir">
+                            <i class="fas fa-check-double"></i> Semua Hadir
+                        </button>
+                    </div>
+                    <div class="content-card-body">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
-                                <thead style="background-color: #F7F0F0;">
+                                <thead>
                                     <tr>
-                                        <th style="color: #25671E; width: 50px;">No</th>
-                                        <th style="color: #25671E;">Nama Siswa</th>
-                                        <th style="color: #25671E; text-align: center; width: 280px;">Status</th>
+                                        <th style="width: 60px;">No</th>
+                                        <th>Nama Siswa</th>
+                                        <th class="text-center" style="width: 300px;">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($students as $index => $student)
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
+                                            <td class="fw-semibold text-muted">{{ $index + 1 }}</td>
                                             <td>
-                                                <strong>{{ $student->user->name }}</strong><br>
-                                                <small class="text-muted">NIS: {{ $student->nis }}</small>
+                                                <div class="fw-bold text-dark">{{ $student->user->name }}</div>
+                                                <div class="text-muted small">NIS: {{ $student->nis }}</div>
                                             </td>
                                             <td>
                                                 <div class="status-radio-group">
@@ -99,7 +114,7 @@
                             </table>
                         </div>
                         @error('statuses')
-                            <small class="text-danger">{{ $message }}</small>
+                            <small class="text-danger mt-2 d-block">{{ $message }}</small>
                         @enderror
                     </div>
                 </div>
@@ -107,10 +122,11 @@
         </div>
     </form>
 
+    @push('styles')
     <style>
         .status-radio-group {
             display: flex;
-            gap: 5px;
+            gap: 6px;
             justify-content: center;
         }
         .status-radio-item {
@@ -121,50 +137,60 @@
         }
         .status-radio-item label {
             display: block;
-            padding: 5px 2px;
+            padding: 8px 4px;
             text-align: center;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             font-size: 0.75rem;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #6c757d;
+            transition: all 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        .status-radio-item label:hover {
+            background-color: rgba(27, 94, 32, 0.04);
+            border-color: rgba(27, 94, 32, 0.15);
+            color: var(--primary);
         }
         
         /* Hadir */
         .status-radio-item input[value="hadir"]:checked + label {
-            background-color: #25671E;
-            color: white;
-            border-color: #25671E;
+            background-color: rgba(67, 160, 71, 0.12);
+            color: #2E7D32;
+            border-color: #2E7D32;
+            box-shadow: 0 2px 8px rgba(67, 160, 71, 0.1);
         }
         /* Izin */
         .status-radio-item input[value="izin"]:checked + label {
-            background-color: #F2B50B;
-            color: #25671E;
-            border-color: #F2B50B;
+            background-color: rgba(249, 168, 37, 0.12);
+            color: #B26A00;
+            border-color: #B26A00;
+            box-shadow: 0 2px 8px rgba(249, 168, 37, 0.1);
         }
         /* Sakit */
         .status-radio-item input[value="sakit"]:checked + label {
-            background-color: #48A111;
-            color: white;
-            border-color: #48A111;
+            background-color: rgba(255, 152, 0, 0.12);
+            color: #E65100;
+            border-color: #E65100;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.1);
         }
         /* Alpa */
         .status-radio-item input[value="alpa"]:checked + label {
-            background-color: #dc3545;
-            color: white;
-            border-color: #dc3545;
-        }
-        
-        .status-radio-item label:hover {
-            background-color: #f8f9fa;
+            background-color: rgba(198, 40, 40, 0.10);
+            color: #C62828;
+            border-color: #C62828;
+            box-shadow: 0 2px 8px rgba(198, 40, 40, 0.1);
         }
     </style>
+    @endpush
 
     <script>
-        document.getElementById('markAllHadir').addEventListener('click', () => {
-            const radioButtons = document.querySelectorAll('input[type="radio"][value="hadir"]');
-            radioButtons.forEach(radio => radio.checked = true);
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('markAllHadir').addEventListener('click', () => {
+                const radioButtons = document.querySelectorAll('input[type="radio"][value="hadir"]');
+                radioButtons.forEach(radio => radio.checked = true);
+            });
         });
     </script>
 @endsection

@@ -8,6 +8,8 @@ use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class StudentController extends Controller
@@ -48,12 +50,15 @@ class StudentController extends Controller
             'class_id' => ['nullable', 'exists:classes,id'],
         ]);
 
+        $tempPassword = Str::random(8);
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt('password'),
-            'role' => 'siswa',
+            'password' => bcrypt($tempPassword),
         ]);
+        $user->role = 'siswa';
+        $user->save();
 
         Student::create([
             'user_id' => $user->id,
@@ -62,7 +67,7 @@ class StudentController extends Controller
         ]);
 
         return redirect()->route('tatausaha.students.index')
-            ->with('success', 'Data siswa berhasil dibuat (password default: password).');
+            ->with('success', "Data siswa berhasil dibuat. Password sementara: {$tempPassword} — minta siswa segera mengganti password.");
     }
 
     public function edit(Student $student): View
@@ -79,7 +84,7 @@ class StudentController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $student->user_id],
             'nis' => ['required', 'string', 'max:50', 'unique:students,nis,' . $student->id],
             'class_id' => ['nullable', 'exists:classes,id'],
-            'password' => ['nullable', 'string', 'min:6'],
+            'password' => ['nullable', 'string', Password::min(8)->mixedCase()->numbers()],
         ]);
 
         $userData = [

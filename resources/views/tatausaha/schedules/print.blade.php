@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cetak Jadwal Pelajaran {{ $academicYear ? '- ' . $academicYear->name : '' }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #1B5E20;
+            --primary-light: #2E7D32;
+            --secondary: #43A047;
+            --accent: #F9A825;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -29,14 +36,15 @@
         /* Header Sekolah */
         .school-header {
             text-align: center;
-            border-bottom: 3px double #25671E;
+            border-bottom: 3px double var(--primary);
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
 
         .school-header h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 16pt;
-            color: #25671E;
+            color: var(--primary);
             margin-bottom: 2px;
             font-weight: 700;
             letter-spacing: 1px;
@@ -61,9 +69,10 @@
         }
 
         .doc-title h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 14pt;
             font-weight: 700;
-            color: #25671E;
+            color: var(--primary);
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 4px;
@@ -82,10 +91,11 @@
         }
 
         .class-title {
-            background: linear-gradient(135deg, #25671E, #48A111);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             padding: 8px 16px;
             border-radius: 6px 6px 0 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 11pt;
             font-weight: 700;
             display: flex;
@@ -143,7 +153,7 @@
 
         .schedule-table .subject-name {
             font-weight: 600;
-            color: #25671E;
+            color: var(--primary);
             font-size: 8.5pt;
         }
 
@@ -195,7 +205,7 @@
             top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, #25671E, #48A111);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             padding: 12px 30px;
             display: flex;
             align-items: center;
@@ -206,6 +216,7 @@
 
         .print-toolbar .toolbar-title {
             color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 600;
             font-size: 14px;
         }
@@ -217,7 +228,7 @@
 
         .print-toolbar button, .print-toolbar a {
             padding: 8px 18px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -228,7 +239,7 @@
 
         .btn-print {
             background: white;
-            color: #25671E;
+            color: var(--primary);
         }
 
         .btn-print:hover {

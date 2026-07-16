@@ -16,16 +16,33 @@ class RegistrationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_new_users_can_register(): void
+    public function test_new_students_can_register(): void
     {
         $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
+            'role' => 'siswa',
+            'name' => 'Test Student',
+            'email' => 'student@example.com',
+            'identifier' => 'NIS-99999',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('siswa.dashboard'));
+    }
+
+    public function test_new_teachers_can_register(): void
+    {
+        $response = $this->post('/register', [
+            'role' => 'guru',
+            'name' => 'Test Teacher',
+            'email' => 'teacher@example.com',
+            'identifier' => 'NIP-99999',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('guru.dashboard'));
     }
 }

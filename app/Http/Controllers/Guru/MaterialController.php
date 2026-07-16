@@ -156,7 +156,7 @@ class MaterialController extends Controller
             $filePath = $request->file('file')->store('materials', 'public');
         }
 
-        Material::create([
+        $material = Material::create([
             'teacher_id' => $teacherId,
             'class_id' => $data['class_id'],
             'subject_id' => $data['subject_id'],
@@ -166,6 +166,27 @@ class MaterialController extends Controller
             'file_path' => $filePath,
             'youtube_url' => $data['youtube_url'] ?? null,
         ]);
+
+        // Create notifications for all students in class
+        try {
+            $students = \App\Models\Student::where('class_id', $material->class_id)->get();
+            $subjectName = $material->subject ? $material->subject->name : 'Mata Pelajaran';
+            foreach ($students as $student) {
+                \App\Models\Notification::create([
+                    'user_id' => $student->user_id,
+                    'title' => '📚 Materi Baru: ' . $material->title,
+                    'message' => 'Guru telah menambahkan materi baru untuk mata pelajaran ' . $subjectName . '.',
+                    'url' => route('siswa.materials.show', $material->id),
+                ]);
+            }
+        } catch (\Exception $ne) {
+            // Ignore
+        }
+
+        if ($material->meeting_id) {
+            return redirect()->route('guru.meetings.show', $material->meeting_id)
+                ->with('success', 'Materi berhasil diupload.');
+        }
 
         return redirect()->route('guru.materials.index')
             ->with('success', 'Materi berhasil diupload.');
@@ -219,6 +240,11 @@ class MaterialController extends Controller
         }
 
         $material->update($data);
+
+        if ($material->meeting_id) {
+            return redirect()->route('guru.meetings.show', $material->meeting_id)
+                ->with('success', 'Materi berhasil diperbarui.');
+        }
 
         return redirect()->route('guru.materials.index')
             ->with('success', 'Materi berhasil diperbarui.');

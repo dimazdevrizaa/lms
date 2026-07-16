@@ -3,35 +3,43 @@
 @section('title', 'Rekap Nilai - ' . $class->name)
 
 @section('content')
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a href="{{ route('guru.classroom.index') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-        <div>
-            <h1 class="h3 mb-1">📊 Rekap Nilai Siswa - {{ $class->name }}</h1>
-            <p class="text-muted mb-0">Lihat ringkasan nilai siswa</p>
+    <div class="page-header-banner reveal">
+        <div class="page-header-banner-inner">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h1 style="font-family: 'Plus Jakarta Sans', sans-serif;">📊 Rekap Nilai Siswa</h1>
+                    <p>Kelas {{ $class->name }} • Lihat ringkasan nilai dan statistik siswa</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('guru.classroom.index') }}" class="btn btn-outline-light d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                    <a href="{{ route('guru.classroom.grades.input', $class) }}" class="btn btn-light d-inline-flex align-items-center gap-2" style="color: var(--primary) !important; font-weight: 700;">
+                        <i class="fas fa-plus"></i> Input Nilai Baru
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Tombol Navigation -->
-    <div class="mb-4">
-        <a href="{{ route('guru.classroom.grades.input', $class) }}" class="btn btn-lg" style="background-color: #48A111; color: white; border: none;">
-            ➕ Input Nilai
-        </a>
-    </div>
-
     <!-- Tabel Nilai Siswa -->
-    <div class="card">
-        <div class="card-body p-4">
+    <div class="content-card reveal reveal-delay-1">
+        <div class="content-card-header">
+            <div class="content-card-header-icon">
+                <i class="fas fa-list-ol"></i>
+            </div>
+            <h5 class="content-card-title">Ringkasan Nilai Kelas</h5>
+        </div>
+        <div class="content-card-body p-0">
             @if($students->count() > 0)
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead style="background-color: #F7F0F0; border-bottom: 2px solid #25671E;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th style="color: #25671E; font-weight: 600;">No.</th>
-                                <th style="color: #25671E; font-weight: 600;">📝 Nama Siswa</th>
-                                <th style="color: #25671E; font-weight: 600; text-align: center;">Rata-Rata Nilai</th>
-                                <th style="color: #25671E; font-weight: 600; text-align: center;">Total Penilaian</th>
+                                <th class="ps-4" style="width: 80px;">No.</th>
+                                <th>📝 Nama Siswa</th>
+                                <th class="text-center" style="width: 200px;">Rata-Rata Nilai</th>
+                                <th class="text-center" style="width: 200px;">Total Penilaian</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -42,22 +50,25 @@
                                     $totalGrades = count($grades);
                                 @endphp
                                 <tr>
-                                    <td><strong>{{ $index + 1 }}</strong></td>
+                                    <td class="ps-4 fw-semibold text-muted">{{ $index + 1 }}</td>
                                     <td>
-                                        <strong style="color: #25671E;">{{ $student->user->name }}</strong><br>
-                                        <small class="text-muted">NIS: {{ $student->nis }}</small>
+                                        <div class="fw-bold text-dark">{{ $student->user->name }}</div>
+                                        <div class="text-muted small">NIS: {{ $student->nis }}</div>
                                     </td>
-                                    <td style="text-align: center;">
+                                    <td class="text-center">
                                         @if($avgGrade !== '—')
-                                            <span class="badge " style="background-color: {{ $avgGrade >= 80 ? '#48A111' : ($avgGrade >= 70 ? '#F2B50B' : '#FF6B6B') }}; color: white; font-size: 1rem; padding: 0.5rem 1rem;">
+                                            @php
+                                                $badgeClass = $avgGrade >= 80 ? 'grade-badge--high' : ($avgGrade >= 70 ? 'grade-badge--mid' : 'grade-badge--low');
+                                            @endphp
+                                            <span class="badge grade-badge {{ $badgeClass }}">
                                                 {{ $avgGrade }}
                                             </span>
                                         @else
-                                            <span class="text-muted">—</span>
+                                            <span class="text-muted fw-semibold">—</span>
                                         @endif
                                     </td>
-                                    <td style="text-align: center;">
-                                        <small style="color: #25671E; font-weight: 600;">{{ $totalGrades }} nilai</small>
+                                    <td class="text-center">
+                                        <span class="fw-bold text-success">{{ $totalGrades }} kali</span>
                                     </td>
                                 </tr>
                             @endforeach
@@ -65,10 +76,41 @@
                     </table>
                 </div>
             @else
-                <div class="text-center py-5">
-                    <p class="text-muted mb-0">📭 Belum ada siswa di kelas ini.</p>
+                <div class="empty-state py-5">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <h5 class="empty-state-text mt-3">Belum Ada Siswa</h5>
+                    <p class="text-muted mb-0">Tidak ada siswa yang terdaftar di kelas perwalian Anda saat ini.</p>
                 </div>
             @endif
         </div>
     </div>
+
+    @push('styles')
+    <style>
+        .grade-badge {
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+        }
+        .grade-badge--high {
+            background-color: rgba(67, 160, 71, 0.12);
+            color: #2E7D32;
+            border: 1px solid rgba(67, 160, 71, 0.2);
+        }
+        .grade-badge--mid {
+            background-color: rgba(249, 168, 37, 0.12);
+            color: #B26A00;
+            border: 1px solid rgba(249, 168, 37, 0.2);
+        }
+        .grade-badge--low {
+            background-color: rgba(198, 40, 40, 0.1);
+            color: #C62828;
+            border: 1px solid rgba(198, 40, 40, 0.2);
+        }
+    </style>
+    @endpush
 @endsection

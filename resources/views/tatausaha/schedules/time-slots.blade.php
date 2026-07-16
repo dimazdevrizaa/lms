@@ -4,20 +4,22 @@
 
 @section('content')
 <div class="timeslots-page">
-    <!-- Header -->
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+    {{-- Header --}}
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3 reveal">
         <div>
-            <a href="{{ route('tatausaha.schedules.index', ['academic_year_id' => $selectedYearId]) }}" class="text-decoration-none small text-muted">
+            <a href="{{ route('tatausaha.schedules.index', ['academic_year_id' => $selectedYearId]) }}" class="text-decoration-none small" style="color: var(--secondary);">
                 <i class="fas fa-arrow-left me-1"></i> Kembali ke Jadwal
             </a>
-            <h1 class="h3 mb-2 mt-2">⏰ Kelola Jam Pelajaran</h1>
-            <p class="text-muted mb-0">Atur jam pelajaran dan waktu istirahat yang berlaku untuk seluruh kelas.</p>
+            <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--primary); margin-bottom: 4px; margin-top: 8px;">
+                Kelola Jam Pelajaran
+            </h1>
+            <p class="text-muted mb-0 small">Atur jam pelajaran dan waktu istirahat yang berlaku untuk seluruh kelas.</p>
         </div>
     </div>
 
-    <!-- Filter Tahun Ajar -->
-    <form method="GET" action="{{ route('tatausaha.schedules.time-slots') }}" class="card mb-4 filter-card" style="border-top: 4px solid #F2B50B;">
-        <div class="card-body py-3">
+    {{-- Filter --}}
+    <form method="GET" action="{{ route('tatausaha.schedules.time-slots') }}" class="content-card mb-4 reveal reveal-delay-1" style="border-top: 3px solid var(--accent);">
+        <div class="content-card-body" style="padding: 20px 28px;">
             <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                     <label class="form-label small fw-semibold text-muted"><i class="fas fa-calendar me-1"></i> Tahun Ajar</label>
@@ -31,7 +33,7 @@
                     </select>
                 </div>
                 <div class="col-md-4 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-sm btn-primary shadow-sm" style="background-color: #25671E; border: none;">
+                    <button type="submit" class="btn btn-sm btn-outline-primary-theme">
                         <i class="fas fa-filter me-1"></i> Filter
                     </button>
                 </div>
@@ -41,40 +43,40 @@
 
     @if($selectedYearId)
         <div class="row g-4">
-            <!-- Tabel Existing Slots -->
+            {{-- Tabel Existing Slots --}}
             <div class="col-md-7">
-                <div class="card border-0 shadow-sm" style="cursor: default;">
-                    <div class="card-header py-3 px-4" style="background: linear-gradient(135deg, #25671E, #48A111); border: none;">
+                <div class="content-card reveal reveal-delay-2" style="cursor: default;">
+                    <div class="py-3 px-4" style="background: linear-gradient(135deg, var(--primary), var(--secondary));">
                         <h6 class="mb-0 text-white fw-bold"><i class="fas fa-list me-2"></i> Daftar Jam Pelajaran</h6>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="content-card-body" style="padding: 0;">
                         @if($timeSlots->count() > 0)
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead>
-                                        <tr style="background-color: #f8f9fa; border-bottom: 2px solid #e9ecef;">
-                                            <th class="ps-4" style="width: 50px; color: #6c757d; font-weight: 600; font-size: 0.8rem;">URUTAN</th>
-                                            <th style="color: #6c757d; font-weight: 600; font-size: 0.8rem;">LABEL</th>
-                                            <th style="color: #6c757d; font-weight: 600; font-size: 0.8rem;">TIPE</th>
-                                            <th style="color: #6c757d; font-weight: 600; font-size: 0.8rem;">WAKTU</th>
-                                            <th style="color: #6c757d; font-weight: 600; font-size: 0.8rem; text-align: center; width: 80px;">AKSI</th>
+                                        <tr>
+                                            <th class="ps-4" style="width: 50px;">URUTAN</th>
+                                            <th>LABEL</th>
+                                            <th>TIPE</th>
+                                            <th>WAKTU</th>
+                                            <th style="text-align: center; width: 80px;">AKSI</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($timeSlots as $slot)
                                             <tr class="{{ $slot->isBreak() ? 'break-row-highlight' : '' }}">
-                                                <td class="ps-4 text-center fw-bold" style="color: #25671E;">{{ $slot->slot_order }}</td>
+                                                <td class="ps-4 text-center fw-bold" style="color: var(--primary);">{{ $slot->slot_order }}</td>
                                                 <td>
-                                                    <span class="fw-semibold" style="color: {{ $slot->isBreak() ? '#b8860b' : '#25671E' }};">
+                                                    <span class="fw-semibold" style="color: {{ $slot->isBreak() ? '#b8860b' : 'var(--primary)' }};">
                                                         @if($slot->isBreak()) ☕ @else 📖 @endif
                                                         {{ $slot->label }}
                                                     </span>
                                                 </td>
                                                 <td>
                                                     @if($slot->isBreak())
-                                                        <span class="badge" style="background-color: #F2B50B; color: #333; font-size: 0.7rem;">Istirahat</span>
+                                                        <span class="status-badge" style="background: rgba(249, 168, 37, 0.12); color: #B26A00;">Istirahat</span>
                                                     @else
-                                                        <span class="badge" style="background-color: #48A111; font-size: 0.7rem;">Pelajaran</span>
+                                                        <span class="status-badge status-badge--hadir">Pelajaran</span>
                                                     @endif
                                                 </td>
                                                 <td class="small text-muted">
@@ -95,22 +97,24 @@
                                 </table>
                             </div>
                         @else
-                            <div class="text-center py-5">
-                                <i class="fas fa-clock fa-3x mb-3" style="color: #e0e0e0;"></i>
-                                <p class="text-muted">Belum ada jam pelajaran. Tambahkan di form samping.</p>
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="empty-state-text">Belum ada jam pelajaran. Tambahkan di form samping.</div>
                             </div>
                         @endif
                     </div>
                 </div>
             </div>
 
-            <!-- Form Tambah Slot -->
+            {{-- Form Tambah Slot --}}
             <div class="col-md-5">
-                <div class="card border-0 shadow-sm" style="cursor: default;">
-                    <div class="card-header py-3 px-4" style="background: linear-gradient(135deg, #F2B50B, #f5c842); border: none;">
+                <div class="content-card reveal reveal-delay-2" style="cursor: default;">
+                    <div class="py-3 px-4" style="background: linear-gradient(135deg, var(--accent), #f5c842);">
                         <h6 class="mb-0 fw-bold" style="color: #333;"><i class="fas fa-plus-circle me-2"></i> Tambah / Edit Slot</h6>
                     </div>
-                    <div class="card-body p-4">
+                    <div class="content-card-body">
                         <form method="POST" action="{{ route('tatausaha.schedules.time-slots.store') }}">
                             @csrf
                             <input type="hidden" name="academic_year_id" value="{{ $selectedYearId }}">
@@ -148,17 +152,22 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-sm w-100 shadow-sm" style="background: linear-gradient(135deg, #25671E, #48A111); color: white; border: none;">
+                            <button type="submit" class="btn btn-sm w-100 btn-outline-primary-theme">
                                 <i class="fas fa-save me-1"></i> Simpan Slot
                             </button>
                         </form>
                     </div>
                 </div>
 
-                <!-- Info Card -->
-                <div class="card border-0 shadow-sm mt-3" style="cursor: default;">
-                    <div class="card-body p-4">
-                        <h6 class="fw-bold mb-3" style="color: #25671E;"><i class="fas fa-info-circle me-1"></i> Panduan</h6>
+                {{-- Info Card --}}
+                <div class="content-card reveal reveal-delay-3" style="cursor: default;">
+                    <div class="content-card-header">
+                        <div class="content-card-header-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h2 class="content-card-title">Panduan</h2>
+                    </div>
+                    <div class="content-card-body">
                         <ul class="small text-muted mb-0" style="padding-left: 1.2rem;">
                             <li class="mb-2">Jam pelajaran digunakan sebagai <strong>baris</strong> di jadwal mingguan</li>
                             <li class="mb-2">Tipe <strong>Istirahat</strong> akan ditampilkan sebagai baris kosong</li>
@@ -170,31 +179,33 @@
             </div>
         </div>
     @else
-        <div class="card text-center py-5 border-0 shadow-sm" style="cursor: default;">
-            <div class="card-body">
-                <i class="fas fa-calendar-alt fa-4x mb-4" style="color: #e0e0e0;"></i>
-                <h5 class="mb-2" style="color: #25671E;">Pilih Tahun Ajar</h5>
-                <p class="text-muted">Pilih tahun ajar terlebih dahulu.</p>
+        <div class="content-card reveal reveal-delay-2">
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="empty-state-text">Pilih tahun ajar terlebih dahulu.</div>
             </div>
         </div>
     @endif
 </div>
 
+@push('styles')
 <style>
-    .timeslots-page .filter-card:hover,
-    .timeslots-page .card:hover {
+    .timeslots-page .content-card:hover {
         transform: none !important;
         cursor: default;
     }
 
     .break-row-highlight {
-        background-color: rgba(242, 181, 11, 0.08);
+        background-color: rgba(249, 168, 37, 0.06);
     }
 
     .break-row-highlight td {
-        border-left: 3px solid #F2B50B !important;
+        border-left: 3px solid var(--accent) !important;
     }
 </style>
+@endpush
 
 <script>
     function updateLabel() {

@@ -56,6 +56,16 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // NOTIFICATIONS
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::get('/notifications/poll', [App\Http\Controllers\NotificationController::class, 'poll'])->name('notifications.poll');
+
+    // WEB PUSH SUBSCRIPTIONS
+    Route::post('/push/subscribe', [App\Http\Controllers\PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [App\Http\Controllers\PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
+
     // ADMIN
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
@@ -96,6 +106,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [MaterialController::class, 'dashboard'])->name('dashboard');
         Route::resource('materials', MaterialController::class);
         Route::resource('meetings', MeetingController::class);
+        Route::get('meetings/class/{classSlug}/{subjectSlug}', [MeetingController::class, 'classMeetingsIndex'])->name('meetings.class-meetings');
+        Route::get('meetings/class/{classSlug}/{subjectSlug}/create', [MeetingController::class, 'classMeetingsCreate'])->name('meetings.class-meetings.create');
+        Route::post('meetings/{meeting}/video-link', [MeetingController::class, 'updateVideoLink'])->name('meetings.updateVideoLink');
+        Route::post('meetings/{meeting}/toggle-visibility', [MeetingController::class, 'toggleVisibility'])->name('meetings.toggleVisibility');
         Route::get('assignments/grading', [AssignmentController::class, 'grading'])->name('assignments.grading');
         Route::resource('assignments', AssignmentController::class);
         Route::post('assignments/answers/{answer}/grade', [AssignmentController::class, 'gradeQuestion'])->name('assignments.grade-question');
@@ -129,6 +143,7 @@ Route::middleware('auth')->group(function () {
     // SISWA
     Route::middleware('role:siswa')->prefix('siswa')->name('siswa.')->group(function () {
         Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/directory', [StudentDashboardController::class, 'directory'])->name('directory');
         
         // Flow Baru: Mapel -> Pertemuan -> Detail
         Route::get('/subjects', [StudentMaterialController::class, 'subjects'])->name('subjects.index');
@@ -139,17 +154,52 @@ Route::middleware('auth')->group(function () {
         Route::get('/assignments', [StudentSubmissionController::class, 'index'])->name('assignments.index');
         Route::get('/assignments/{assignment}', [StudentSubmissionController::class, 'show'])->name('assignments.show');
         Route::post('/assignments/{assignment}/submit', [StudentSubmissionController::class, 'store'])->name('assignments.submit');
+        Route::post('/assignments/{assignment}/unsubmit', [StudentSubmissionController::class, 'unsubmit'])->name('assignments.unsubmit');
         Route::get('/attendance', [StudentAttendanceController::class, 'index'])->name('attendance.index');
     });
+
+    // FORUM / STREAM
+    Route::get('/forum/{classSlug}/{subjectSlug}', [App\Http\Controllers\ForumController::class, 'index'])->name('forum.index');
+    Route::post('/forum/{classSlug}/{subjectSlug}/post', [App\Http\Controllers\ForumController::class, 'storePost'])->name('forum.post.store');
+    Route::post('/forum/post/{post}/comment', [App\Http\Controllers\ForumController::class, 'storeComment'])->name('forum.comment.store');
+    Route::delete('/forum/post/{post}', [App\Http\Controllers\ForumController::class, 'destroyPost'])->name('forum.post.destroy');
+
+    // MEETING DISCUSSION FORUM
+    Route::post('/meetings/{meeting}/discussion', [App\Http\Controllers\ForumController::class, 'storeMeetingPost'])->name('meeting.discussion.store');
+    Route::post('/meetings/discussion/{post}/comment', [App\Http\Controllers\ForumController::class, 'storeMeetingComment'])->name('meeting.discussion.comment');
+    Route::delete('/meetings/discussion/{post}', [App\Http\Controllers\ForumController::class, 'destroyMeetingPost'])->name('meeting.discussion.destroy');
+    Route::delete('/forum/comment/{comment}', [App\Http\Controllers\ForumController::class, 'destroyComment'])->name('forum.comment.destroy');
+
+    // SUBMISSION COMMENTS
+    Route::post('/submissions/{submission}/comments', [App\Http\Controllers\SubmissionCommentController::class, 'store'])->name('submissions.comments.store');
+
+    // SECURE FILE DOWNLOADS
+    Route::get('/assignments/{assignment}/download-file', [App\Http\Controllers\FileDownloadController::class, 'downloadAssignment'])->name('assignments.download');
+    Route::get('/submissions/{submission}/download-file', [App\Http\Controllers\FileDownloadController::class, 'downloadSubmission'])->name('submissions.download');
+    Route::get('/materials/{material}/view-file', [App\Http\Controllers\FileDownloadController::class, 'downloadMaterial'])->name('materials.view-file');
 });
 
 // PARENT MONITORING PORTAL
 Route::prefix('ortu')->name('parent.')->group(function () {
     Route::get('/', [App\Http\Controllers\ParentController::class, 'index'])->name('index');
-    Route::post('/access', [App\Http\Controllers\ParentController::class, 'access'])->middleware('throttle:5,1')->name('access');
+    Route::post('/access', [App\Http\Controllers\ParentController::class, 'access'])->middleware('throttle:parent-access')->name('access');
     Route::get('/dashboard', [App\Http\Controllers\ParentController::class, 'dashboard'])->name('dashboard');
-    Route::get('/view/{code}', [App\Http\Controllers\ParentController::class, 'viewDirect'])->middleware('throttle:10,1')->name('view');
+    Route::get('/view/{code}', [App\Http\Controllers\ParentController::class, 'viewDirect'])->middleware('throttle:parent-direct')->name('view');
+    Route::post('/view/confirm', [App\Http\Controllers\ParentController::class, 'viewDirectConfirm'])->middleware('throttle:parent-confirm')->name('view.confirm');
     Route::post('/logout', [App\Http\Controllers\ParentController::class, 'logout'])->name('logout');
 });
 
+// Parent code regeneration (authenticated users only)
+Route::post('/parent-code/{student}/regenerate', [App\Http\Controllers\ParentController::class, 'regenerateCode'])
+    ->middleware(['auth'])
+    ->name('parent.code.regenerate');
+
+Route::post('/parent-code/{student}/reveal', [App\Http\Controllers\ParentController::class, 'revealCode'])
+    ->middleware(['auth', 'role:admin,guru,tatausaha'])
+    ->name('parent.code.reveal');
+
 require __DIR__.'/auth.php';
+
+
+
+

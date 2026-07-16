@@ -22,6 +22,15 @@ class SchoolClass extends Model
         'homeroom_teacher_id',
     ];
 
+    protected static function booted()
+    {
+        static::saving(function ($class) {
+            if (empty($class->slug)) {
+                $class->slug = \Illuminate\Support\Str::slug($class->name);
+            }
+        });
+    }
+
     public function academicYear(): BelongsTo
     {
         return $this->belongsTo(AcademicYear::class);

@@ -4,27 +4,31 @@
 
 @section('content')
     <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a href="{{ route('admin.subjects.index') }}" class="btn btn-outline-secondary btn-sm">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ route('admin.subjects.index') }}" class="btn btn-outline-secondary-theme btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
         <div>
-            <h1 class="h3 mb-1">➕ Tambah Mata Pelajaran Baru</h1>
-            <p class="text-muted mb-0">Daftarkan mata pelajaran baru ke dalam sistem</p>
+            <h1 class="mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.5rem;">➕ Tambah Mata Pelajaran Baru</h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Daftarkan mata pelajaran baru ke dalam sistem</p>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-7">
-            <div class="card">
-                <div class="card-body p-4">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <div class="content-card-header-icon">📖</div>
+                    <h5 class="content-card-title">Form Mata Pelajaran</h5>
+                </div>
+                <div class="content-card-body">
                     <form method="POST" action="{{ route('admin.subjects.store') }}">
                         @csrf
 
                         <!-- Nama Mata Pelajaran -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📖 Nama Mata Pelajaran</label>
-                            <input class="form-control" style="border-color: #25671E;" name="name" value="{{ old('name') }}" placeholder="Contoh: Matematika" required>
+                            <label class="form-label fw-semibold">📖 Nama Mata Pelajaran</label>
+                            <input class="form-control" name="name" value="{{ old('name') }}" placeholder="Contoh: Matematika" required>
                             @error('name')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -32,8 +36,8 @@
 
                         <!-- Kode Mata Pelajaran -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🔖 Kode Mata Pelajaran</label>
-                            <input class="form-control" style="border-color: #25671E;" type="text" name="code" value="{{ old('code') }}" placeholder="Contoh: MTK">
+                            <label class="form-label fw-semibold">🔖 Kode Mata Pelajaran</label>
+                            <input class="form-control" type="text" name="code" value="{{ old('code') }}" placeholder="Contoh: MTK">
                             @error('code')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -41,8 +45,8 @@
 
                         <!-- Jurusan -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🧪 Jurusan</label>
-                            <select class="form-select" style="border-color: #25671E;" name="major" required>
+                            <label class="form-label fw-semibold">🧪 Jurusan</label>
+                            <select class="form-select" name="major" required>
                                 <option value="">-- Pilih Jurusan --</option>
                                 <option value="IPA" @selected(old('major') === 'IPA')​>🧪 IPA (Sains)</option>
                                 <option value="IPS" @selected(old('major') === 'IPS')​>🧪 IPS (Sosial)</option>
@@ -54,12 +58,10 @@
                             @enderror
                         </div>
 
-
-
                         <!-- Buttons -->
-                        <div class="d-flex gap-2 mt-5">
-                            <button class="btn btn-lg" style="background-color: #48A111; color: white; border: none;" type="submit">✓ Simpan Mata Pelajaran</button>
-                            <a class="btn btn-lg btn-outline-secondary" href="{{ route('admin.subjects.index') }}">Batal</a>
+                        <div class="d-flex gap-2 mt-4">
+                            <button class="btn btn-lg btn-primary" type="submit">✓ Simpan Mata Pelajaran</button>
+                            <a class="btn btn-lg btn-outline-secondary-theme" href="{{ route('admin.subjects.index') }}">Batal</a>
                         </div>
                     </form>
                 </div>
@@ -68,16 +70,19 @@
 
         <!-- Info Sidebar -->
         <div class="col-lg-5">
-            <div class="card" style="border-top: 4px solid #F2B50B;">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">💡 Panduan</h5>
-                    <ul class="small text-muted">
+            <div class="content-card" style="border-top: 4px solid var(--accent);">
+                <div class="content-card-header">
+                    <div class="content-card-header-icon" style="background: linear-gradient(135deg, rgba(249, 168, 37, 0.15), rgba(249, 168, 37, 0.06)); color: var(--accent);">💡</div>
+                    <h5 class="content-card-title">Panduan</h5>
+                </div>
+                <div class="content-card-body">
+                    <ul class="small text-muted mb-0" style="padding-left: 1.2rem;">
                         <li class="mb-3">
-                            <strong style="color: #25671E;">Nama Mata Pelajaran</strong><br>
+                            <strong style="color: var(--primary);">Nama Mata Pelajaran</strong><br>
                             Masukkan nama mata pelajaran dengan jelas (wajib)
                         </li>
                         <li class="mb-3">
-                            <strong style="color: #48A111;">Kode</strong><br>
+                            <strong style="color: var(--secondary);">Kode</strong><br>
                             Singkat untuk mata pelajaran (opsional)
                         </li>
                     </ul>

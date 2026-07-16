@@ -22,8 +22,8 @@ class TeachingAssignmentController extends Controller
         $academicYears = AcademicYear::orderBy('name', 'desc')->get();
         $activeYear = AcademicYear::where('is_active', true)->first();
 
-        // Default ke tahun ajar aktif jika belum ada filter
-        $selectedYearId = $request->filled('academic_year_id')
+        // Default ke tahun ajar aktif jika belum ada filter query param
+        $selectedYearId = $request->has('academic_year_id')
             ? $request->academic_year_id
             : ($activeYear?->id ?? null);
 
@@ -64,7 +64,7 @@ class TeachingAssignmentController extends Controller
     public function printPdf(Request $request): View
     {
         $activeYear = AcademicYear::where('is_active', true)->first();
-        $selectedYearId = $request->filled('academic_year_id')
+        $selectedYearId = $request->has('academic_year_id')
             ? $request->academic_year_id
             : ($activeYear?->id ?? null);
 

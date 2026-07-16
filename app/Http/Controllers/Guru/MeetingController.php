@@ -21,21 +21,6 @@ class MeetingController extends Controller
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         abort_unless($teacherId, 403);
 
-        // Jika ada filter class_id dan subject_id, tampilkan daftar pertemuan (view lama)
-        if ($request->has('class_id') && $request->has('subject_id')) {
-            $currentClass = SchoolClass::findOrFail($request->class_id);
-            $currentSubject = Subject::findOrFail($request->subject_id);
-            
-            $meetings = Meeting::where('teacher_id', $teacherId)
-                ->where('class_id', $request->class_id)
-                ->where('subject_id', $request->subject_id)
-                ->with(['schoolClass', 'subject'])
-                ->orderBy('number', 'asc')
-                ->get();
-
-            return view('guru.meetings.list', compact('meetings', 'currentClass', 'currentSubject'));
-        }
-
         // Tampilan awal: Grup Kelas & Mapel yang diajar
         $activeYear = AcademicYear::where('is_active', true)->first();
         
@@ -115,7 +100,71 @@ class MeetingController extends Controller
             }
         }
 
-        return view('guru.meetings.create', compact('classes', 'subjects', 'prefilledClassId', 'prefilledSubjectId', 'nextNumber'));
+        // ponytail: fetch class and subject models to support direct back route
+        $currentClass = $prefilledClassId ? SchoolClass::find($prefilledClassId) : null;
+        $currentSubject = $prefilledSubjectId ? Subject::find($prefilledSubjectId) : null;
+
+        return view('guru.meetings.create', compact('classes', 'subjects', 'prefilledClassId', 'prefilledSubjectId', 'nextNumber', 'currentClass', 'currentSubject'));
+    }
+
+    public function classMeetingsIndex($classSlug, $subjectSlug): View
+    {
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless($teacherId, 403);
+
+        $currentClass = SchoolClass::where('slug', $classSlug)->firstOrFail();
+        $currentSubject = Subject::where('slug', $subjectSlug)->firstOrFail();
+        
+        $meetings = Meeting::where('teacher_id', $teacherId)
+            ->where('class_id', $currentClass->id)
+            ->where('subject_id', $currentSubject->id)
+            ->with(['schoolClass', 'subject'])
+            ->orderBy('number', 'asc')
+            ->get();
+
+        return view('guru.meetings.list', compact('meetings', 'currentClass', 'currentSubject'));
+    }
+
+    public function classMeetingsCreate($classSlug, $subjectSlug): View
+    {
+        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $activeYear = AcademicYear::where('is_active', true)->first();
+        
+        $currentClass = SchoolClass::where('slug', $classSlug)->firstOrFail();
+        $currentSubject = Subject::where('slug', $subjectSlug)->firstOrFail();
+
+        if ($activeYear) {
+            $assignedClassIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('class_id');
+            $classes = SchoolClass::whereIn('id', $assignedClassIds)->orderBy('name')->get();
+            
+            $assignedSubjectIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
+                ->where('academic_year_id', $activeYear->id)
+                ->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+        } else {
+            $classes = SchoolClass::orderBy('name')->get();
+            $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+            $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
+            if ($subjects->isEmpty()) {
+                $subjects = Subject::orderBy('name')->get();
+            }
+        }
+
+        $lastMeeting = Meeting::where('teacher_id', $teacher->id)
+            ->where('class_id', $currentClass->id)
+            ->where('subject_id', $currentSubject->id)
+            ->orderBy('number', 'desc')
+            ->first();
+        
+        $nextNumber = $lastMeeting ? $lastMeeting->number + 1 : 1;
+
+        $prefilledClassId = $currentClass->id;
+        $prefilledSubjectId = $currentSubject->id;
+
+        // ponytail: pass currentClass and currentSubject to enable correct back route
+        return view('guru.meetings.create', compact('classes', 'subjects', 'prefilledClassId', 'prefilledSubjectId', 'nextNumber', 'currentClass', 'currentSubject'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -125,17 +174,25 @@ class MeetingController extends Controller
             'subject_id' => ['required', 'exists:subjects,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'video_link' => ['nullable', 'url', 'max:255'],
             'date' => ['required', 'date'],
             'number' => ['required', 'integer', 'min:1'],
+            'is_visible' => ['nullable', 'boolean'],
         ]);
 
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         abort_unless($teacherId, 403);
 
+        $data['is_visible'] = $request->boolean('is_visible');
         Meeting::create(array_merge($data, ['teacher_id' => $teacherId]));
 
-        return redirect()->route('guru.meetings.index')
-            ->with('success', 'Pertemuan berhasil dibuat.');
+        $class = SchoolClass::findOrFail($data['class_id']);
+        $subject = Subject::findOrFail($data['subject_id']);
+
+        return redirect()->route('guru.meetings.class-meetings', [
+            'classSlug' => $class->slug,
+            'subjectSlug' => $subject->slug,
+        ])->with('success', 'Pertemuan berhasil dibuat.');
     }
 
     public function edit(Meeting $meeting): View
@@ -177,24 +234,40 @@ class MeetingController extends Controller
             'subject_id' => ['required', 'exists:subjects,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'video_link' => ['nullable', 'url', 'max:255'],
             'date' => ['required', 'date'],
             'number' => ['required', 'integer', 'min:1'],
+            'is_visible' => ['nullable', 'boolean'],
         ]);
 
+        $data['is_visible'] = $request->boolean('is_visible');
         $meeting->update($data);
 
-        return redirect()->route('guru.meetings.index')
-            ->with('success', 'Pertemuan berhasil diperbarui.');
+        // ponytail: redirect to specific class meetings index instead of general dashboard
+        $class = SchoolClass::findOrFail($data['class_id']);
+        $subject = Subject::findOrFail($data['subject_id']);
+        return redirect()->route('guru.meetings.class-meetings', [
+            'classSlug' => $class->slug,
+            'subjectSlug' => $subject->slug,
+        ])->with('success', 'Pertemuan berhasil diperbarui.');
     }
 
     public function destroy(Meeting $meeting): RedirectResponse
     {
         abort_unless($meeting->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
 
+        $classId = $meeting->class_id;
+        $subjectId = $meeting->subject_id;
+
         $meeting->delete();
 
-        return redirect()->route('guru.meetings.index')
-            ->with('success', 'Pertemuan berhasil dihapus.');
+        // ponytail: redirect to specific class meetings index using slugs
+        $class = SchoolClass::findOrFail($classId);
+        $subject = Subject::findOrFail($subjectId);
+        return redirect()->route('guru.meetings.class-meetings', [
+            'classSlug' => $class->slug,
+            'subjectSlug' => $subject->slug,
+        ])->with('success', 'Pertemuan berhasil dihapus.');
     }
 
     public function show(Meeting $meeting): View
@@ -203,6 +276,46 @@ class MeetingController extends Controller
 
         $meeting->load(['materials', 'assignments', 'attendance.details.student.user']);
 
-        return view('guru.meetings.show', compact('meeting'));
+        $discussionPosts = \App\Models\ForumPost::where('meeting_id', $meeting->id)
+            ->with([
+                'user',
+                'comments' => function($q) { $q->whereNull('parent_id')->with('user'); },
+                'comments.replies.user',
+                'comments.replies.replies.user',
+                'comments.replies.replies.replies.user'
+            ])
+            ->latest()
+            ->get();
+
+        return view('guru.meetings.show', compact('meeting', 'discussionPosts'));
+    }
+
+    public function updateVideoLink(Request $request, Meeting $meeting): RedirectResponse
+    {
+        abort_unless($meeting->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+
+        $data = $request->validate([
+            'video_link' => ['nullable', 'url', 'max:255'],
+            'video_link_status' => ['nullable', 'string', 'in:active,finished'],
+        ]);
+
+        if (empty($data['video_link'])) {
+            $data['video_link_status'] = 'active';
+        }
+
+        $meeting->update($data);
+
+        return back()->with('success', 'Link video conference berhasil diperbarui.');
+    }
+
+    public function toggleVisibility(Meeting $meeting): RedirectResponse
+    {
+        abort_unless($meeting->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+
+        $meeting->update([
+            'is_visible' => !$meeting->is_visible
+        ]);
+
+        return back()->with('success', $meeting->is_visible ? 'Pertemuan sekarang terlihat oleh siswa.' : 'Pertemuan berhasil disembunyikan dari siswa.');
     }
 }

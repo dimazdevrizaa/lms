@@ -4,18 +4,19 @@
 
 @section('content')
 <div class="schedule-editor-page">
-    <!-- Header -->
-    <!-- Header -->
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+    {{-- Header --}}
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3 reveal">
         <div class="d-flex align-items-center gap-3">
-            <a href="{{ route('tatausaha.schedules.index', ['academic_year_id' => $selectedYearId]) }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ route('tatausaha.schedules.index', ['academic_year_id' => $selectedYearId]) }}" class="btn btn-outline-secondary-theme btn-sm">
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
             <div>
-                <h1 class="h3 mb-1">📅 Jadwal Kelas {{ $schoolClass->name }}</h1>
-                <p class="text-muted mb-0">
+                <h1 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--primary); margin-bottom: 4px;">
+                    Jadwal Kelas {{ $schoolClass->name }}
+                </h1>
+                <p class="text-muted mb-0 small">
                     @if($schoolClass->major)
-                        <span class="badge" style="background-color: #48A111; font-size: 0.7rem;">{{ $schoolClass->major }}</span>
+                        <span class="status-badge status-badge--hadir" style="font-size: 0.7rem;">{{ $schoolClass->major }}</span>
                     @endif
                     Susun jadwal mingguan untuk kelas ini
                 </p>
@@ -23,22 +24,20 @@
         </div>
         <div class="d-flex flex-wrap gap-2">
             <a href="{{ route('tatausaha.schedules.print', ['academic_year_id' => $selectedYearId, 'class_id' => $schoolClass->id]) }}" 
-               target="_blank" class="btn btn-sm btn-outline-danger shadow-sm">
+               target="_blank" class="btn btn-sm btn-outline-accent-theme">
                 <i class="fas fa-print me-1"></i> Cetak Jadwal
             </a>
         </div>
     </div>
 
-
-
-    <!-- Grid Editor -->
+    {{-- Grid Editor --}}
     <form method="POST" action="{{ route('tatausaha.schedules.update', $schoolClass) }}" id="scheduleForm">
         @csrf
         @method('PUT')
         <input type="hidden" name="academic_year_id" value="{{ $selectedYearId }}">
 
-        <div class="card border-0 shadow-sm" style="cursor: default; border-radius: 16px !important;">
-            <div class="card-body p-0">
+        <div class="content-card reveal reveal-delay-1" style="cursor: default;">
+            <div class="content-card-body" style="padding: 0;">
                 <div class="table-responsive">
                     <table class="table table-bordered mb-0 schedule-grid">
                         <thead>
@@ -57,7 +56,7 @@
                             @php $slotIndex = 0; @endphp
                             @foreach($timeSlots as $slot)
                                 <tr class="{{ $slot->isBreak() ? 'break-row' : 'lesson-row' }}">
-                                    <!-- Kolom Waktu -->
+                                    {{-- Kolom Waktu --}}
                                     <td class="slot-label-cell">
                                         <div class="slot-label {{ $slot->isBreak() ? 'break-label' : '' }}">
                                             <div class="fw-bold small">{{ $slot->label }}</div>
@@ -81,31 +80,33 @@
                                                 <input type="hidden" name="{{ $fieldName }}[day]" value="{{ $day }}">
                                                 <input type="hidden" name="{{ $fieldName }}[time_slot_id]" value="{{ $slot->id }}">
                                                 
-                                                <select name="{{ $fieldName }}[subject_id]" 
-                                                        class="form-select form-select-sm subject-select mb-1"
-                                                        data-day="{{ $day }}" 
-                                                        data-slot="{{ $slot->id }}"
-                                                        onchange="onSubjectChange(this)">
-                                                    <option value="">— Kosong —</option>
-                                                    @foreach($uniqueSubjects as $subj)
-                                                        <option value="{{ $subj->id }}" 
-                                                                data-teacher-id="{{ $classAssignments[$subj->id]->teacher_id ?? $subj->teacher_id ?? '' }}"
-                                                                @selected($existing && $existing->subject->name ?? '' == $subj->name)>
-                                                            {{ $subj->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                
-                                                <select name="{{ $fieldName }}[teacher_id]" 
-                                                        class="form-select form-select-sm teacher-select"
-                                                        id="teacher_{{ $day }}_{{ $slot->id }}">
-                                                    <option value="">— Guru —</option>
-                                                    @foreach($teachers as $t)
-                                                        <option value="{{ $t->id }}" @selected($existing && $existing->teacher_id == $t->id)>
-                                                            {{ $t->user->name ?? '-' }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                                <div class="schedule-cell-card">
+                                                    <select name="{{ $fieldName }}[subject_id]" 
+                                                            class="form-select form-select-sm subject-select"
+                                                            data-day="{{ $day }}" 
+                                                            data-slot="{{ $slot->id }}"
+                                                            onchange="onSubjectChange(this)">
+                                                        <option value="">— Kosong —</option>
+                                                        @foreach($uniqueSubjects as $subj)
+                                                            <option value="{{ $subj->id }}" 
+                                                                    data-teacher-id="{{ $classAssignments[$subj->id]->teacher_id ?? $subj->teacher_id ?? '' }}"
+                                                                    @selected($existing && $existing->subject->name ?? '' == $subj->name)>
+                                                                {{ $subj->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    
+                                                    <select name="{{ $fieldName }}[teacher_id]" 
+                                                            class="form-select form-select-sm teacher-select"
+                                                            id="teacher_{{ $day }}_{{ $slot->id }}">
+                                                        <option value="">— Guru —</option>
+                                                        @foreach($teachers as $t)
+                                                            <option value="{{ $t->id }}" @selected($existing && $existing->teacher_id == $t->id)>
+                                                                {{ $t->user->name ?? '-' }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             @endif
                                         </td>
                                     @endforeach
@@ -120,17 +121,18 @@
             </div>
         </div>
 
-        <!-- Tombol Simpan -->
-        <div class="d-flex justify-content-end align-items-center mt-4">
-            <button type="submit" class="btn btn-lg shadow-sm" style="background: linear-gradient(135deg, #25671E, #48A111); color: white; border: none; border-radius: 12px; padding: 12px 40px;">
+        {{-- Save Button --}}
+        <div class="d-flex justify-content-end align-items-center mt-4 reveal reveal-delay-2">
+            <button type="submit" class="btn btn-lg btn-outline-primary-theme" style="padding: 12px 40px;">
                 <i class="fas fa-save me-2"></i> Simpan Jadwal
             </button>
         </div>
     </form>
 </div>
 
+@push('styles')
 <style>
-    .schedule-editor-page .card:hover {
+    .schedule-editor-page .content-card:hover {
         transform: none !important;
     }
 
@@ -140,37 +142,41 @@
 
     .schedule-grid th,
     .schedule-grid td {
-        border: 1px solid #e9ecef !important;
+        border: 1px solid #f1f3f5 !important;
         vertical-align: middle;
     }
 
     .slot-header {
-        background: linear-gradient(135deg, #25671E, #48A111) !important;
-        color: white !important;
-        font-weight: 600;
+        background: #ffffff !important;
+        color: var(--primary) !important;
+        border-bottom: 2px solid var(--secondary) !important;
+        font-weight: 700;
         font-size: 0.85rem;
-        padding: 12px !important;
+        padding: 14px 12px !important;
         position: sticky;
         left: 0;
         z-index: 2;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.02);
     }
 
     .day-header {
-        background: linear-gradient(135deg, #25671E, #48A111) !important;
-        color: white !important;
+        background: #ffffff !important;
+        color: var(--primary) !important;
+        border-bottom: 2px solid var(--secondary) !important;
         font-weight: 700;
         font-size: 0.85rem;
-        padding: 12px 8px !important;
-        min-width: 150px;
+        padding: 14px 8px !important;
+        min-width: 170px;
         letter-spacing: 0.5px;
     }
 
     .slot-label-cell {
-        background: #f8f9fa;
-        padding: 8px 12px !important;
+        background: #fafafa;
+        padding: 10px 12px !important;
         position: sticky;
         left: 0;
         z-index: 1;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.02);
     }
 
     .slot-label {
@@ -178,84 +184,96 @@
     }
 
     .slot-label.break-label {
-        color: #F2B50B;
+        color: var(--accent);
     }
 
     .lesson-cell {
-        padding: 6px 8px !important;
-        background: white;
-        transition: background-color 0.2s;
+        padding: 8px !important;
+        background: #fdfdfd;
     }
 
-    .lesson-cell:hover {
-        background-color: rgba(72, 161, 17, 0.04);
+    /* Card container inside cells */
+    .schedule-cell-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .schedule-cell-card:hover {
+        border-color: rgba(67, 160, 71, 0.4);
+        box-shadow: 0 4px 12px rgba(67, 160, 71, 0.08);
+    }
+
+    .schedule-cell-card.has-assignment {
+        background: #f4faf3;
+        border-color: rgba(67, 160, 71, 0.35);
     }
 
     .break-row {
-        background: repeating-linear-gradient(
-            45deg,
-            #fffbe6,
-            #fffbe6 10px,
-            #fff8d6 10px,
-            #fff8d6 20px
-        );
+        background: #fdfdfd;
     }
 
     .break-cell {
-        padding: 6px !important;
-        background: rgba(242, 181, 11, 0.08);
+        padding: 8px !important;
+        background: #fffdf5;
+        border-top: 1px solid rgba(249, 168, 37, 0.15) !important;
+        border-bottom: 1px solid rgba(249, 168, 37, 0.15) !important;
     }
 
     .break-indicator {
         text-align: center;
         color: #b8860b;
-        font-size: 0.75rem;
-        font-weight: 600;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
         padding: 4px;
     }
 
+    /* Clean borderless select inputs */
+    .subject-select,
+    .teacher-select {
+        border: none !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        outline: none !important;
+        padding: 2px 1.1rem 2px 4px !important;
+        background-position: right 0.2rem center !important;
+        background-size: 8px 6px !important;
+        height: 24px !important;
+        border-radius: 4px;
+        font-family: 'Inter', sans-serif;
+    }
+
     .subject-select {
-        font-size: 0.75rem !important;
-        padding: 4px 6px !important;
-        border-color: #dee2e6;
-        border-radius: 6px;
-        transition: border-color 0.2s;
-    }
-
-    .subject-select:focus {
-        border-color: #48A111;
-        box-shadow: 0 0 0 2px rgba(72, 161, 17, 0.15);
-    }
-
-    .subject-select option:not([value=""]) {
-        font-weight: 500;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        color: var(--primary) !important;
     }
 
     .teacher-select {
-        font-size: 0.7rem !important;
-        padding: 3px 6px !important;
-        border-color: #e9ecef;
-        border-radius: 6px;
-        color: #6c757d;
+        font-size: 0.65rem !important;
+        color: #718096 !important;
+        margin-top: -1px;
     }
 
-    .teacher-select:focus {
-        border-color: #F2B50B;
-        box-shadow: 0 0 0 2px rgba(242, 181, 11, 0.15);
-    }
-
-    /* Highlight when filled */
-    .subject-select.has-value {
-        border-color: #48A111;
-        background-color: rgba(72, 161, 17, 0.04);
+    .subject-select option,
+    .teacher-select option {
+        background-color: #ffffff !important;
+        color: #2d3748 !important;
+        font-weight: normal !important;
     }
 </style>
+@endpush
 
 <script>
-    // Mapping subject_id -> [teacher_ids] dari server
     const subjectTeachersMap = @json($subjectTeachersMap);
-    
-    // Simpan semua teacher options untuk rebuild dropdown
     const allTeachers = @json($teachers->map(fn($t) => ['id' => $t->id, 'name' => $t->user->name ?? '-'])->values());
 
     function onSubjectChange(selectEl) {
@@ -268,14 +286,11 @@
         const selectedOption = selectEl.options[selectEl.selectedIndex];
         const suggestedTeacherId = selectedOption.dataset.teacherId;
 
-        // Simpan teacher yang sedang terpilih
         const currentTeacherId = teacherSelect.value;
 
-        // Rebuild teacher dropdown berdasarkan mapel yang dipilih
         teacherSelect.innerHTML = '<option value="">— Guru —</option>';
 
         if (subjectId && subjectTeachersMap[subjectId]) {
-            // Hanya tampilkan guru yang mengampu mapel ini
             const allowedIds = subjectTeachersMap[subjectId];
             allTeachers.forEach(t => {
                 if (allowedIds.includes(t.id)) {
@@ -286,15 +301,12 @@
                 }
             });
 
-            // Auto-select guru dari penugasan kelas
             if (suggestedTeacherId) {
                 teacherSelect.value = suggestedTeacherId;
             } else if (allowedIds.length === 1) {
-                // Jika hanya ada 1 guru, auto-select
                 teacherSelect.value = allowedIds[0];
             }
         } else if (subjectId) {
-            // Mapel tidak punya guru terdaftar → tampilkan semua guru
             allTeachers.forEach(t => {
                 const opt = document.createElement('option');
                 opt.value = t.id;
@@ -302,22 +314,24 @@
                 teacherSelect.appendChild(opt);
             });
         }
-        // Jika kosong, biarkan dropdown guru juga kosong
 
-        // Visual feedback
+        const card = selectEl.closest('.schedule-cell-card');
         if (subjectId) {
             selectEl.classList.add('has-value');
+            if (card) card.classList.add('has-assignment');
         } else {
             selectEl.classList.remove('has-value');
+            if (card) card.classList.remove('has-assignment');
         }
     }
 
-    // Initialize: filter teacher dropdowns untuk yang sudah terisi on page load
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.subject-select').forEach(sel => {
             if (sel.value) {
                 sel.classList.add('has-value');
-                // Rebuild dropdown guru sesuai mapel, tapi pertahankan nilai tersimpan
+                const card = sel.closest('.schedule-cell-card');
+                if (card) card.classList.add('has-assignment');
+
                 const day = sel.dataset.day;
                 const slotId = sel.dataset.slot;
                 const teacherSelect = document.getElementById('teacher_' + day + '_' + slotId);
@@ -353,4 +367,3 @@
     });
 </script>
 @endsection
-

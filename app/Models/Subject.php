@@ -19,6 +19,15 @@ class Subject extends Model
     ];
 
 
+    protected static function booted()
+    {
+        static::saving(function ($subject) {
+            if (empty($subject->slug)) {
+                $subject->slug = \Illuminate\Support\Str::slug($subject->name);
+            }
+        });
+    }
+
     public function teachingAssignments(): HasMany
     {
         return $this->hasMany(ClassSubjectTeacher::class);

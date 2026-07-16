@@ -4,17 +4,24 @@
 
 @section('content')
     <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a href="{{ isset($meeting) ? route('guru.attendances.index', ['class_id' => $meeting->class_id, 'subject_id' => $meeting->subject_id]) : route('guru.attendances.index') }}" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-        <div>
-            <h1 class="h3 mb-1">✅ Input Kehadiran Siswa</h1>
-            @if(isset($meeting))
-                <p class="text-muted mb-0">Pertemuan ke-{{ $meeting->number }}: {{ $meeting->title }} | {{ $meeting->schoolClass->name }}</p>
-            @else
-                <p class="text-muted mb-0">Catat kehadiran siswa untuk kelas dan mata pelajaran tertentu</p>
-            @endif
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3 reveal">
+        <div class="d-flex align-items-center gap-3">
+            @php
+                $backUrl = isset($meeting) 
+                    ? route('guru.meetings.show', $meeting->id) 
+                    : route('guru.attendances.index');
+            @endphp
+            <a href="{{ $backUrl }}" class="btn btn-outline-secondary-theme btn-sm" style="border-radius: var(--radius-sm);">
+                <i class="fas fa-arrow-left me-1"></i> Kembali
+            </a>
+            <div>
+                <h1 class="mb-1 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.75rem;">✅ Input Kehadiran Siswa</h1>
+                @if(isset($meeting))
+                    <p class="text-muted mb-0">Pertemuan ke-{{ $meeting->number }}: {{ $meeting->title }} | {{ $meeting->schoolClass->name }}</p>
+                @else
+                    <p class="text-muted mb-0">Catat kehadiran siswa untuk kelas dan mata pelajaran tertentu</p>
+                @endif
+            </div>
         </div>
     </div>
 
@@ -25,15 +32,20 @@
         @endif
 
         <div class="row">
-            <div class="col-lg-4">
-                <div class="card mb-4">
-                    <div class="card-body p-4">
-                        <h5 class="card-title mb-4">Konfigurasi</h5>
-                        
+            <!-- Left Config Sidebar -->
+            <div class="col-lg-4 mb-4 reveal reveal-delay-1">
+                <div class="content-card mb-4">
+                    <div class="content-card-header">
+                        <div class="content-card-header-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <h5 class="content-card-title mb-0">Konfigurasi</h5>
+                    </div>
+                    <div class="content-card-body">
                         <!-- Kelas -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🎓 Kelas</label>
-                            <select class="form-select @if(isset($meeting)) bg-light @endif" style="border-color: #25671E;" name="class_id" id="classSelect" required @if(isset($meeting)) readonly @endif>
+                            <label class="form-label fw-bold" style="color: var(--primary);">🎓 Kelas</label>
+                            <select class="form-select @if(isset($meeting)) bg-light @endif" name="class_id" id="classSelect" required @if(isset($meeting)) readonly @endif style="border-radius: var(--radius-sm);">
                                 <option value="">-- Pilih Kelas --</option>
                                 @foreach($classes as $class)
                                     <option value="{{ $class->id }}" @selected(old('class_id', isset($meeting) ? $meeting->class_id : null) == $class->id)>{{ $class->name }}</option>
@@ -46,8 +58,8 @@
 
                         <!-- Mata Pelajaran -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📖 Mata Pelajaran</label>
-                            <select class="form-select @if(isset($meeting)) bg-light @endif" style="border-color: #25671E;" name="subject_id" required @if(isset($meeting)) readonly @endif>
+                            <label class="form-label fw-bold" style="color: var(--primary);">📖 Mata Pelajaran</label>
+                            <select class="form-select @if(isset($meeting)) bg-light @endif" name="subject_id" required @if(isset($meeting)) readonly @endif style="border-radius: var(--radius-sm);">
                                 @if($subjects->count() > 1 && !isset($meeting))
                                     <option value="">-- Pilih Mata Pelajaran --</option>
                                 @endif
@@ -62,32 +74,37 @@
 
                         <!-- Tanggal -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📅 Tanggal</label>
-                            <input class="form-control @if(isset($meeting)) bg-light @endif" style="border-color: #25671E;" type="date" name="date" value="{{ old('date', isset($meeting) ? $meeting->date : now()->toDateString()) }}" required @if(isset($meeting)) readonly @endif>
+                            <label class="form-label fw-bold" style="color: var(--primary);">📅 Tanggal</label>
+                            <input class="form-control @if(isset($meeting)) bg-light @endif" type="date" name="date" value="{{ old('date', isset($meeting) ? $meeting->date : now()->toDateString()) }}" required @if(isset($meeting)) readonly @endif style="border-radius: var(--radius-sm);">
                             @error('date')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
                     </div>
                 </div>
-                <div class="d-grid gap-2 mb-4">
-                    <button class="btn btn-lg" style="background-color: #25671E; color: white; border: none;" type="submit">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-lg btn-primary" style="border-radius: var(--radius-md);" type="submit">
                         <i class="fas fa-save me-2"></i> Simpan Absensi
                     </button>
-                    <a class="btn btn-outline-secondary" href="{{ isset($meeting) ? route('guru.attendances.index', ['class_id' => $meeting->class_id, 'subject_id' => $meeting->subject_id]) : route('guru.attendances.index') }}">Batal</a>
+                    <a class="btn btn-outline-secondary-theme btn-lg" href="{{ $backUrl }}" style="border-radius: var(--radius-md);">Batal</a>
                 </div>
             </div>
 
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="card-title mb-0">Daftar Siswa</h5>
-                            <button type="button" class="btn btn-sm btn-outline-success" id="markAllHadir">
-                                <i class="fas fa-check-double me-1"></i> Semua Hadir
-                            </button>
+            <!-- Right Student List -->
+            <div class="col-lg-8 mb-4 reveal reveal-delay-2">
+                <div class="content-card">
+                    <div class="content-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="content-card-header-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5 class="content-card-title mb-0">Daftar Siswa</h5>
                         </div>
-
+                        <button type="button" class="btn btn-sm btn-outline-primary-theme" id="markAllHadir" style="border-radius: var(--radius-sm);">
+                            <i class="fas fa-check-double me-1"></i> Semua Hadir
+                        </button>
+                    </div>
+                    <div class="content-card-body">
                         <div id="studentContainer">
                             <div class="text-center py-5 text-muted">
                                 <p class="mb-2" style="font-size: 1.5rem; opacity: 0.5;">👆</p>
@@ -97,15 +114,15 @@
 
                         <div class="table-responsive d-none" id="studentTableWrapper">
                             <table class="table table-hover align-middle">
-                                <thead style="background-color: #F7F0F0;">
+                                <thead>
                                     <tr>
-                                        <th style="color: #25671E; width: 50px;">No</th>
-                                        <th style="color: #25671E;">Nama Siswa</th>
-                                        <th style="color: #25671E; text-align: center; width: 280px;">Status Kehadiran</th>
+                                        <th class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; width: 60px;">No</th>
+                                        <th class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700;">Nama Siswa</th>
+                                        <th class="text-muted text-uppercase text-center" style="font-size: 0.75rem; font-weight: 700; width: 300px;">Status Kehadiran</th>
                                     </tr>
                                 </thead>
                                 <tbody id="studentTableBody">
-                                    <!-- Students will be loaded here via JS -->
+                                    <!-- Students loaded via JS -->
                                 </tbody>
                             </table>
                         </div>
@@ -118,7 +135,7 @@
     <style>
         .status-radio-group {
             display: flex;
-            gap: 5px;
+            gap: 6px;
             justify-content: center;
         }
         .status-radio-item {
@@ -129,43 +146,50 @@
         }
         .status-radio-item label {
             display: block;
-            padding: 5px 2px;
+            padding: 8px 4px;
             text-align: center;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
+            border: 1px solid rgba(27, 94, 32, 0.1);
+            border-radius: var(--radius-sm);
             cursor: pointer;
             font-size: 0.75rem;
-            font-weight: 600;
-            transition: all 0.2s;
+            font-weight: 700;
+            transition: all 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+            background: var(--bg-body);
+            color: var(--text-muted);
         }
         
         /* Hadir */
         .status-radio-item input[value="hadir"]:checked + label {
-            background-color: #25671E;
+            background-color: var(--primary);
             color: white;
-            border-color: #25671E;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(27, 94, 32, 0.15);
         }
         /* Izin */
         .status-radio-item input[value="izin"]:checked + label {
-            background-color: #F2B50B;
-            color: #25671E;
-            border-color: #F2B50B;
+            background-color: var(--accent);
+            color: #4E3400;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(249, 168, 37, 0.15);
         }
         /* Sakit */
         .status-radio-item input[value="sakit"]:checked + label {
-            background-color: #48A111;
+            background-color: var(--secondary);
             color: white;
-            border-color: #48A111;
+            border-color: var(--secondary);
+            box-shadow: 0 4px 12px rgba(67, 160, 71, 0.15);
         }
         /* Alpa */
         .status-radio-item input[value="alpa"]:checked + label {
             background-color: #dc3545;
             color: white;
             border-color: #dc3545;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
         }
         
         .status-radio-item label:hover {
-            background-color: #f8f9fa;
+            background-color: rgba(27, 94, 32, 0.04);
+            transform: translateY(-1px);
         }
     </style>
 
@@ -183,10 +207,10 @@
             if (!stats) return '';
             
             let html = '';
-            if (stats.hadir) html += `<span class="badge bg-light text-primary border me-1" title="Total Hadir">${stats.hadir} H</span>`;
-            if (stats.izin) html += `<span class="badge bg-light text-warning border me-1" title="Total Izin">${stats.izin} I</span>`;
-            if (stats.sakit) html += `<span class="badge bg-light text-info border me-1" title="Total Sakit">${stats.sakit} S</span>`;
-            if (stats.alpa) html += `<span class="badge bg-light text-danger border me-1" title="Total Alpa">${stats.alpa} A</span>`;
+            if (stats.hadir) html += `<span class="status-badge status-badge--hadir me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Hadir">${stats.hadir} H</span>`;
+            if (stats.izin) html += `<span class="status-badge status-badge--izin me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Izin">${stats.izin} I</span>`;
+            if (stats.sakit) html += `<span class="status-badge status-badge--sakit me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Sakit">${stats.sakit} S</span>`;
+            if (stats.alpa) html += `<span class="status-badge status-badge--alpa me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Alpa">${stats.alpa} A</span>`;
             
             return html ? `<small class="text-muted" style="font-size: 10px;">Rekap: </small>${html}` : '';
         }
@@ -207,11 +231,11 @@
                 selectedClass.students.forEach((student, index) => {
                     const row = `
                         <tr>
-                            <td>${index + 1}</td>
+                            <td class="text-muted fw-bold">${index + 1}</td>
                             <td>
-                                <strong>${student.user.name}</strong><br>
-                                <small class="text-muted">NIS: ${student.nis}</small>
-                                <div class="mt-1">
+                                <div class="fw-bold text-dark">${student.user.name}</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">NIS: ${student.nis}</div>
+                                <div class="mt-2 d-flex align-items-center flex-wrap gap-1">
                                     ${renderStats(student.id)}
                                 </div>
                             </td>
@@ -255,4 +279,3 @@
         }
     </script>
 @endsection
-

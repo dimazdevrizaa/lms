@@ -3,112 +3,103 @@
 @section('title', 'Dashboard Admin')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <h1 class="mb-0">📊 Dashboard Admin</h1>
-        <div class="text-muted small">
-            {{ date('l, d F Y') }}
+    <!-- Header Banner -->
+    <div class="content-card" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--secondary) 100%); border: none; margin-bottom: 32px;">
+        <div class="content-card-body" style="padding: 36px 32px;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="mb-2" style="color: #FFFFFF !important; font-size: 1.75rem; font-family: 'Plus Jakarta Sans', sans-serif;">
+                        📊 Dashboard Admin
+                    </h1>
+                    <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 0.95rem;">
+                        Selamat datang! Pantau dan kelola sistem LMS dari sini.
+                    </p>
+                </div>
+                <div style="color: rgba(255,255,255,0.7); font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 500;">
+                    {{ \Carbon\Carbon::now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Metrics Section -->
-    <div class="row mb-5">
+    <div class="stats-grid" style="margin-bottom: 40px;">
         <!-- Total User Card -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title">👥 Total User</h5>
-                            <p class="display-5" style="color: #F2B50B; font-weight: 700; margin-bottom: 0;">{{ $userCount }}</p>
-                            <small class="text-muted">Pengguna terdaftar</small>
-                        </div>
-                        <div class="text-center" style="opacity: 0.1; font-size: 2rem;">👥</div>
-                    </div>
+        <a href="{{ route('admin.users.index') }}" class="stat-card stat-card--grades" style="text-decoration: none; color: inherit; display: block;">
+            <div class="d-flex align-items-start gap-3">
+                <div class="stat-icon-circle stat-icon-circle--gold">👥</div>
+                <div>
+                    <div class="stat-label">Total User</div>
+                    <div class="stat-value" style="color: var(--accent);">{{ $userCount }}</div>
+                    <div class="stat-sub">Pengguna terdaftar</div>
                 </div>
-                <a href="{{ route('admin.users.index') }}" class="stretched-link"></a>
             </div>
-        </div>
+        </a>
 
         <!-- Total Guru Card -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title">🎓 Total Guru</h5>
-                            <p class="display-5" style="color: #48A111; font-weight: 700; margin-bottom: 0;">{{ $teacherCount }}</p>
-                            <small class="text-muted">Guru aktif</small>
-                        </div>
-                        <div class="text-center" style="opacity: 0.1; font-size: 2rem;">🎓</div>
-                    </div>
+        <a href="{{ route('admin.users.index', ['role' => 'guru']) }}" class="stat-card stat-card--attendance" style="text-decoration: none; color: inherit; display: block;">
+            <div class="d-flex align-items-start gap-3">
+                <div class="stat-icon-circle stat-icon-circle--green">🎓</div>
+                <div>
+                    <div class="stat-label">Total Guru</div>
+                    <div class="stat-value stat-value--green">{{ $teacherCount }}</div>
+                    <div class="stat-sub">Guru aktif</div>
                 </div>
-                <a href="{{ route('admin.users.index', ['role' => 'guru']) }}" class="stretched-link"></a>
             </div>
-        </div>
+        </a>
 
         <!-- Total Siswa Card -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title">🎒 Total Siswa</h5>
-                            <p class="display-5" style="color: #25671E; font-weight: 700; margin-bottom: 0;">{{ $studentCount }}</p>
-                            <small class="text-muted">Siswa terdaftar</small>
-                        </div>
-                        <div class="text-center" style="opacity: 0.1; font-size: 2rem;">🎒</div>
-                    </div>
+        <a href="{{ route('admin.users.index', ['role' => 'siswa']) }}" class="stat-card stat-card--behavior" style="text-decoration: none; color: inherit; display: block;">
+            <div class="d-flex align-items-start gap-3">
+                <div class="stat-icon-circle stat-icon-circle--deep">🎒</div>
+                <div>
+                    <div class="stat-label">Total Siswa</div>
+                    <div class="stat-value stat-value--primary">{{ $studentCount }}</div>
+                    <div class="stat-sub">Siswa terdaftar</div>
                 </div>
-                <a href="{{ route('admin.users.index', ['role' => 'siswa']) }}" class="stretched-link"></a>
             </div>
-        </div>
+        </a>
 
         <!-- Total Kelas Card -->
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 position-relative shadow-sm hover-card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title">🏫 Total Kelas</h5>
-                            <p class="display-5" style="color: #0d6efd; font-weight: 700; margin-bottom: 0;">{{ $classCount }}</p>
-                            <small class="text-muted">Kelas aktif</small>
-                        </div>
-                        <div class="text-center" style="opacity: 0.1; font-size: 2rem;">🏫</div>
-                    </div>
+        <a href="{{ route('admin.classes.index') }}" class="stat-card stat-card--attendance" style="text-decoration: none; color: inherit; display: block;">
+            <div class="d-flex align-items-start gap-3">
+                <div class="stat-icon-circle stat-icon-circle--green">🏫</div>
+                <div>
+                    <div class="stat-label">Total Kelas</div>
+                    <div class="stat-value stat-value--green">{{ $classCount }}</div>
+                    <div class="stat-sub">Kelas aktif</div>
                 </div>
-                <a href="{{ route('admin.classes.index') }}" class="stretched-link"></a>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- Quick Actions Section -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">⚙️ Aksi Cepat</h5>
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary w-100">
-                                <span>👤 Kelola User</span>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('admin.classes.index') }}" class="btn btn-outline-success w-100">
-                                <span>🎓 Kelola Kelas</span>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('admin.academic-years.index') }}" class="btn btn-outline-warning w-100">
-                                <span>📅 Tahun Ajaran</span>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{{ route('admin.monitoring.index') }}" class="btn btn-outline-info w-100">
-                                <span>📊 Monitoring</span>
-                            </a>
-                        </div>
-                    </div>
+    <div class="content-card">
+        <div class="content-card-header">
+            <div class="content-card-header-icon">⚙️</div>
+            <h5 class="content-card-title">Aksi Cepat</h5>
+        </div>
+        <div class="content-card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary-theme w-100 py-3">
+                        👤 Kelola User
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ route('admin.classes.index') }}" class="btn btn-outline-secondary-theme w-100 py-3">
+                        🎓 Kelola Kelas
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ route('admin.academic-years.index') }}" class="btn btn-outline-accent-theme w-100 py-3">
+                        📅 Tahun Ajaran
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ route('admin.monitoring.index') }}" class="btn btn-outline-primary-theme w-100 py-3">
+                        📊 Monitoring
+                    </a>
                 </div>
             </div>
         </div>

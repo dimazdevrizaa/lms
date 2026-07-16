@@ -4,27 +4,31 @@
 
 @section('content')
     <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary-theme btn-sm">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
         <div>
-            <h1 class="h3 mb-1">👤 Tambah User Baru</h1>
-            <p class="text-muted mb-0">Buat akun pengguna baru untuk sistem LMS</p>
+            <h1 class="mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.5rem;">👤 Tambah User Baru</h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Buat akun pengguna baru untuk sistem LMS</p>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-7">
-            <div class="card">
-                <div class="card-body p-4">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <div class="content-card-header-icon">👤</div>
+                    <h5 class="content-card-title">Form Tambah User</h5>
+                </div>
+                <div class="content-card-body">
                     <form method="POST" action="{{ route('admin.users.store') }}">
                         @csrf
 
                         <!-- Nama User -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">👤 Nama Lengkap</label>
-                            <input class="form-control" style="border-color: #25671E;" name="name" value="{{ old('name') }}" placeholder="Masukkan nama lengkap" required>
+                            <label class="form-label fw-semibold">👤 Nama Lengkap</label>
+                            <input class="form-control" name="name" value="{{ old('name') }}" placeholder="Masukkan nama lengkap" required>
                             @error('name')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -32,8 +36,8 @@
 
                         <!-- Email -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">📧 Email</label>
-                            <input class="form-control" style="border-color: #25671E;" type="email" name="email" value="{{ old('email') }}" placeholder="example@school.com" required>
+                            <label class="form-label fw-semibold">📧 Email</label>
+                            <input class="form-control" type="email" name="email" value="{{ old('email') }}" placeholder="example@school.com" required>
                             @error('email')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -41,8 +45,8 @@
 
                         <!-- Role -->
                         <div class="mb-4">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🔐 Peran (Role)</label>
-                            <select class="form-select" style="border-color: #25671E;" id="roleSelect" name="role" required>
+                            <label class="form-label fw-semibold">🔐 Peran (Role)</label>
+                            <select class="form-select" id="roleSelect" name="role" required>
                                 <option value="">-- Pilih Role --</option>
                                 @foreach(['admin' => '📄 Admin', 'tatausaha' => '🃋 Tata Usaha', 'guru' => '👨‍🏫 Guru', 'siswa' => '🎒 Siswa'] as $key => $label)
                                     <option value="{{ $key }}" @selected(old('role') === $key)>{{ $label }}</option>
@@ -55,8 +59,8 @@
 
                         <!-- NIP (untuk guru) -->
                         <div class="mb-4" id="nipField" style="display: none;">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🆔 NIP (Nomor Induk Pegawai)</label>
-                            <input class="form-control" style="border-color: #25671E;" type="text" name="nip" value="{{ old('nip') }}" placeholder="Masukkan NIP guru">
+                            <label class="form-label fw-semibold">🆔 NIP (Nomor Induk Pegawai)</label>
+                            <input class="form-control" type="text" name="nip" value="{{ old('nip') }}" placeholder="Masukkan NIP guru">
                             @error('nip')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -64,26 +68,8 @@
 
                         <!-- NIS (untuk siswa) -->
                         <div class="mb-4" id="nisField" style="display: none;">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🆔 NIS (Nomor Induk Siswa)</label>
-                            <input class="form-control" style="border-color: #25671E;" type="text" name="nis" value="{{ old('nis') }}" placeholder="Masukkan NIS siswa">
-                            @error('nis')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- NIP (untuk guru) -->
-                        <div class="mb-4" id="nipField" style="display: none;">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🆔 NIP (Nomor Induk Pegawai)</label>
-                            <input class="form-control" style="border-color: #25671E;" type="text" name="nip" value="{{ old('nip') }}" placeholder="Masukkan NIP guru">
-                            @error('nip')
-                                <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <!-- NIS (untuk siswa) -->
-                        <div class="mb-4" id="nisField" style="display: none;">
-                            <label class="form-label" style="font-weight: 600; color: #25671E;">🆔 NIS (Nomor Induk Siswa)</label>
-                            <input class="form-control" style="border-color: #25671E;" type="text" name="nis" value="{{ old('nis') }}" placeholder="Masukkan NIS siswa">
+                            <label class="form-label fw-semibold">🆔 NIS (Nomor Induk Siswa)</label>
+                            <input class="form-control" type="text" name="nis" value="{{ old('nis') }}" placeholder="Masukkan NIS siswa">
                             @error('nis')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
@@ -92,15 +78,15 @@
                         <!-- Password Fields -->
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label" style="font-weight: 600; color: #25671E;">🔄 Password</label>
-                                <input class="form-control" style="border-color: #25671E;" type="password" name="password" placeholder="Masukkan password" required>
+                                <label class="form-label fw-semibold">🔄 Password</label>
+                                <input class="form-control" type="password" name="password" placeholder="Masukkan password" required>
                                 @error('password')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label" style="font-weight: 600; color: #25671E;">✅ Konfirmasi Password</label>
-                                <input class="form-control" style="border-color: #25671E;" type="password" name="password_confirmation" placeholder="Ulangi password" required>
+                                <label class="form-label fw-semibold">✅ Konfirmasi Password</label>
+                                <input class="form-control" type="password" name="password_confirmation" placeholder="Ulangi password" required>
                                 @error('password_confirmation')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
@@ -108,9 +94,9 @@
                         </div>
 
                         <!-- Buttons -->
-                        <div class="d-flex gap-2 mt-5">
-                            <button class="btn btn-lg" style="background-color: #48A111; color: white; border: none;" type="submit">✓ Buat User</button>
-                            <a class="btn btn-lg btn-outline-secondary" href="{{ route('admin.users.index') }}">Batal</a>
+                        <div class="d-flex gap-2 mt-4">
+                            <button class="btn btn-lg btn-primary" type="submit">✓ Buat User</button>
+                            <a class="btn btn-lg btn-outline-secondary-theme" href="{{ route('admin.users.index') }}">Batal</a>
                         </div>
                     </form>
                 </div>
@@ -119,24 +105,27 @@
 
         <!-- Info Sidebar -->
         <div class="col-lg-5">
-            <div class="card" style="border-top: 4px solid #F2B50B;">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">💡 Panduan Role</h5>
-                    <ul class="small text-muted">
+            <div class="content-card" style="border-top: 4px solid var(--accent);">
+                <div class="content-card-header">
+                    <div class="content-card-header-icon" style="background: linear-gradient(135deg, rgba(249, 168, 37, 0.15), rgba(249, 168, 37, 0.06)); color: var(--accent);">💡</div>
+                    <h5 class="content-card-title">Panduan Role</h5>
+                </div>
+                <div class="content-card-body">
+                    <ul class="small text-muted mb-0" style="padding-left: 1.2rem;">
                         <li class="mb-3">
-                            <strong style="color: #25671E;">📄 Admin</strong><br>
+                            <strong style="color: var(--primary);">📄 Admin</strong><br>
                             Akses penuh ke semua fitur sistem
                         </li>
                         <li class="mb-3">
-                            <strong style="color: #48A111;">🃋 Tata Usaha</strong><br>
+                            <strong style="color: var(--secondary);">🃋 Tata Usaha</strong><br>
                             Mengelola data siswa, guru, dan kelas
                         </li>
                         <li class="mb-3">
-                            <strong style="color: #25671E;">👨‍🏫 Guru</strong><br>
+                            <strong style="color: var(--primary);">👨‍🏫 Guru</strong><br>
                             Membuat tugas, materi, dan penilaian
                         </li>
                         <li>
-                            <strong style="color: #F2B50B;">🎒 Siswa</strong><br>
+                            <strong style="color: var(--accent);">🎒 Siswa</strong><br>
                             Mengumpulkan tugas dan melihat nilai
                         </li>
                     </ul>
@@ -167,4 +156,3 @@
         });
     </script>
 @endsection
-

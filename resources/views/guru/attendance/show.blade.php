@@ -3,43 +3,55 @@
 @section('title', 'Detail Kehadiran')
 
 @section('content')
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <a class="btn btn-outline-secondary btn-sm" href="{{ route('guru.attendances.index', ['class_id' => $attendance->class_id, 'subject_id' => $attendance->subject_id]) }}">
-            <i class="fas fa-arrow-left"></i> Kembali
-        </a>
-        <div>
-            <h1 class="h3 mb-0">🔍 Detail Kehadiran</h1>
-            <p class="text-muted mb-0">Informasi lengkap kehadiran siswa pada sesi ini</p>
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3 reveal">
+        <div class="d-flex align-items-center gap-3">
+            @php
+                $backUrl = $attendance->meeting_id 
+                    ? route('guru.meetings.show', $attendance->meeting_id) 
+                    : route('guru.attendances.index', ['class_id' => $attendance->class_id, 'subject_id' => $attendance->subject_id]);
+            @endphp
+            <a class="btn btn-outline-secondary-theme btn-sm" href="{{ $backUrl }}" style="border-radius: var(--radius-sm);">
+                <i class="fas fa-arrow-left me-1"></i> Kembali
+            </a>
+            <div>
+                <h1 class="mb-1 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.75rem;">🔍 Detail Kehadiran</h1>
+                <p class="text-muted mb-0">Informasi lengkap kehadiran siswa pada sesi ini</p>
+            </div>
         </div>
     </div>
 
     <div class="row">
         <!-- Info Card -->
-        <div class="col-lg-4 mb-4">
-            <div class="card border-0 shadow-sm" style="border-left: 5px solid #25671E !important;">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold mb-4" style="color: #25671E;">Informasi Kelas</h5>
-                    
+        <div class="col-lg-4 mb-4 reveal reveal-delay-1">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <div class="content-card-header-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h5 class="content-card-title mb-0">Informasi Kelas</h5>
+                </div>
+                <div class="content-card-body">
                     <div class="mb-3">
-                        <label class="text-muted small d-block">Tanggal</label>
-                        <span class="fw-bold">{{ \Carbon\Carbon::parse($attendance->date)->format('d F Y') }}</span>
+                        <label class="text-muted small d-block fw-semibold mb-1">Tanggal</label>
+                        <span class="fw-bold text-dark">{{ \Carbon\Carbon::parse($attendance->date)->format('d F Y') }}</span>
                     </div>
 
                     <div class="mb-3">
-                        <label class="text-muted small d-block">Kelas</label>
-                        <span class="badge" style="background-color: #48A111;">{{ $attendance->schoolClass?->name }}</span>
+                        <label class="text-muted small d-block fw-semibold mb-1">Kelas</label>
+                        <span class="status-badge status-badge--hadir">{{ $attendance->schoolClass?->name }}</span>
                     </div>
 
                     <div class="mb-3">
-                        <label class="text-muted small d-block">Mata Pelajaran</label>
+                        <label class="text-muted small d-block fw-semibold mb-1">Mata Pelajaran</label>
                         <span class="fw-bold text-dark">{{ $attendance->subject?->name }}</span>
                     </div>
 
                     @if($attendance->meeting_id)
                     <div class="mb-3">
-                        <label class="text-muted small d-block">Pertemuan</label>
-                        <a href="{{ route('guru.meetings.show', $attendance->meeting_id) }}" class="fw-bold text-success" style="text-decoration: none;">
-                            <i class="fas fa-calendar-check me-1"></i> Pertemuan Ke-{{ $attendance->meeting->number }}
+                        <label class="text-muted small d-block fw-semibold mb-1">Pertemuan</label>
+                        <a href="{{ route('guru.meetings.show', $attendance->meeting_id) }}" class="fw-bold text-decoration-none d-flex align-items-center gap-1" style="color: var(--primary);">
+                            <i class="fas fa-calendar-check"></i> Pertemuan Ke-{{ $attendance->meeting->number }}
                         </a>
                     </div>
                     @endif
@@ -48,13 +60,13 @@
                         $stats = $attendance->details->groupBy('status')->map->count();
                     @endphp
 
-                    <div class="mt-4 pt-3 border-top">
-                        <label class="text-muted small d-block mb-2">Ringkasan:</label>
+                    <div class="mt-4 pt-3 border-top" style="border-color: rgba(37, 103, 30, 0.06) !important;">
+                        <label class="text-muted small d-block fw-semibold mb-2">Ringkasan:</label>
                         <div class="d-flex flex-wrap gap-2">
-                            <span class="badge bg-success">Hadir: {{ $stats['hadir'] ?? 0 }}</span>
-                            <span class="badge bg-info text-dark">Izin: {{ $stats['izin'] ?? 0 }}</span>
-                            <span class="badge bg-warning text-dark">Sakit: {{ $stats['sakit'] ?? 0 }}</span>
-                            <span class="badge bg-danger">Alpa: {{ $stats['alpa'] ?? 0 }}</span>
+                            <span class="status-badge status-badge--hadir">Hadir: {{ $stats['hadir'] ?? 0 }}</span>
+                            <span class="status-badge status-badge--izin">Izin: {{ $stats['izin'] ?? 0 }}</span>
+                            <span class="status-badge status-badge--sakit">Sakit: {{ $stats['sakit'] ?? 0 }}</span>
+                            <span class="status-badge status-badge--alpa">Alpa: {{ $stats['alpa'] ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -62,42 +74,50 @@
         </div>
 
         <!-- Student List -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead style="background-color: #F7F0F0;">
-                            <tr>
-                                <th class="ps-4" style="color: #25671E;">Nama Siswa</th>
-                                <th>NIS</th>
-                                <th class="text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($attendance->details as $detail)
+        <div class="col-lg-8 mb-4 reveal reveal-delay-2">
+            <div class="content-card">
+                <div class="content-card-header">
+                    <div class="content-card-header-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <h5 class="content-card-title mb-0">Daftar Kehadiran Siswa</h5>
+                </div>
+                <div class="content-card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
                                 <tr>
-                                    <td class="ps-4">
-                                        <div class="fw-bold">{{ $detail->student->user?->name }}</div>
-                                    </td>
-                                    <td>{{ $detail->student->nis }}</td>
-                                    <td class="text-center">
-                                        @php
-                                            $badgeClass = match($detail->status) {
-                                                'hadir' => 'bg-success',
-                                                'izin' => 'bg-info text-dark',
-                                                'sakit' => 'bg-warning text-dark',
-                                                'alpa' => 'bg-danger',
-                                                default => 'bg-secondary'
-                                            };
-                                        @endphp
-                                        <span class="badge {{ $badgeClass }} px-3 py-2 text-uppercase" style="min-width: 80px;">
-                                            {{ $detail->status }}
-                                        </span>
-                                    </td>
+                                    <th class="ps-4 text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700;">Nama Siswa</th>
+                                    <th class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700;">NIS</th>
+                                    <th class="text-center text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; width: 140px;">Status</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($attendance->details as $detail)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div class="fw-bold text-dark">{{ $detail->student->user?->name }}</div>
+                                        </td>
+                                        <td class="text-muted">{{ $detail->student->nis }}</td>
+                                        <td class="text-center">
+                                            @php
+                                                $badgeClass = match($detail->status) {
+                                                    'hadir' => 'status-badge--hadir',
+                                                    'izin' => 'status-badge--izin',
+                                                    'sakit' => 'status-badge--sakit',
+                                                    'alpa' => 'status-badge--alpa',
+                                                    default => ''
+                                                };
+                                            @endphp
+                                            <span class="status-badge {{ $badgeClass }} px-3 py-2 text-uppercase d-inline-block" style="min-width: 90px; text-align: center;">
+                                                {{ $detail->status }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

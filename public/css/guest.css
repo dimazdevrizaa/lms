@@ -1,0 +1,251 @@
+/* ── Design Tokens ── */
+:root {
+    --primary: #1B5E20;
+    --primary-light: #2E7D32;
+    --secondary: #43A047;
+    --accent: #F9A825;
+    --bg-body: #FAFAF7;
+    --text-heading: #1A1A1A;
+    --text-body: #4A4A4A;
+    --radius-lg: 24px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+    --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── Reset & Base Styles ── */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    background: radial-gradient(circle at center, #1B5E20 0%, #0E3E11 100%) !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text-body);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Login Layout Container ── */
+.login-container {
+    width: 100%;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.75rem;
+    max-width: 480px;
+    animation: scaleIn 0.5s var(--ease-out);
+    margin: auto; /* ponytail: auto margin centers flex child and allows scrolling without top clipping on overflow */
+}
+
+.logo-wrapper {
+    flex-shrink: 0;
+}
+
+.logo-wrapper img {
+    width: 6.5rem;
+    height: 6.5rem;
+    object-fit: contain;
+    border-radius: 50%;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    background-color: #FFFFFF;
+    padding: 0.65rem;
+    display: block;
+    transition: transform 0.3s var(--ease-spring);
+}
+
+.logo-wrapper img:hover {
+    transform: scale(1.06) rotate(3deg);
+}
+
+/* ── Custom Form Box ── */
+.form-box {
+    width: 100%;
+    background-color: #FFFFFF;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    border-top: 5px solid var(--primary);
+    padding: 2.5rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    border-right: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* ── Headings & Titles ── */
+.page-heading {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-heading h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.02em;
+}
+
+.page-heading p {
+    font-size: 0.9rem;
+    color: #6B7280;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ── Form Controls & Inputs ── */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--primary);
+    margin-bottom: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #E2E8F0;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    color: var(--text-heading);
+    background-color: #FFFFFF;
+    transition: all 0.25s var(--ease-out);
+}
+
+.form-input::placeholder {
+    color: #A0AEC0;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 4px rgba(67, 160, 71, 0.12);
+}
+
+/* ── Checkbox custom style ── */
+.remember-checkbox {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 0.5rem;
+}
+
+.remember-checkbox input[type="checkbox"] {
+    accent-color: var(--primary);
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+}
+
+.remember-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4A5568;
+}
+
+/* ── Buttons ── */
+.btn-login {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 1.5rem;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.25s var(--ease-spring);
+    box-shadow: 0 4px 12px rgba(27, 94, 32, 0.15);
+}
+
+.btn-login:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(27, 94, 32, 0.22);
+}
+
+.btn-login:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(249, 168, 37, 0.3);
+}
+
+.forgot-link {
+    color: var(--primary-light);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: color 0.2s var(--ease-out);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    margin: 0;
+}
+
+.forgot-link:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+/* ── Form Errors ── */
+.form-error {
+    color: #DC2626;
+    font-size: 0.8rem;
+    margin-top: 0.45rem;
+    font-weight: 600;
+}
+
+.form-error p {
+    margin: 0;
+}
+
+/* ── Animations ── */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ── Legacy Hex Colors Inline Override ── */
+[style*="background-color: #F2B50B" i],
+[style*="background-color:#F2B50B" i] {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: var(--primary) !important;
+}
+
+[style*="color: #25671E" i],
+[style*="color:#25671E" i] {
+    color: var(--primary) !important;
+}

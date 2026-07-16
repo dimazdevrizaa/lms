@@ -4,33 +4,33 @@
 
 @section('content')
     <!-- Header -->
-    <div class="mb-4">
+    <div class="mb-4 reveal">
         <div class="d-flex align-items-center gap-3 mb-3">
-            <a href="{{ route('siswa.assignments.index') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-arrow-left"></i> Kembali
+            <a href="{{ route('siswa.assignments.index') }}" class="btn btn-outline-secondary-theme btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Kembali
             </a>
-            <h1 class="h3 mb-0">{{ $submission ? '📊 Hasil Tugas' : '📝 Kerjakan Tugas' }}</h1>
+            <h1 class="h3 mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif;">{{ $submission ? '📊 Hasil Tugas' : '📝 Kerjakan Tugas' }}</h1>
         </div>
 
         @php
             $isDeadlinePassed = $assignment->due_at && \Carbon\Carbon::parse($assignment->due_at)->isPast();
         @endphp
 
-        <div class="card bg-light border-0">
-            <div class="card-body p-4">
-                <h4 style="color: #25671E; font-weight: 700;">{{ $assignment->title }}</h4>
+        <div class="content-card" style="border-top: none;">
+            <div class="content-card-body pt-4">
+                <h4 style="color: var(--primary); font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $assignment->title }}</h4>
                 @if($assignment->description)
                     <p class="text-muted mb-2">{{ $assignment->description }}</p>
                 @endif
-                <div class="d-flex gap-3 flex-wrap">
-                    <span class="badge bg-primary"><i class="fas fa-laptop me-1"></i> Soal Online</span>
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="status-badge status-badge--online"><i class="fas fa-laptop me-1"></i> Soal Online</span>
                     <span class="text-muted small"><i class="fas fa-list-ol me-1"></i> {{ $assignment->questions->count() }} soal</span>
                     <span class="text-muted small"><i class="fas fa-star me-1"></i> {{ $assignment->questions->sum('points') }} total poin</span>
                     @if($assignment->due_at)
                         <span class="small {{ $isDeadlinePassed ? 'text-danger fw-bold' : 'text-muted' }}">
                             <i class="fas fa-clock me-1"></i> Deadline: {{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}
                             @if($isDeadlinePassed)
-                                <span class="badge bg-danger ms-1">Terlewat</span>
+                                <span class="status-badge status-badge--alpa ms-1">Terlewat</span>
                             @else
                                 ({{ \Carbon\Carbon::parse($assignment->due_at)->diffForHumans() }})
                             @endif
@@ -53,92 +53,168 @@
 
     @if($submission)
         {{-- Already submitted: show results --}}
-        <div class="card mb-4" style="border-top: 4px solid #25671E;">
-            <div class="card-body text-center py-4">
-                <h5 style="color: #25671E;">✅ Tugas sudah dikumpulkan</h5>
+        <div class="content-card mb-4 reveal reveal-delay-1">
+            <div class="content-card-body text-center py-4">
+                <h5 style="color: var(--primary); font-family: 'Plus Jakarta Sans', sans-serif;">✅ Tugas sudah dikumpulkan</h5>
                 <p class="text-muted mb-2">Dikumpulkan pada {{ \Carbon\Carbon::parse($submission->submitted_at)->format('d M Y, H:i') }}</p>
                 @if($submission->score !== null)
-                    <div class="d-inline-block bg-light rounded-3 p-3 mt-2">
-                        <h2 class="mb-0" style="color: #25671E; font-weight: 800;">{{ $submission->score }}</h2>
+                    <div class="d-inline-block rounded-3 p-3 mt-2" style="background: rgba(27, 94, 32, 0.04);">
+                        <h2 class="mb-0" style="color: var(--primary); font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $submission->score }}</h2>
                         <small class="text-muted text-uppercase fw-bold">Nilai</small>
                     </div>
                 @else
-                    <span class="badge bg-warning text-dark fs-6 mt-2"><i class="fas fa-hourglass-half me-1"></i> Menunggu penilaian guru</span>
+                    <div class="d-flex flex-column align-items-center gap-2 mt-2">
+                        <span class="status-badge status-badge--pending fs-6"><i class="fas fa-hourglass-half me-1"></i> Menunggu penilaian guru</span>
+                        @if($assignment->type === 'pdf')
+                            <form action="{{ route('siswa.assignments.unsubmit', $assignment) }}" method="POST" class="mt-2" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengiriman tugas ini? File yang dikirim sebelumnya akan dihapus.')">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                    <i class="fas fa-undo me-1"></i> Batalkan Pengiriman
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 @endif
             </div>
         </div>
 
-        {{-- Show answers with results --}}
-        @foreach($assignment->questions as $question)
-            @php
-                $ans = $answers[$question->id] ?? null;
-            @endphp
-            <div class="card mb-3 {{ $ans && $ans->is_correct === true ? 'border-success' : ($ans && $ans->is_correct === false ? 'border-danger' : '') }}" style="border-width: 2px;">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <span class="badge bg-secondary me-1">{{ $question->order }}</span>
-                            @if($question->type === 'pilihan_ganda')
-                                <span class="badge bg-primary" style="font-size: 0.65rem;">Pilihan Ganda</span>
-                            @elseif($question->type === 'isian_singkat')
-                                <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">Isian Singkat</span>
-                            @else
-                                <span class="badge bg-success" style="font-size: 0.65rem;">Essay</span>
-                            @endif
-                            <span class="text-muted small ms-1">({{ $question->points }} poin)</span>
+        <!-- Private Comments Section -->
+        <div class="card border-0 shadow-sm mb-4 reveal reveal-delay-1" style="border-radius: var(--radius-md) !important;">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold text-dark mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-comment-dots text-primary me-2"></i> Komentar Pribadi</h5>
+                <small class="text-muted">Komentar hanya dapat dilihat oleh Anda dan guru pengampu.</small>
+            </div>
+            <div class="card-body p-4">
+                <!-- Comments List -->
+                <div class="d-flex flex-column gap-3 mb-4">
+                    @forelse($submission->comments as $comment)
+                        <div class="p-3 rounded-3" style="background: {{ $comment->user_id === Auth::id() ? 'rgba(27, 94, 32, 0.04)' : '#f8f9fa' }}; border: 1px solid rgba(0,0,0,0.03);">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">{{ $comment->user->name }}</span>
+                                <small class="text-muted" style="font-size: 0.75rem;">{{ $comment->created_at->diffForHumans() }}</small>
+                            </div>
+                            <div class="text-muted" style="font-size: 0.85rem; white-space: pre-wrap;">{{ $comment->content }}</div>
                         </div>
-                        @if($ans)
-                            @if($ans->is_correct === true)
-                                <span class="badge bg-success">✓ Benar ({{ $ans->score }}/{{ $question->points }})</span>
-                            @elseif($ans->is_correct === false)
-                                <span class="badge bg-danger">✗ Salah ({{ $ans->score ?? 0 }}/{{ $question->points }})</span>
-                            @else
-                                <span class="badge bg-warning text-dark">⏳ Belum dinilai</span>
-                            @endif
-                        @endif
-                    </div>
-                    
-                    <p class="mb-3 fw-bold">{{ $question->body }}</p>
+                    @empty
+                        <p class="text-muted small text-center my-3">Belum ada komentar pribadi.</p>
+                    @endforelse
+                </div>
 
-                    @if($question->type === 'pilihan_ganda')
-                        @foreach($question->options as $opt)
-                            <div class="d-flex align-items-center gap-2 p-2 rounded mb-1 
-                                {{ $opt->is_correct ? 'bg-success bg-opacity-10' : '' }}
-                                {{ $ans && $ans->selected_option_id == $opt->id && !$opt->is_correct ? 'bg-danger bg-opacity-10' : '' }}">
-                                <span class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" 
-                                      style="width: 28px; height: 28px; font-size: 0.8rem; font-weight: 700;
-                                      {{ $opt->is_correct ? 'background: #48A111; color: white;' : ($ans && $ans->selected_option_id == $opt->id ? 'background: #dc3545; color: white;' : 'background: #e2e8f0;') }}">
-                                    {{ $opt->label }}
-                                </span>
-                                <span class="{{ $opt->is_correct ? 'text-success fw-bold' : '' }} {{ $ans && $ans->selected_option_id == $opt->id && !$opt->is_correct ? 'text-danger' : '' }}">
-                                    {{ $opt->body }}
-                                </span>
-                                @if($ans && $ans->selected_option_id == $opt->id)
-                                    <small class="text-muted ms-auto">(Jawaban Anda)</small>
+                <!-- Add Comment Form -->
+                <form action="{{ route('submissions.comments.store', $submission->id) }}" method="POST">
+                    @csrf
+                    <div class="input-group">
+                        <input type="text" name="content" class="form-control bg-light border-0 py-2 px-3" 
+                               placeholder="Kirim komentar pribadi ke guru..." required style="border-radius: var(--radius-sm) 0 0 var(--radius-sm); font-size: 0.9rem;">
+                        <button class="btn btn-outline-primary-theme" type="submit" style="border-radius: 0 var(--radius-sm) var(--radius-sm) 0;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- Show answers with results --}}
+        @if($assignment->isOnline())
+            @foreach($assignment->questions as $question)
+                @php
+                    $ans = $answers[$question->id] ?? null;
+                @endphp
+                <div class="content-card mb-3 reveal reveal-delay-{{ min($loop->index + 2, 5) }}" style="{{ $ans && $ans->is_correct === true ? 'border-left: 4px solid var(--secondary);' : ($ans && $ans->is_correct === false ? 'border-left: 4px solid #C62828;' : '') }}">
+                    <div class="content-card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge bg-secondary me-1">{{ $question->order }}</span>
+                                @if($question->type === 'pilihan_ganda')
+                                    <span class="status-badge status-badge--online" style="font-size: 0.65rem;">Pilihan Ganda</span>
+                                @elseif($question->type === 'isian_singkat')
+                                    <span class="status-badge status-badge--pending" style="font-size: 0.65rem;">Isian Singkat</span>
+                                @else
+                                    <span class="status-badge status-badge--hadir" style="font-size: 0.65rem;">Essay</span>
+                                @endif
+                                <span class="text-muted small ms-1">({{ $question->points }} poin)</span>
+                            </div>
+                            @if($ans)
+                                @if($ans->is_correct === true)
+                                    <span class="status-badge status-badge--hadir">✓ Benar ({{ $ans->score }}/{{ $question->points }})</span>
+                                @elseif($ans->is_correct === false)
+                                    <span class="status-badge status-badge--alpa">✗ Salah ({{ $ans->score ?? 0 }}/{{ $question->points }})</span>
+                                @else
+                                    <span class="status-badge status-badge--pending">⏳ Belum dinilai</span>
+                                @endif
+                            @endif
+                        </div>
+                        
+                        <p class="mb-3 fw-bold">{{ $question->body }}</p>
+
+                        @if($question->type === 'pilihan_ganda')
+                            @foreach($question->options as $opt)
+                                <div class="d-flex align-items-center gap-2 p-2 rounded mb-1 
+                                    {{ $opt->is_correct ? 'bg-success bg-opacity-10' : '' }}
+                                    {{ $ans && $ans->selected_option_id == $opt->id && !$opt->is_correct ? 'bg-danger bg-opacity-10' : '' }}">
+                                    <span class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" 
+                                          style="width: 28px; height: 28px; font-size: 0.8rem; font-weight: 700;
+                                          {{ $opt->is_correct ? 'background: var(--secondary); color: white;' : ($ans && $ans->selected_option_id == $opt->id ? 'background: #dc3545; color: white;' : 'background: #e2e8f0;') }}">
+                                        {{ $opt->label }}
+                                    </span>
+                                    <span class="{{ $opt->is_correct ? 'text-success fw-bold' : '' }} {{ $ans && $ans->selected_option_id == $opt->id && !$opt->is_correct ? 'text-danger' : '' }}">
+                                        {{ $opt->body }}
+                                    </span>
+                                    @if($ans && $ans->selected_option_id == $opt->id)
+                                        <small class="text-muted ms-auto">(Jawaban Anda)</small>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @elseif($question->type === 'isian_singkat' && $ans)
+                            <div class="ms-2">
+                                <div class="small mb-1"><strong>Jawaban Anda:</strong> <span class="{{ $ans->is_correct ? 'text-success' : 'text-danger' }}">{{ $ans->answer_text }}</span></div>
+                                @if(!$ans->is_correct)
+                                    <div class="small text-success"><strong>Jawaban benar:</strong> {{ $question->correct_answer }}</div>
                                 @endif
                             </div>
-                        @endforeach
-                    @elseif($question->type === 'isian_singkat' && $ans)
-                        <div class="ms-2">
-                            <div class="small mb-1"><strong>Jawaban Anda:</strong> <span class="{{ $ans->is_correct ? 'text-success' : 'text-danger' }}">{{ $ans->answer_text }}</span></div>
-                            @if(!$ans->is_correct)
-                                <div class="small text-success"><strong>Jawaban benar:</strong> {{ $question->correct_answer }}</div>
-                            @endif
+                        @elseif($question->type === 'essay' && $ans)
+                            <div class="ms-2">
+                                <div class="p-3 rounded small" style="background: rgba(27, 94, 32, 0.03);">{{ $ans->answer_text }}</div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        @else
+            {{-- PDF Assignment Submission Details --}}
+            <div class="content-card mb-4 reveal reveal-delay-2">
+                <div class="content-card-body">
+                    <h5 class="fw-bold text-dark mb-4" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-folder-open text-primary me-2"></i> Jawaban Yang Dikirim</h5>
+                    
+                    @if($submission->answer_text)
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-dark"><i class="fas fa-align-left text-primary me-1"></i> Jawaban Teks Anda:</label>
+                            <div class="p-3 bg-light border rounded text-dark" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6; border-radius: var(--radius-sm);">{{ $submission->answer_text }}</div>
                         </div>
-                    @elseif($question->type === 'essay' && $ans)
-                        <div class="ms-2">
-                            <div class="p-3 bg-light rounded small">{{ $ans->answer_text }}</div>
+                    @endif
+
+                    @if($submission->file_path)
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-dark"><i class="fas fa-file-pdf text-danger me-1"></i> File PDF Anda:</label>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <a href="{{ route('submissions.download', $submission) }}" target="_blank" class="btn btn-sm btn-outline-secondary-theme">
+                                    <i class="fas fa-external-link-alt me-1"></i> Buka PDF di Tab Baru
+                                </a>
+                            </div>
+                            <div class="rounded border" style="overflow: hidden; height: 500px; background: #f8f9fa;">
+                                <iframe src="{{ route('submissions.download', $submission) }}" width="100%" height="100%" frameborder="0"></iframe>
+                            </div>
                         </div>
                     @endif
                 </div>
             </div>
-        @endforeach
+        @endif
     @elseif($isDeadlinePassed)
         {{-- Deadline passed and not submitted --}}
-        <div class="card mb-4" style="border-top: 4px solid #dc3545;">
-            <div class="card-body text-center py-5">
-                <i class="fas fa-lock fa-3x text-danger mb-3"></i>
-                <h5 class="text-danger">⛔ Deadline Terlewat</h5>
+        <div class="content-card mb-4 reveal reveal-delay-1">
+            <div class="content-card-body text-center py-5">
+                <i class="fas fa-lock fa-3x mb-3" style="color: #C62828;"></i>
+                <h5 style="color: #C62828;">⛔ Deadline Terlewat</h5>
                 <p class="text-muted mb-0">
                     Batas waktu pengumpulan tugas ini sudah lewat pada 
                     <strong>{{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}</strong>.<br>
@@ -148,76 +224,106 @@
         </div>
     @else
         {{-- Not yet submitted: show answer form --}}
-        <form method="POST" action="{{ route('siswa.assignments.submit', $assignment) }}" id="quizForm">
-            @csrf
+        @if($assignment->isOnline())
+            <form method="POST" action="{{ route('siswa.assignments.submit', $assignment) }}" id="quizForm">
+                @csrf
 
-            @foreach($assignment->questions as $question)
-                <div class="card mb-3 question-card-student" id="question-card-{{ $question->id }}" style="border-left: 4px solid #25671E;">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start gap-2 mb-3">
-                            <span class="badge bg-secondary">{{ $question->order }}</span>
+                @foreach($assignment->questions as $question)
+                    <div class="content-card mb-3 question-card-student reveal reveal-delay-{{ min($loop->index + 1, 5) }}" id="question-card-{{ $question->id }}" style="border-left: 4px solid var(--primary);">
+                        <div class="content-card-body">
+                            <div class="d-flex align-items-start gap-2 mb-3">
+                                <span class="badge bg-secondary">{{ $question->order }}</span>
+                                @if($question->type === 'pilihan_ganda')
+                                    <span class="status-badge status-badge--online" style="font-size: 0.65rem;">Pilihan Ganda</span>
+                                @elseif($question->type === 'isian_singkat')
+                                    <span class="status-badge status-badge--pending" style="font-size: 0.65rem;">Isian Singkat</span>
+                                @else
+                                    <span class="status-badge status-badge--hadir" style="font-size: 0.65rem;">Essay</span>
+                                @endif
+                                <span class="text-muted small">({{ $question->points }} poin)</span>
+                            </div>
+
+                            <p class="fw-bold mb-3">{{ $question->body }}</p>
+
                             @if($question->type === 'pilihan_ganda')
-                                <span class="badge bg-primary" style="font-size: 0.65rem;">Pilihan Ganda</span>
+                                @foreach($question->options as $opt)
+                                    <div class="form-check mb-2 p-2 rounded border option-select">
+                                        <input class="form-check-input" type="radio" 
+                                               name="answers[{{ $question->id }}][selected_option_id]" 
+                                               value="{{ $opt->id }}" 
+                                               id="opt_{{ $opt->id }}"
+                                               {{ old("answers.{$question->id}.selected_option_id") == $opt->id ? 'checked' : '' }}>
+                                        <label class="form-check-label w-100" for="opt_{{ $opt->id }}" style="cursor: pointer;">
+                                            <strong class="me-2">{{ $opt->label }}.</strong> {{ $opt->body }}
+                                        </label>
+                                    </div>
+                                @endforeach
                             @elseif($question->type === 'isian_singkat')
-                                <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">Isian Singkat</span>
-                            @else
-                                <span class="badge bg-success" style="font-size: 0.65rem;">Essay</span>
+                                <input type="text" class="form-control" 
+                                       name="answers[{{ $question->id }}][answer_text]"
+                                       placeholder="Ketik jawaban Anda..." 
+                                       value="{{ old("answers.{$question->id}.answer_text") }}">
+                            @elseif($question->type === 'essay')
+                                <textarea class="form-control" 
+                                          name="answers[{{ $question->id }}][answer_text]"
+                                          placeholder="Tulis jawaban essay Anda..." 
+                                          rows="4">{{ old("answers.{$question->id}.answer_text") }}</textarea>
                             @endif
-                            <span class="text-muted small">({{ $question->points }} poin)</span>
                         </div>
+                    </div>
+                @endforeach
 
-                        <p class="fw-bold mb-3">{{ $question->body }}</p>
-
-                        @if($question->type === 'pilihan_ganda')
-                            @foreach($question->options as $opt)
-                                <div class="form-check mb-2 p-2 rounded border option-select" style="cursor: pointer;">
-                                    <input class="form-check-input" type="radio" 
-                                           name="answers[{{ $question->id }}][selected_option_id]" 
-                                           value="{{ $opt->id }}" 
-                                           id="opt_{{ $opt->id }}"
-                                           {{ old("answers.{$question->id}.selected_option_id") == $opt->id ? 'checked' : '' }}>
-                                    <label class="form-check-label w-100" for="opt_{{ $opt->id }}" style="cursor: pointer;">
-                                        <strong class="me-2">{{ $opt->label }}.</strong> {{ $opt->body }}
-                                    </label>
-                                </div>
-                            @endforeach
-                        @elseif($question->type === 'isian_singkat')
-                            <input type="text" class="form-control" 
-                                   name="answers[{{ $question->id }}][answer_text]"
-                                   placeholder="Ketik jawaban Anda..." 
-                                   value="{{ old("answers.{$question->id}.answer_text") }}"
-                                   style="border-color: #25671E;">
-                        @elseif($question->type === 'essay')
-                            <textarea class="form-control" 
-                                      name="answers[{{ $question->id }}][answer_text]"
-                                      placeholder="Tulis jawaban essay Anda..." 
-                                      rows="4"
-                                      style="border-color: #25671E;">{{ old("answers.{$question->id}.answer_text") }}</textarea>
-                        @endif
+                <!-- Submit Button -->
+                <div class="content-card reveal reveal-delay-5">
+                    <div class="content-card-body text-center py-4">
+                        <p class="text-muted mb-3"><i class="fas fa-info-circle me-1"></i> Pastikan semua soal sudah dijawab sebelum mengirim.</p>
+                        <button type="submit" class="btn btn-primary btn-lg" 
+                                onclick="return confirm('Kirim jawaban? Jawaban tidak dapat diubah setelah dikirim.')">
+                            <i class="fas fa-paper-plane me-2"></i> Kirim Jawaban
+                        </button>
                     </div>
                 </div>
-            @endforeach
+            </form>
+        @else
+            {{-- PDF Submission Form --}}
+            @if($assignment->file_path)
+                <div class="card border-0 shadow-sm mb-4 reveal reveal-delay-1" style="border-radius: var(--radius-md) !important;">
+                    <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                        <h5 class="fw-bold text-dark mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-file-pdf text-danger me-2"></i> File Soal PDF</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="btn btn-outline-secondary-theme btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i> Buka di Tab Baru
+                            </a>
+                        </div>
+                        <div class="rounded border" style="overflow: hidden; height: 500px; background: #f8f9fa;">
+                            <iframe src="{{ route('assignments.download', $assignment) }}" width="100%" height="100%" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
-            <!-- Submit Button -->
-            <div class="card" style="border-top: 4px solid #48A111;">
-                <div class="card-body text-center py-4">
-                    <p class="text-muted mb-3"><i class="fas fa-info-circle me-1"></i> Pastikan semua soal sudah dijawab sebelum mengirim.</p>
-                    <button type="submit" class="btn btn-lg" style="background-color: #48A111; color: white; border: none;" 
-                            onclick="return confirm('Kirim jawaban? Jawaban tidak dapat diubah setelah dikirim.')">
-                        <i class="fas fa-paper-plane me-2"></i> Kirim Jawaban
-                    </button>
+            <div class="content-card mb-4 reveal reveal-delay-2">
+                <div class="content-card-body">
+                    <h5 class="fw-bold text-dark mb-3" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-paper-plane text-primary me-2"></i> Kirim Jawaban</h5>
+                    <form method="POST" action="{{ route('siswa.assignments.submit', $assignment) }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Jawaban Teks (Opsional)</label>
+                            <textarea class="form-control" name="answer_text" placeholder="Ketik jawaban Anda di sini..." rows="4"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Upload File PDF (Opsional)</label>
+                            <input type="file" class="form-control" name="file" accept=".pdf">
+                            <small class="text-muted mt-1 d-block">Format file wajib berupa PDF. Maksimal 5MB.</small>
+                        </div>
+                        <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">
+                            <i class="fas fa-check-circle me-1"></i> Kirim Tugas
+                        </button>
+                    </form>
                 </div>
             </div>
-        </form>
-
-        <style>
-            .option-select:has(input:checked) {
-                background-color: rgba(37, 103, 30, 0.08);
-                border-color: #25671E !important;
-            }
-            .option-select:hover {
-                background-color: rgba(37, 103, 30, 0.04);
-            }
-        </style>
+        @endif
     @endif
 @endsection

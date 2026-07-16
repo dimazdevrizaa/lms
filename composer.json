@@ -6,9 +6,10 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
-        "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1"
+        "php": "^8.3",
+        "laravel/framework": "^13.0",
+        "laravel/tinker": "^3.0",
+        "minishlink/web-push": "^8.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -18,7 +19,7 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.3"
+        "phpunit/phpunit": "^12.0"
     },
     "autoload": {
         "psr-4": {
@@ -51,7 +52,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php -r \"if (file_exists('vendor/minishlink/web-push/src/Encryption.php')) { $f = 'vendor/minishlink/web-push/src/Encryption.php'; $c = file_get_contents($f); if (strpos($c, 'str_pad(gmp_strval') === false) { $c = str_replace(['gmp_strval($publicKey->getPoint()->getX(), 16)', 'gmp_strval($publicKey->getPoint()->getY(), 16)', 'gmp_strval($privateKey->getSecret(), 16)', 'gmp_strval($curve->mul($pub_key->getPoint(), $priv_key->getSecret())->getX(), 16)'], ['str_pad(gmp_strval($publicKey->getPoint()->getX(), 16), 64, \\'0\\', STR_PAD_LEFT)', 'str_pad(gmp_strval($publicKey->getPoint()->getY(), 16), 64, \\'0\\', STR_PAD_LEFT)', 'str_pad(gmp_strval($privateKey->getSecret(), 16), 64, \\'0\\', STR_PAD_LEFT)', 'str_pad(gmp_strval($curve->mul($pub_key->getPoint(), $priv_key->getSecret())->getX(), 16), 64, \\'0\\', STR_PAD_LEFT)'], $c); file_put_contents($f, $c); } }\""
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
