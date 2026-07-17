@@ -29,6 +29,14 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('siswa.dashboard'));
+
+        $this->assertDatabaseHas('classes', [
+            'name' => 'Kelas Digital',
+        ]);
+        $student = \App\Models\Student::where('nis', 'NIS-99999')->first();
+        $this->assertNotNull($student);
+        $this->assertNotNull($student->class_id);
+        $this->assertEquals('Kelas Digital', $student->schoolClass->name);
     }
 
     public function test_new_teachers_can_register(): void

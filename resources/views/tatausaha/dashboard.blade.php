@@ -34,7 +34,8 @@
         border-radius: 50%;
     }
     .tu-header-banner h1 {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #fff !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
         font-weight: 800;
         font-size: 1.75rem;
         margin-bottom: 6px;

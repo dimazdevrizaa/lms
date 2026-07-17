@@ -52,9 +52,18 @@ class RegisteredUserController extends Controller
             $request->validate([
                 'identifier' => ['unique:students,nis'],
             ]);
+            // ponytail: auto register to 'Kelas Digital' with minimal DB queries
+            $kelasDigital = \App\Models\SchoolClass::firstOrCreate(
+                ['name' => 'Kelas Digital'],
+                [
+                    'level' => 'X',
+                    'academic_year_id' => \App\Models\AcademicYear::where('is_active', true)->first()?->id,
+                ]
+            );
             Student::create([
                 'user_id' => $user->id,
                 'nis' => $request->identifier,
+                'class_id' => $kelasDigital->id,
             ]);
         } else {
             // Check unique NIP

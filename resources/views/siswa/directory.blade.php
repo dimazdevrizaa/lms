@@ -151,20 +151,20 @@
             box-shadow: 0 10px 24px rgba(37, 103, 30, 0.08) !important;
         }
         #directoryTabs .nav-link {
-            color: var(--text-muted);
+            color: var(--text-muted, #718096) !important;
             background: transparent;
             border: 1px solid rgba(0,0,0,0.08);
             transition: all 0.2s;
         }
         #directoryTabs .nav-link.active {
-            color: #fff;
-            background-color: var(--primary);
-            border-color: var(--primary);
+            color: #fff !important;
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
         }
         #directoryTabs .nav-link:hover:not(.active) {
-            background-color: rgba(37, 103, 30, 0.04);
-            border-color: var(--primary-light);
-            color: var(--primary);
+            background-color: rgba(37, 103, 30, 0.04) !important;
+            border-color: var(--primary-light) !important;
+            color: var(--primary) !important;
         }
     </style>
 @endsection

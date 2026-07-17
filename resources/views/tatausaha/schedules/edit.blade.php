@@ -90,7 +90,7 @@
                                                         @foreach($uniqueSubjects as $subj)
                                                             <option value="{{ $subj->id }}" 
                                                                     data-teacher-id="{{ $classAssignments[$subj->id]->teacher_id ?? $subj->teacher_id ?? '' }}"
-                                                                    @selected($existing && $existing->subject->name ?? '' == $subj->name)>
+                                                                    @selected($existing && $existing->subject && $existing->subject->name == $subj->name)>
                                                                 {{ $subj->name }}
                                                             </option>
                                                         @endforeach
