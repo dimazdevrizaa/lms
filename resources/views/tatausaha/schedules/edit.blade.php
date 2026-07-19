@@ -23,6 +23,9 @@
             </div>
         </div>
         <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#clearScheduleModal">
+                <i class="fas fa-eraser me-1"></i> Kosongkan Semua
+            </button>
             <a href="{{ route('tatausaha.schedules.print', ['academic_year_id' => $selectedYearId, 'class_id' => $schoolClass->id]) }}" 
                target="_blank" class="btn btn-sm btn-outline-accent-theme">
                 <i class="fas fa-print me-1"></i> Cetak Jadwal
@@ -87,6 +90,7 @@
                                                             data-slot="{{ $slot->id }}"
                                                             onchange="onSubjectChange(this)">
                                                         <option value="">— Kosong —</option>
+                                                        <option value="__upacara__" @selected($existing && $existing->activity === 'Upacara')>🎌 Upacara</option>
                                                         @foreach($uniqueSubjects as $subj)
                                                             <option value="{{ $subj->id }}" 
                                                                     data-teacher-id="{{ $classAssignments[$subj->id]->teacher_id ?? $subj->teacher_id ?? '' }}"
@@ -129,6 +133,37 @@
         </div>
     </form>
 </div>
+
+@push('modals')
+    <div class="modal fade" id="clearScheduleModal" tabindex="-1" aria-labelledby="clearScheduleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 14px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="clearScheduleModalLabel" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: var(--primary);">
+                        <i class="fas fa-triangle-exclamation text-danger me-2"></i> Kosongkan Semua Jadwal?
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0 text-muted" style="font-size: 0.9rem;">
+                        Seluruh jadwal untuk <strong>Kelas {{ $schoolClass->name }}</strong> akan dihapus permanen dari database dan tidak dapat dikembalikan. Lanjutkan?
+                    </p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary-theme btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <form method="POST" action="{{ route('tatausaha.schedules.clear', $schoolClass) }}">
+                        @csrf
+                        @method('DELETE')
+                        <input type="hidden" name="academic_year_id" value="{{ $selectedYearId }}">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <i class="fas fa-eraser me-1"></i> Ya, Kosongkan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endpush
 
 @push('styles')
 <style>
@@ -283,6 +318,19 @@
         if (!teacherSelect) return;
 
         const subjectId = selectEl.value;
+
+        // Kegiatan non-mapel (Upacara): tidak perlu guru
+        if (subjectId === '__upacara__') {
+            teacherSelect.innerHTML = '<option value="">—</option>';
+            teacherSelect.value = '';
+            teacherSelect.disabled = true;
+            selectEl.classList.add('has-value');
+            const upCard = selectEl.closest('.schedule-cell-card');
+            if (upCard) upCard.classList.add('has-assignment');
+            return;
+        }
+        teacherSelect.disabled = false;
+
         const selectedOption = selectEl.options[selectEl.selectedIndex];
         const suggestedTeacherId = selectedOption.dataset.teacherId;
 
@@ -291,9 +339,9 @@
         teacherSelect.innerHTML = '<option value="">— Guru —</option>';
 
         if (subjectId && subjectTeachersMap[subjectId]) {
-            const allowedIds = subjectTeachersMap[subjectId];
+            const allowedIds = (subjectTeachersMap[subjectId] || []).map(Number);
             allTeachers.forEach(t => {
-                if (allowedIds.includes(t.id)) {
+                if (allowedIds.includes(Number(t.id))) {
                     const opt = document.createElement('option');
                     opt.value = t.id;
                     opt.textContent = t.name;
@@ -340,12 +388,20 @@
                 const savedTeacherId = teacherSelect.value;
                 const subjectId = sel.value;
 
+                // Kegiatan non-mapel (Upacara): tidak perlu guru
+                if (subjectId === '__upacara__') {
+                    teacherSelect.innerHTML = '<option value="">—</option>';
+                    teacherSelect.value = '';
+                    teacherSelect.disabled = true;
+                    return;
+                }
+
                 teacherSelect.innerHTML = '<option value="">— Guru —</option>';
 
                 if (subjectTeachersMap[subjectId]) {
-                    const allowedIds = subjectTeachersMap[subjectId];
+                    const allowedIds = (subjectTeachersMap[subjectId] || []).map(Number);
                     allTeachers.forEach(t => {
-                        if (allowedIds.includes(t.id)) {
+                        if (allowedIds.includes(Number(t.id))) {
                             const opt = document.createElement('option');
                             opt.value = t.id;
                             opt.textContent = t.name;

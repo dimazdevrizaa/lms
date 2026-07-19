@@ -94,6 +94,7 @@ Route::middleware('auth')->group(function () {
             Route::delete('/time-slots/{timeSlot}', [ScheduleController::class, 'deleteTimeSlot'])->name('time-slots.destroy');
             Route::get('/{schoolClass}/edit', [ScheduleController::class, 'edit'])->name('edit');
             Route::put('/{schoolClass}', [ScheduleController::class, 'update'])->name('update');
+            Route::delete('/{schoolClass}/clear', [ScheduleController::class, 'clear'])->name('clear');
             Route::get('/print', [ScheduleController::class, 'printSchedule'])->name('print');
         });
 

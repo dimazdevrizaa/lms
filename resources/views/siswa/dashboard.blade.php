@@ -53,10 +53,12 @@
                                         <small class="text-muted" style="font-size: 0.7rem;">{{ substr($schedule->timeSlot->end_time, 0, 5) }}</small>
                                     </div>
                                     <div>
-                                        <span class="fw-bold text-dark d-block" style="font-size: 0.95rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $schedule->subject->name }}</span>
+                                        <span class="fw-bold text-dark d-block" style="font-size: 0.95rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $schedule->subject->name ?? $schedule->activity ?? '-' }}</span>
+                                        @if($schedule->subject)
                                         <small class="text-muted" style="font-size: 0.75rem;">
                                             <i class="far fa-user me-1"></i> {{ $schedule->teacher->user->name ?? 'Tidak ada guru' }}
                                         </small>
+                                        @endif
                                     </div>
                                 </div>
                                 <span class="badge bg-success-subtle text-success-theme rounded-pill" style="font-size: 0.65rem;">

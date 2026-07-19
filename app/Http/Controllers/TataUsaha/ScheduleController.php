@@ -36,7 +36,9 @@ class ScheduleController extends Controller
         $filledCounts = [];
         if ($selectedYearId) {
             $counts = Schedule::where('academic_year_id', $selectedYearId)
-                ->whereNotNull('subject_id')
+                ->where(function ($q) {
+                    $q->whereNotNull('subject_id')->orWhereNotNull('activity');
+                })
                 ->selectRaw('class_id, count(*) as total')
                 ->groupBy('class_id')
                 ->pluck('total', 'class_id');
@@ -133,7 +135,9 @@ class ScheduleController extends Controller
             }
             
             if (!empty($teacherIds)) {
-                $subjectTeachersMap[$subj->id] = $teacherIds;
+                // Normalisasi ke integer & unik agar cocok saat difilter di sisi JS.
+                // Beberapa driver DB (MySQL/PDO) mengembalikan id sebagai string.
+                $subjectTeachersMap[$subj->id] = array_values(array_unique(array_map('intval', $teacherIds)));
             }
         }
 
@@ -155,7 +159,15 @@ class ScheduleController extends Controller
             'slots' => ['required', 'array'],
             'slots.*.day' => ['required', 'in:' . implode(',', Schedule::DAYS)],
             'slots.*.time_slot_id' => ['required', 'exists:time_slots,id'],
-            'slots.*.subject_id' => ['nullable', 'exists:subjects,id'],
+            'slots.*.subject_id' => ['nullable', function ($attribute, $value, $fail) {
+                // Izinkan kosong atau penanda kegiatan non-mapel (Upacara)
+                if ($value === '' || $value === null || $value === '__upacara__') {
+                    return;
+                }
+                if (!Subject::whereKey($value)->exists()) {
+                    $fail('Mata pelajaran tidak valid.');
+                }
+            }],
             'slots.*.teacher_id' => ['nullable', 'exists:teachers,id'],
         ]);
 
@@ -168,14 +180,24 @@ class ScheduleController extends Controller
 
         // Insert jadwal baru
         foreach ($data['slots'] as $slot) {
-            if (!empty($slot['subject_id'])) {
+            $subjectId = $slot['subject_id'] ?? null;
+            $activity = null;
+
+            // Penanda slot kegiatan non-mapel (mis. Upacara): tanpa mapel & guru
+            if ($subjectId === '__upacara__') {
+                $activity = 'Upacara';
+                $subjectId = null;
+            }
+
+            if (!empty($subjectId) || $activity) {
                 Schedule::create([
                     'academic_year_id' => $yearId,
                     'class_id' => $schoolClass->id,
                     'day' => $slot['day'],
                     'time_slot_id' => $slot['time_slot_id'],
-                    'subject_id' => $slot['subject_id'],
-                    'teacher_id' => $slot['teacher_id'] ?? null,
+                    'subject_id' => $subjectId ?: null,
+                    'activity' => $activity,
+                    'teacher_id' => $activity ? null : ($slot['teacher_id'] ?? null),
                 ]);
             }
         }
@@ -192,6 +214,27 @@ class ScheduleController extends Controller
             'schoolClass' => $schoolClass->id,
             'academic_year_id' => $yearId,
         ])->with('success', $successMsg);
+    }
+
+    /**
+     * Kosongkan seluruh jadwal untuk satu kelas & tahun ajar.
+     */
+    public function clear(Request $request, SchoolClass $schoolClass): RedirectResponse
+    {
+        $data = $request->validate([
+            'academic_year_id' => ['required', 'exists:academic_years,id'],
+        ]);
+
+        $yearId = $data['academic_year_id'];
+
+        Schedule::where('academic_year_id', $yearId)
+            ->where('class_id', $schoolClass->id)
+            ->delete();
+
+        return redirect()->route('tatausaha.schedules.edit', [
+            'schoolClass' => $schoolClass->id,
+            'academic_year_id' => $yearId,
+        ])->with('success', 'Semua jadwal kelas ' . $schoolClass->name . ' telah dikosongkan.');
     }
 
     /**

@@ -377,6 +377,8 @@
                                                     @if($schedule->teacher && $schedule->teacher->user)
                                                         <div class="teacher-name">{{ $schedule->teacher->user->name }}</div>
                                                     @endif
+                                                @elseif($schedule && $schedule->activity)
+                                                    <div class="subject-name">{{ $schedule->activity }}</div>
                                                 @else
                                                     <span style="color: #ddd;">—</span>
                                                 @endif
