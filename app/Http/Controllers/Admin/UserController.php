@@ -85,8 +85,10 @@ class UserController extends Controller
             unset($data['password']);
         }
 
-        // ponytail: role not in $fillable, assign explicitly
+        // role/nip/nis bukan bagian dari $fillable User — simpan dulu sebelum di-unset
         $role = $data['role'];
+        $nip = $data['nip'] ?? null;
+        $nis = $data['nis'] ?? null;
         unset($data['role'], $data['nip'], $data['nis']);
 
         $user->update($data);
@@ -96,20 +98,20 @@ class UserController extends Controller
         // Update atau buat entry di tabel relasi berdasarkan role
         if ($user->role === 'guru') {
             if ($user->teacher) {
-                $user->teacher->update(['nip' => $data['nip'] ?? null]);
+                $user->teacher->update(['nip' => $nip]);
             } else {
                 Teacher::create([
                     'user_id' => $user->id,
-                    'nip' => $data['nip'] ?? null,
+                    'nip' => $nip,
                 ]);
             }
         } elseif ($user->role === 'siswa') {
             if ($user->student) {
-                $user->student->update(['nis' => $data['nis'] ?? null]);
+                $user->student->update(['nis' => $nis]);
             } else {
                 Student::create([
                     'user_id' => $user->id,
-                    'nis' => $data['nis'] ?? null,
+                    'nis' => $nis,
                 ]);
             }
         }
