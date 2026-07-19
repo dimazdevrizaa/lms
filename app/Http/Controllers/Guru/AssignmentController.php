@@ -137,13 +137,14 @@ class AssignmentController extends Controller
             'class_id' => ['required', 'exists:classes,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
             'meeting_id' => ['nullable', 'exists:meetings,id'],
-            'type' => ['required', 'in:pdf,online'],
+            'type' => ['required', 'in:pdf,online,external'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'due_at' => ['nullable', 'date'],
             'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             // Online questions come as JSON
             'questions_json' => ['nullable', 'string'],
+            'quiz_url' => ['nullable', 'url', 'max:255'],
         ]);
 
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
@@ -160,12 +161,13 @@ class AssignmentController extends Controller
                 'teacher_id' => $teacherId,
                 'class_id' => $data['class_id'],
                 'subject_id' => $data['subject_id'],
-                'meeting_id' => $data['meeting_id'],
+                'meeting_id' => $data['meeting_id'] ?? null,
                 'type' => $data['type'],
                 'title' => $data['title'],
                 'description' => $data['description'] ?? null,
                 'due_at' => $data['due_at'] ?? null,
                 'file_path' => $filePath,
+                'quiz_url' => $data['type'] === 'external' ? ($request->quiz_url) : null,
             ]);
 
             // Create questions for online assignments
@@ -181,6 +183,7 @@ class AssignmentController extends Controller
                         'assignment_id' => $assignment->id,
                         'type' => $q['type'],
                         'body' => $q['body'],
+                        'image' => $q['image'] ?? null,
                         'order' => $index + 1,
                         'points' => $q['points'] ?? 1,
                         'correct_answer' => $q['type'] === 'isian_singkat' ? ($q['correct_answer'] ?? null) : null,
@@ -193,6 +196,7 @@ class AssignmentController extends Controller
                                 'question_id' => $question->id,
                                 'label' => $opt['label'],
                                 'body' => $opt['body'],
+                                'image' => $opt['image'] ?? null,
                                 'is_correct' => $opt['is_correct'] ?? false,
                             ]);
                         }
@@ -283,6 +287,7 @@ class AssignmentController extends Controller
             'due_at' => ['nullable', 'date'],
             'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
             'questions_json' => ['nullable', 'string'],
+            'quiz_url' => ['nullable', 'url', 'max:255'],
         ]);
 
         DB::beginTransaction();
@@ -292,6 +297,12 @@ class AssignmentController extends Controller
                     Storage::disk('local')->delete($assignment->file_path);
                 }
                 $data['file_path'] = $request->file('file')->store('assignments', 'local');
+            }
+
+            if ($assignment->type === 'external') {
+                $data['quiz_url'] = $request->quiz_url;
+            } else {
+                $data['quiz_url'] = null;
             }
 
             $assignment->update($data);
@@ -312,6 +323,7 @@ class AssignmentController extends Controller
                         'assignment_id' => $assignment->id,
                         'type' => $q['type'],
                         'body' => $q['body'],
+                        'image' => $q['image'] ?? null,
                         'order' => $index + 1,
                         'points' => $q['points'] ?? 1,
                         'correct_answer' => $q['type'] === 'isian_singkat' ? ($q['correct_answer'] ?? null) : null,
@@ -323,6 +335,7 @@ class AssignmentController extends Controller
                                 'question_id' => $question->id,
                                 'label' => $opt['label'],
                                 'body' => $opt['body'],
+                                'image' => $opt['image'] ?? null,
                                 'is_correct' => $opt['is_correct'] ?? false,
                             ]);
                         }

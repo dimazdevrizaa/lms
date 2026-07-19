@@ -79,14 +79,14 @@
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">🔄 Password</label>
-                                <input class="form-control" type="password" name="password" placeholder="Masukkan password" required>
+                                <x-text-input class="form-control" type="password" name="password" placeholder="Masukkan password" required />
                                 @error('password')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">✅ Konfirmasi Password</label>
-                                <input class="form-control" type="password" name="password_confirmation" placeholder="Ulangi password" required>
+                                <x-text-input class="form-control" type="password" name="password_confirmation" placeholder="Ulangi password" required />
                                 @error('password_confirmation')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror

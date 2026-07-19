@@ -270,8 +270,8 @@
                                 @endif
                             </div>
                             <div class="d-flex gap-2">
-                                <a href="{{ route('guru.materials.edit', $material) }}" class="btn btn-sm btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Edit Materi">
-                                    <i class="fas fa-edit small text-primary"></i>
+                                <a href="{{ route('guru.materials.edit', $material) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.8rem; font-weight: 600;" title="Edit Materi">
+                                    <i class="fas fa-edit small"></i> Edit
                                 </a>
                             </div>
                         </div>
@@ -312,8 +312,8 @@
                                 <a href="{{ route('guru.assignments.show', $assignment) }}" class="btn btn-sm btn-outline-primary px-3 rounded-pill" style="font-size: 0.8rem; font-weight: 600;" title="Detail Tugas">
                                     Detail
                                 </a>
-                                <a href="{{ route('guru.assignments.edit', $assignment) }}" class="btn btn-sm btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Edit Tugas">
-                                    <i class="fas fa-edit small text-primary"></i>
+                                <a href="{{ route('guru.assignments.edit', $assignment) }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill d-inline-flex align-items-center justify-content-center gap-1" style="font-size: 0.8rem; font-weight: 600;" title="Edit Tugas">
+                                    <i class="fas fa-edit small"></i> Edit
                                 </a>
                             </div>
                         </div>

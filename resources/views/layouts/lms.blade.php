@@ -20,6 +20,8 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <!-- Main LMS CSS stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/lms.css') }}">
+    <!-- KaTeX CSS for rendering math formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     @stack('styles')
 </head>
 <body>
@@ -31,8 +33,8 @@
             </button>
             <a class="navbar-brand" href="{{ url('/') }}">
                 {{-- ponytail: school logo replacement --}}
-                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover; margin-right: 0.5rem; background: #fff; padding: 2px;">
-                LMS SMA 15<span class="d-none d-sm-inline"> Padang</span>
+                <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover; background: #fff; padding: 2px;">
+                <span>LMS SMA 15&nbsp;Padang</span>
             </a>
         </div>
 
@@ -57,9 +59,13 @@
                 <div class="dropdown">
                     <button class="btn btn-link text-white dropdown-toggle d-flex align-items-center gap-2 shadow-none border-0 p-0 text-decoration-none" 
                             type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-white text-success fw-bold" 
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-white text-success fw-bold overflow-hidden" 
                              style="width: 32px; height: 32px; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
-                            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                            @if(auth()->user()->avatar)
+                                <img src="{{ auth()->user()->avatar_url }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                            @else
+                                {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                            @endif
                         </div>
                         <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
                     </button>
@@ -607,8 +613,153 @@
         });
     </script>
 
+    <!-- Visual Math Editor Modal -->
+    <div class="modal fade" id="mathEditorModal" tabindex="-1" aria-labelledby="mathEditorModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" style="border-radius: var(--radius-md); border: none; box-shadow: var(--shadow-lg);">
+                <div class="modal-header bg-white border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="mathEditorModalLabel" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                        <i class="fas fa-calculator text-primary"></i> Pembuat Rumus Matematika (Visual)
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <p class="text-muted small mb-3">Tulis rumus secara visual dengan memilih simbol dari keyboard matematika di bawah. Klik tombol untuk mengetik variabel atau angka.</p>
+                    
+                    <!-- Mathfield element from MathLive -->
+                    <div class="border rounded p-3 bg-light mb-3">
+                        <math-field id="global-math-field" style="width: 100%; font-size: 1.5rem; background: #fff; padding: 12px; border: 1px solid #dee2e6; border-radius: 6px; min-height: 80px;"></math-field>
+                    </div>
+
+                    <div class="alert alert-light small py-2 px-3 mb-0" style="background: rgba(13,110,253,0.04); color: var(--primary); border: 1px solid rgba(13,110,253,0.1);">
+                        <i class="fas fa-info-circle me-1"></i> Gunakan mouse/sentuh tombol visual, atau ketik langsung di keyboard Anda. Navigasi cursor dengan tombol panah.
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: var(--radius-sm);">Batal</button>
+                    <button type="button" class="btn btn-primary px-4" onclick="window.insertVisualMath()" style="border-radius: var(--radius-sm); background-color: var(--primary); border: none;">
+                        <i class="fas fa-plus me-1"></i> Sisipkan ke Soal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @stack('modals')
     @stack('scripts')
+
+    <!-- KaTeX JS for rendering math formulas -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="window.renderMath()"></script>
+    <!-- MathLive JS for visual math editor -->
+    <script src="https://cdn.jsdelivr.net/npm/mathlive@0.98.6/dist/mathlive.min.js"></script>
+    <script>
+        window.renderMath = function() {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false},
+                        {left: "\\(", right: "\\)", display: false},
+                        {left: "\\[", right: "\\]", display: true}
+                    ],
+                    throwOnError : false
+                });
+            }
+        };
+        window.insertMathCode = function(buttonEl, code, cursorOffset) {
+            const toolbar = buttonEl.closest('.math-toolbar');
+            if (!toolbar) return;
+            const targetId = toolbar.dataset.target;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            input.focus();
+            var startPos = input.selectionStart;
+            var endPos = input.selectionEnd;
+            
+            // Check if cursor is already inside math delimiters \( ... \)
+            var textBefore = input.value.substring(0, startPos);
+            var openCount = (textBefore.match(/\\\(/g) || []).length;
+            var closeCount = (textBefore.match(/\\\)/g) || []).length;
+            var inMath = openCount > closeCount;
+
+            var insertValue = code;
+            var finalOffset = cursorOffset;
+
+            if (!inMath && code.indexOf('\\(') === -1) {
+                insertValue = '\\( ' + code + ' \\)';
+                if (finalOffset !== undefined) {
+                    finalOffset = finalOffset + 3; // Account for '\( ' prefix
+                }
+            }
+
+            input.value = input.value.substring(0, startPos) + insertValue + input.value.substring(endPos, input.value.length);
+            
+            var newCursorPos = startPos + (finalOffset !== undefined ? finalOffset : insertValue.length);
+            input.selectionStart = newCursorPos;
+            input.selectionEnd = newCursorPos;
+
+            // Trigger input event to update preview
+            input.dispatchEvent(new Event('input'));
+            input.dispatchEvent(new Event('change'));
+        };
+        let activeMathTargetInput = null;
+        window.openVisualMathEditor = function(buttonEl) {
+            const toolbar = buttonEl.closest('.math-toolbar');
+            if (!toolbar) return;
+            const targetId = toolbar.dataset.target;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            activeMathTargetInput = input;
+            
+            const mf = document.getElementById('global-math-field');
+            if (mf) {
+                mf.value = '';
+            }
+            
+            const modalEl = document.getElementById('mathEditorModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+            
+            setTimeout(() => {
+                mf.focus();
+            }, 450);
+        };
+
+        window.insertVisualMath = function() {
+            if (!activeMathTargetInput) return;
+            const mf = document.getElementById('global-math-field');
+            if (!mf) return;
+
+            const latex = mf.value;
+            if (latex.trim()) {
+                const input = activeMathTargetInput;
+                input.focus();
+                var startPos = input.selectionStart;
+                var endPos = input.selectionEnd;
+                
+                const insertValue = '\\( ' + latex + ' \\)';
+                
+                input.value = input.value.substring(0, startPos) + insertValue + input.value.substring(endPos, input.value.length);
+                
+                var newCursorPos = startPos + insertValue.length;
+                input.selectionStart = newCursorPos;
+                input.selectionEnd = newCursorPos;
+
+                input.dispatchEvent(new Event('input'));
+                input.dispatchEvent(new Event('change'));
+            }
+            
+            const modalEl = document.getElementById('mathEditorModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) modal.hide();
+        };
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(window.renderMath, 100);
+        });
+    </script>
 
     @auth
     <script>

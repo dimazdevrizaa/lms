@@ -68,11 +68,11 @@
                         <div class="row mb-4">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">🔄 Password Baru (opsional)</label>
-                                <input class="form-control" type="password" name="password">
+                                <x-text-input class="form-control" type="password" name="password" />
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">✅ Konfirmasi Password Baru</label>
-                                <input class="form-control" type="password" name="password_confirmation">
+                                <x-text-input class="form-control" type="password" name="password_confirmation" />
                             </div>
                         </div>
 

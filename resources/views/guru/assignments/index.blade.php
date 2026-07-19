@@ -63,6 +63,8 @@
                                     @endif
                                     @if($a->isOnline())
                                         <span class="status-badge" style="background: rgba(13,110,253,0.1); color: #0d6efd;"><i class="fas fa-laptop me-1"></i>Online</span>
+                                    @elseif($a->type === 'external')
+                                        <span class="status-badge" style="background: rgba(25,135,84,0.1); color: var(--primary); font-weight: 700; border: none; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: var(--radius-sm);"><i class="fas fa-link me-1"></i>Kuis Online</span>
                                     @else
                                         <span class="status-badge" style="background: rgba(108,117,125,0.1); color: #6c757d;"><i class="fas fa-file-pdf me-1"></i>PDF</span>
                                     @endif

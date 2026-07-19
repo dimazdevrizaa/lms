@@ -53,7 +53,7 @@
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Ganti Password (Kosongkan jika tidak ingin ganti)</label>
-                    <input class="form-control" type="password" name="password">
+                    <x-text-input class="form-control" type="password" name="password" />
                 </div>
 
                 <div class="d-flex gap-2">

@@ -27,6 +27,7 @@ class ProfileUpdateRequest extends FormRequest
             ],
             // ponytail: allow phone edit
             'phone' => ['nullable', 'string', 'max:20'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ];
     }
 }

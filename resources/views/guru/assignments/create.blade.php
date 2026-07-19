@@ -10,8 +10,8 @@
             : route('guru.assignments.index');
     @endphp
     <!-- Header -->
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <a href="{{ $backUrl }}" class="btn btn-outline-secondary-theme btn-sm" style="border-radius: var(--radius-sm);">
+    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 gap-sm-3 mb-4">
+        <a href="{{ $backUrl }}" class="btn btn-outline-secondary-theme btn-sm align-self-start flex-shrink-0" style="border-radius: var(--radius-sm);">
             <i class="fas fa-arrow-left me-1"></i> Kembali
         </a>
         <div>
@@ -30,17 +30,23 @@
                         <!-- Tipe Tugas -->
                         <div class="mb-4">
                             <label class="form-label fw-semibold" style="color: var(--primary);">📋 Tipe Tugas</label>
-                            <div class="d-flex gap-3">
-                                <div class="form-check form-check-inline">
+                            <div class="d-flex flex-column flex-sm-row flex-wrap gap-2 gap-sm-3">
+                                <div class="form-check ms-2 ms-sm-0">
                                     <input class="form-check-input" type="radio" name="type" id="type_pdf" value="pdf" checked onchange="toggleType()">
                                     <label class="form-check-label fw-bold" for="type_pdf">
                                         <i class="fas fa-file-pdf text-danger me-1"></i> Upload PDF
                                     </label>
                                 </div>
-                                <div class="form-check form-check-inline">
+                                <div class="form-check ms-2 ms-sm-0">
                                     <input class="form-check-input" type="radio" name="type" id="type_online" value="online" onchange="toggleType()">
                                     <label class="form-check-label fw-bold" for="type_online">
                                         <i class="fas fa-laptop me-1" style="color: var(--primary);"></i> Buat Soal Online
+                                    </label>
+                                </div>
+                                <div class="form-check ms-2 ms-sm-0">
+                                    <input class="form-check-input" type="radio" name="type" id="type_external" value="external" onchange="toggleType()">
+                                    <label class="form-check-label fw-bold" for="type_external">
+                                        <i class="fas fa-link text-primary me-1"></i> Kuis Online (Quizizz, dll)
                                     </label>
                                 </div>
                             </div>
@@ -168,6 +174,18 @@
                             </div>
                         </div>
 
+                        <!-- External Quiz Section (shown when type=external) -->
+                        <div id="externalSection" style="display: none;">
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" style="color: var(--primary);">🔗 Link Kuis Online (Quizizz, Kahoot, Google Forms, dll)</label>
+                                <input type="url" class="form-control" name="quiz_url" id="quiz_url" placeholder="Contoh: https://quizizz.com/join?gc=123456" value="{{ old('quiz_url') }}">
+                                <small style="color: var(--text-muted);">Masukkan URL lengkap kuis eksternal agar siswa dapat membukanya secara langsung.</small>
+                                @error('quiz_url')
+                                    <small class="text-danger d-block">{{ $message }}</small>
+                                @enderror
+                            </div>
+                        </div>
+
                         <!-- Online Questions Section (shown when type=online) -->
                         <div id="onlineSection" style="display: none;">
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -201,7 +219,7 @@
                         </div>
 
                         <!-- Buttons -->
-                        <div class="d-flex gap-2 mt-5">
+                        <div class="d-flex flex-column flex-sm-row gap-2 mt-5">
                             <button class="btn btn-lg btn-outline-secondary-theme" type="submit" style="border-radius: var(--radius-sm); background: var(--secondary); color: white; border-color: var(--secondary);">✓ Buat Tugas</button>
                             <a class="btn btn-lg btn-outline-secondary" href="{{ $backUrl }}" style="border-radius: var(--radius-sm);">Batal</a>
                         </div>
@@ -236,6 +254,16 @@
                             <li class="mb-2"><strong>Isian Singkat</strong> — dinilai otomatis (exact match)</li>
                             <li class="mb-2"><strong>Essay</strong> — dinilai manual oleh guru</li>
                             <li class="mb-2">Siswa wajib menjawab semua soal</li>
+                        </ul>
+                    </div>
+
+                    <div id="externalTips" style="display: none;">
+                        <hr style="border-color: rgba(27,94,32,0.08);">
+                        <h6 class="mb-2" style="color: var(--primary); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;">🔗 Tips Kuis Online</h6>
+                        <ul class="small" style="color: var(--text-muted);">
+                            <li class="mb-2"><strong>Platform Populer</strong> — Quizizz, Wordwall, Kahoot, Google Forms, atau Quizlet.</li>
+                            <li class="mb-2"><strong>Instruksi</strong> — Tuliskan instruksi cara pengerjaan kuis pada deskripsi tugas.</li>
+                            <li class="mb-2"><strong>Nilai Manual</strong> — Guru menilai secara manual berdasarkan hasil dari kuis eksternal.</li>
                         </ul>
                     </div>
                 </div>
@@ -307,9 +335,12 @@
 
         function toggleType() {
             const isOnline = document.getElementById('type_online').checked;
-            document.getElementById('pdfSection').style.display = isOnline ? 'none' : 'block';
+            const isExternal = document.getElementById('type_external').checked;
+            document.getElementById('pdfSection').style.display = (!isOnline && !isExternal) ? 'block' : 'none';
             document.getElementById('onlineSection').style.display = isOnline ? 'block' : 'none';
             document.getElementById('onlineTips').style.display = isOnline ? 'block' : 'none';
+            document.getElementById('externalSection').style.display = isExternal ? 'block' : 'none';
+            document.getElementById('externalTips').style.display = isExternal ? 'block' : 'none';
         }
 
         function addQuestion(type) {
@@ -318,17 +349,27 @@
                 id: questionCounter,
                 type: type,
                 body: '',
+                image: '',
                 points: 1,
                 correct_answer: '',
+                math_mode: false,
                 options: type === 'pilihan_ganda' ? [
-                    { label: 'A', body: '', is_correct: true },
-                    { label: 'B', body: '', is_correct: false },
-                    { label: 'C', body: '', is_correct: false },
-                    { label: 'D', body: '', is_correct: false },
+                    { label: 'A', body: '', image: '', is_correct: true },
+                    { label: 'B', body: '', image: '', is_correct: false },
+                    { label: 'C', body: '', image: '', is_correct: false },
+                    { label: 'D', body: '', image: '', is_correct: false },
                 ] : []
             };
             questions.push(q);
             renderQuestions();
+        }
+
+        function toggleQuestionMathMode(id) {
+            const q = questions.find(item => item.id === id);
+            if (q) {
+                q.math_mode = !q.math_mode;
+                renderQuestions();
+            }
         }
 
         function removeQuestion(id) {
@@ -342,7 +383,7 @@
             const q = questions.find(q => q.id === questionId);
             if (!q || q.options.length >= 5) return;
             const labels = ['A', 'B', 'C', 'D', 'E'];
-            q.options.push({ label: labels[q.options.length], body: '', is_correct: false });
+            q.options.push({ label: labels[q.options.length], body: '', image: '', is_correct: false });
             renderQuestions();
         }
 
@@ -375,6 +416,75 @@
             }
         }
 
+        function getMathToolbarHtml(inputId, compact = false) {
+            if (compact) {
+                return `
+                    <div class="math-toolbar d-flex flex-wrap gap-1 mb-1 p-1 bg-light border rounded align-items-center" data-target="${inputId}" style="font-family: sans-serif; width: 100%; max-width: 100%;">
+                        <span class="text-muted fw-bold me-1 ms-1" style="font-size: 0.65rem;"><i class="fas fa-calculator text-primary"></i> Math:</span>
+                        <button type="button" class="btn btn-xs btn-primary py-0 px-1.5 fw-bold" onclick="window.openVisualMathEditor(this)" style="font-size: 0.65rem; border-radius: 4px; border: none; background-color: var(--primary);"><i class="fas fa-keyboard"></i> Buat Rumus (Visual)</button>
+                        <span class="text-muted me-1 ms-1" style="font-size: 0.65rem;">atau</span>
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1" style="font-size: 0.65rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, '\\\\frac{a}{b}', 6)" title="Pecahan / Fraction"><i class="fas fa-divide"></i></button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1" style="font-size: 0.65rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, '\\\\sqrt{x}', 6)" title="Akar / Square Root"><i class="fas fa-square-root-alt"></i></button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1" style="font-size: 0.65rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, 'x^{y}', 4)" title="Pangkat / Power">x²</button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1" style="font-size: 0.65rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, 'x_{i}', 4)" title="Indeks / Subscript">xᵢ</button>
+                        
+                        <div class="dropdown d-inline-block">
+                            <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1 dropdown-toggle" data-bs-toggle="dropdown" style="font-size: 0.65rem; border-color: #ccc; border-radius: 4px;" title="Simbol & Operator"></button>
+                            <ul class="dropdown-menu p-1" style="min-width: 140px; font-size: 0.75rem;">
+                                <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\pi')">π (Pi)</a></li>
+                                <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\theta')">θ (Theta)</a></li>
+                                <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\pm')">± (Plus-Minus)</a></li>
+                                <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\times')">× (Kali)</a></li>
+                                <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\div')">÷ (Bagi)</a></li>
+                                <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\le')">≤</a></li>
+                                <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\ge')">≥</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="math-toolbar d-flex flex-wrap gap-1 mb-1 p-1 bg-light border rounded align-items-center" data-target="${inputId}" style="font-family: sans-serif; width: 100%; max-width: 100%;">
+                    <span class="small text-muted fw-bold me-1 ms-1" style="font-size: 0.7rem;"><i class="fas fa-calculator text-primary"></i> Equation Editor:</span>
+                    <button type="button" class="btn btn-xs btn-primary py-0 px-2 fw-bold me-1 text-white" onclick="window.openVisualMathEditor(this)" style="font-size: 0.72rem; border-radius: 4px; border: none; background-color: var(--primary);"><i class="fas fa-keyboard text-white"></i> Buat Persamaan secara Visual (MS Word)</button>
+                    <span class="text-muted small me-2 ms-1">atau tulis manual:</span>
+                    <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, '\\\\frac{a}{b}', 6)" title="Pecahan / Fraction"><i class="fas fa-divide"></i> Pecahan</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, '\\\\sqrt{x}', 6)" title="Akar / Square Root"><i class="fas fa-square-root-alt"></i> Akar</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, 'x^{y}', 4)" title="Pangkat / Power">x² Pangkat</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, 'x_{i}', 4)" title="Indeks Bawah / Subscript">xᵢ Indeks</button>
+                    
+                    <div class="dropdown d-inline-block">
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5 dropdown-toggle" data-bs-toggle="dropdown" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;">π Simbol</button>
+                        <ul class="dropdown-menu p-1" style="min-width: 140px; font-size: 0.75rem;">
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\pi')">π (Pi)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\theta')">θ (Theta)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\alpha')">α (Alpha)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\beta')">β (Beta)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\Delta')">Δ (Delta)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\infty')">∞ (Infinity)</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown d-inline-block">
+                        <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5 dropdown-toggle" data-bs-toggle="dropdown" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;">± Operator</button>
+                        <ul class="dropdown-menu p-1" style="min-width: 140px; font-size: 0.75rem;">
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\pm')">± (Plus-Minus)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\times')">× (Kali)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\div')">÷ (Bagi)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\le')">≤ (Kurang Dari / Sama Dengan)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\ge')">≥ (Lebih Dari / Sama Dengan)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\ne')">≠ (Tidak Sama Dengan)</a></li>
+                            <li><a class="dropdown-item py-1" href="javascript:void(0)" onclick="window.insertMathCode(this, '\\\\approx')">≈ (Pendekatan)</a></li>
+                        </ul>
+                    </div>
+
+                    <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, '\\\\sum_{i=1}^{n}', 13)" title="Sigma / Summation">Σ Sigma</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-1.5" style="font-size: 0.72rem; border-color: #ccc; border-radius: 4px;" onclick="window.insertMathCode(this, '\\\\int_{a}^{b}', 11)" title="Integral">∫ Integral</button>
+                </div>
+            `;
+        }
+
         function renderQuestions() {
             const container = document.getElementById('questionsContainer');
             const empty = document.getElementById('emptyQuestions');
@@ -393,14 +503,35 @@
                 html += `<span class="question-number">Soal ${index + 1}</span>`;
                 html += `<div class="d-flex justify-content-between align-items-start mb-3 mt-1">`;
                 html += `<div>${getTypeBadge(q.type)}</div>`;
-                html += `<div class="d-flex gap-1">`;
+                html += `<div class="d-flex flex-wrap gap-1 align-items-center justify-content-end">`;
+                html += `<button type="button" class="btn btn-sm ${q.math_mode ? 'btn-primary' : 'btn-outline-primary'} py-1 px-2.5 d-inline-flex align-items-center gap-1" style="font-size: 0.75rem; font-weight: 600;" onclick="toggleQuestionMathMode(${q.id})">`;
+                html += `<i class="fas fa-calculator"></i> ${q.math_mode ? 'Sembunyikan Equation' : 'Tulis Rumus Matematika'}`;
+                html += `</button>`;
                 if (index > 0) html += `<button type="button" class="btn btn-sm btn-outline-secondary" onclick="moveQuestion(${q.id}, -1)" title="Pindah ke atas"><i class="fas fa-arrow-up"></i></button>`;
                 if (index < questions.length - 1) html += `<button type="button" class="btn btn-sm btn-outline-secondary" onclick="moveQuestion(${q.id}, 1)" title="Pindah ke bawah"><i class="fas fa-arrow-down"></i></button>`;
                 html += `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQuestion(${q.id})" title="Hapus soal"><i class="fas fa-trash"></i></button>`;
                 html += `</div></div>`;
 
                 html += `<div class="mb-3">`;
-                html += `<textarea class="form-control" placeholder="Tulis pertanyaan..." rows="2" onchange="updateQuestionField(${q.id}, 'body', this.value)">${escapeHtml(q.body)}</textarea>`;
+                if (q.math_mode) {
+                    html += getMathToolbarHtml(`q-input-${q.id}`);
+                }
+                html += `<textarea class="form-control" id="q-input-${q.id}" placeholder="Tulis pertanyaan..." rows="2" oninput="updateQuestionField(${q.id}, 'body', this.value)">${escapeHtml(q.body)}</textarea>`;
+                html += `<div class="math-preview mt-1 p-2 rounded bg-light border small text-dark" style="min-height: 38px; display: ${(q.math_mode && q.body) ? 'block' : 'none'};" id="preview-q-${q.id}">${escapeHtml(q.body)}</div>`;
+
+                html += `<div class="mt-2 text-start">`;
+                if (!q.image) {
+                    html += `<label class="btn btn-xs btn-outline-primary py-1 px-2.5 d-inline-flex align-items-center gap-1 mb-0" style="font-size: 0.72rem; font-weight: 600; cursor: pointer;">`;
+                    html += `<i class="fas fa-image"></i> Tambah Gambar Soal`;
+                    html += `<input type="file" accept="image/*" class="d-none" onchange="uploadQuestionImage(${q.id}, this)">`;
+                    html += `</label>`;
+                } else {
+                    html += `<div class="position-relative d-inline-block border rounded p-1 bg-white">`;
+                    html += `<img src="${q.image}" class="img-fluid rounded" style="max-height: 150px; display: block;">`;
+                    html += `<button type="button" class="btn btn-xs btn-danger py-0.5 px-2 mt-1" style="font-size: 0.65rem;" onclick="removeQuestionImage(${q.id})"><i class="fas fa-trash me-1"></i>Hapus Gambar</button>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
                 html += `</div>`;
 
                 html += `<div class="mb-3 d-flex align-items-center gap-2">`;
@@ -411,12 +542,33 @@
                 if (q.type === 'pilihan_ganda') {
                     html += `<div class="mb-2"><small class="fw-bold" style="color: var(--text-muted);">Pilihan Jawaban (klik lingkaran untuk jawaban benar):</small></div>`;
                     q.options.forEach((opt, optIdx) => {
-                        html += `<div class="option-row">`;
+                        html += `<div class="option-row" style="flex-wrap: wrap;">`;
+                        if (q.math_mode) {
+                            html += `<div class="w-100 ms-5 mb-1">`;
+                            html += getMathToolbarHtml(`opt-input-${q.id}-${optIdx}`, true);
+                            html += `</div>`;
+                        }
+                        html += `<div class="d-flex w-100 gap-2 mb-1 align-items-center">`;
                         html += `<div class="option-label ${opt.is_correct ? 'correct' : ''}" onclick="setCorrectOption(${q.id}, ${optIdx})" style="cursor: pointer;" title="Klik untuk jadikan jawaban benar">${opt.label}</div>`;
-                        html += `<input type="text" class="form-control form-control-sm" placeholder="Teks pilihan ${opt.label}..." value="${escapeHtml(opt.body)}" onchange="updateOptionField(${q.id}, ${optIdx}, 'body', this.value)">`;
+                        html += `<input type="text" class="form-control form-control-sm" id="opt-input-${q.id}-${optIdx}" placeholder="Teks pilihan ${opt.label}..." value="${escapeHtml(opt.body)}" oninput="updateOptionField(${q.id}, ${optIdx}, 'body', this.value)">`;
+                        
+                        if (!opt.image) {
+                            html += `<label class="btn btn-xs btn-outline-primary py-1 px-2 d-inline-flex align-items-center gap-1 mb-0 flex-shrink-0" style="font-size: 0.65rem; font-weight: 600; cursor: pointer;">`;
+                            html += `<i class="fas fa-image"></i> + Gambar`;
+                            html += `<input type="file" accept="image/*" class="d-none" onchange="uploadOptionImage(${q.id}, ${optIdx}, this)">`;
+                            html += `</label>`;
+                        } else {
+                            html += `<div class="d-flex align-items-center gap-1 flex-shrink-0 border rounded p-0.5 bg-white">`;
+                            html += `<img src="${opt.image}" class="rounded" style="max-height: 38px; display: block;">`;
+                            html += `<button type="button" class="btn btn-xs btn-outline-danger py-0 px-1" style="font-size: 0.6rem;" onclick="removeOptionImage(${q.id}, ${optIdx})"><i class="fas fa-times"></i></button>`;
+                            html += `</div>`;
+                        }
+
                         if (q.options.length > 2) {
                             html += `<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOption(${q.id}, ${optIdx})"><i class="fas fa-times"></i></button>`;
                         }
+                        html += `</div>`;
+                        html += `<div class="math-preview w-100 ms-5 p-1 rounded bg-light border small text-dark" style="min-height: 25px; display: ${(q.math_mode && opt.body) ? 'block' : 'none'};" id="preview-opt-${q.id}-${optIdx}">${escapeHtml(opt.body)}</div>`;
                         html += `</div>`;
                     });
                     if (q.options.length < 5) {
@@ -426,7 +578,11 @@
 
                 if (q.type === 'isian_singkat') {
                     html += `<div class="mb-2"><small class="fw-bold" style="color: var(--text-muted);">Jawaban Benar:</small></div>`;
-                    html += `<input type="text" class="form-control form-control-sm" placeholder="Ketik jawaban yang benar..." value="${escapeHtml(q.correct_answer)}" onchange="updateQuestionField(${q.id}, 'correct_answer', this.value)">`;
+                    if (q.math_mode) {
+                        html += getMathToolbarHtml(`ans-input-${q.id}`, true);
+                    }
+                    html += `<input type="text" class="form-control form-control-sm" id="ans-input-${q.id}" placeholder="Ketik jawaban yang benar..." value="${escapeHtml(q.correct_answer)}" oninput="updateQuestionField(${q.id}, 'correct_answer', this.value)">`;
+                    html += `<div class="math-preview mt-1 p-1 rounded bg-light border small text-dark" style="min-height: 25px; display: ${(q.math_mode && q.correct_answer) ? 'block' : 'none'};" id="preview-ans-${q.id}">${escapeHtml(q.correct_answer)}</div>`;
                     html += `<small style="color: var(--text-muted);">Jawaban siswa akan dicocokkan secara case-insensitive</small>`;
                 }
 
@@ -438,16 +594,90 @@
             });
 
             container.innerHTML = html;
+            if (window.renderMath) {
+                setTimeout(window.renderMath, 50);
+            }
         }
 
         function updateQuestionField(id, field, value) {
             const q = questions.find(q => q.id === id);
-            if (q) q[field] = value;
+            if (q) {
+                q[field] = value;
+                if (field === 'body') {
+                    const preview = document.getElementById(`preview-q-${id}`);
+                    if (preview) {
+                        preview.innerHTML = escapeHtml(value);
+                        preview.style.display = (q.math_mode && value) ? 'block' : 'none';
+                        if (window.renderMath) window.renderMath();
+                    }
+                } else if (field === 'correct_answer') {
+                    const preview = document.getElementById(`preview-ans-${id}`);
+                    if (preview) {
+                        preview.innerHTML = escapeHtml(value);
+                        preview.style.display = (q.math_mode && value) ? 'block' : 'none';
+                        if (window.renderMath) window.renderMath();
+                    }
+                }
+            }
         }
 
         function updateOptionField(questionId, optIndex, field, value) {
             const q = questions.find(q => q.id === questionId);
-            if (q && q.options[optIndex]) q.options[optIndex][field] = value;
+            if (q && q.options[optIndex]) {
+                q.options[optIndex][field] = value;
+                if (field === 'body') {
+                    const preview = document.getElementById(`preview-opt-${questionId}-${optIndex}`);
+                    if (preview) {
+                        preview.innerHTML = escapeHtml(value);
+                        preview.style.display = (q.math_mode && value) ? 'block' : 'none';
+                        if (window.renderMath) window.renderMath();
+                    }
+                }
+            }
+        }
+
+        function uploadQuestionImage(id, input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const q = questions.find(item => item.id === id);
+                    if (q) {
+                        q.image = e.target.result;
+                        renderQuestions();
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeQuestionImage(id) {
+            const q = questions.find(item => item.id === id);
+            if (q) {
+                q.image = '';
+                renderQuestions();
+            }
+        }
+
+        function uploadOptionImage(questionId, optIndex, input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const q = questions.find(item => item.id === questionId);
+                    if (q && q.options[optIndex]) {
+                        q.options[optIndex].image = e.target.result;
+                        renderQuestions();
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function removeOptionImage(questionId, optIndex) {
+            const q = questions.find(item => item.id === questionId);
+            if (q && q.options[optIndex]) {
+                q.options[optIndex].image = '';
+                renderQuestions();
+            }
         }
 
         function setCorrectOption(questionId, correctIndex) {

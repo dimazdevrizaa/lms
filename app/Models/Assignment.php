@@ -20,11 +20,17 @@ class Assignment extends Model
         'description',
         'due_at',
         'file_path',
+        'quiz_url',
     ];
 
     public function isOnline(): bool
     {
         return $this->type === 'online';
+    }
+
+    public function isExternal(): bool
+    {
+        return $this->type === 'external';
     }
 
     public function meeting()

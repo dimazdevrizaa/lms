@@ -23,9 +23,15 @@
                     <p class="text-muted mb-2">{{ $assignment->description }}</p>
                 @endif
                 <div class="d-flex gap-2 flex-wrap">
-                    <span class="status-badge status-badge--online"><i class="fas fa-laptop me-1"></i> Soal Online</span>
-                    <span class="text-muted small"><i class="fas fa-list-ol me-1"></i> {{ $assignment->questions->count() }} soal</span>
-                    <span class="text-muted small"><i class="fas fa-star me-1"></i> {{ $assignment->questions->sum('points') }} total poin</span>
+                    @if($assignment->isOnline())
+                        <span class="status-badge status-badge--online"><i class="fas fa-laptop me-1"></i> Soal Online</span>
+                        <span class="text-muted small"><i class="fas fa-list-ol me-1"></i> {{ $assignment->questions->count() }} soal</span>
+                        <span class="text-muted small"><i class="fas fa-star me-1"></i> {{ $assignment->questions->sum('points') }} total poin</span>
+                    @elseif($assignment->type === 'external')
+                        <span class="status-badge status-badge--hadir" style="background: rgba(25,135,84,0.1); color: var(--primary); border: none; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: var(--radius-sm); font-weight: 700;"><i class="fas fa-link me-1"></i> Kuis Online (Quizizz, dll)</span>
+                    @else
+                        <span class="status-badge status-badge--alpa"><i class="fas fa-file-pdf me-1"></i> Tugas PDF</span>
+                    @endif
                     @if($assignment->due_at)
                         <span class="small {{ $isDeadlinePassed ? 'text-danger fw-bold' : 'text-muted' }}">
                             <i class="fas fa-clock me-1"></i> Deadline: {{ \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') }}
@@ -65,7 +71,7 @@
                 @else
                     <div class="d-flex flex-column align-items-center gap-2 mt-2">
                         <span class="status-badge status-badge--pending fs-6"><i class="fas fa-hourglass-half me-1"></i> Menunggu penilaian guru</span>
-                        @if($assignment->type === 'pdf')
+                        @if($assignment->type === 'pdf' || $assignment->type === 'external')
                             <form action="{{ route('siswa.assignments.unsubmit', $assignment) }}" method="POST" class="mt-2" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengiriman tugas ini? File yang dikirim sebelumnya akan dihapus.')">
                                 @csrf
                                 <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
@@ -146,6 +152,11 @@
                         </div>
                         
                         <p class="mb-3 fw-bold">{{ $question->body }}</p>
+                        @if($question->image)
+                            <div class="mb-3 text-start">
+                                <img src="{{ $question->image }}" class="img-fluid rounded border" style="max-height: 250px;">
+                            </div>
+                        @endif
 
                         @if($question->type === 'pilihan_ganda')
                             @foreach($question->options as $opt)
@@ -159,6 +170,11 @@
                                     </span>
                                     <span class="{{ $opt->is_correct ? 'text-success fw-bold' : '' }} {{ $ans && $ans->selected_option_id == $opt->id && !$opt->is_correct ? 'text-danger' : '' }}">
                                         {{ $opt->body }}
+                                        @if($opt->image)
+                                            <div class="mt-1">
+                                                <img src="{{ $opt->image }}" class="img-fluid rounded border" style="max-height: 120px;">
+                                            </div>
+                                        @endif
                                     </span>
                                     @if($ans && $ans->selected_option_id == $opt->id)
                                         <small class="text-muted ms-auto">(Jawaban Anda)</small>
@@ -244,6 +260,11 @@
                             </div>
 
                             <p class="fw-bold mb-3">{{ $question->body }}</p>
+                            @if($question->image)
+                                <div class="mb-3 text-start">
+                                    <img src="{{ $question->image }}" class="img-fluid rounded border" style="max-height: 250px;">
+                                </div>
+                            @endif
 
                             @if($question->type === 'pilihan_ganda')
                                 @foreach($question->options as $opt)
@@ -255,6 +276,11 @@
                                                {{ old("answers.{$question->id}.selected_option_id") == $opt->id ? 'checked' : '' }}>
                                         <label class="form-check-label w-100" for="opt_{{ $opt->id }}" style="cursor: pointer;">
                                             <strong class="me-2">{{ $opt->label }}.</strong> {{ $opt->body }}
+                                            @if($opt->image)
+                                                <div class="mt-1">
+                                                    <img src="{{ $opt->image }}" class="img-fluid rounded border" style="max-height: 120px;">
+                                                </div>
+                                            @endif
                                         </label>
                                     </div>
                                 @endforeach
@@ -284,6 +310,39 @@
                     </div>
                 </div>
             </form>
+        @elseif($assignment->type === 'external')
+            {{-- External Quiz Section --}}
+            <div class="content-card mb-4 reveal reveal-delay-1 text-center py-5" style="border-top: 4px solid var(--primary) !important;">
+                <div class="content-card-body">
+                    <i class="fas fa-gamepad fa-4x mb-3 text-success"></i>
+                    <h4 class="fw-bold mb-2" style="font-family: 'Plus Jakarta Sans', sans-serif;">Kuis Online Eksternal</h4>
+                    <p class="text-muted mb-4">Tugas ini diselenggarakan di platform kuis online luar (seperti Quizizz, Kahoot, dll). Klik tombol di bawah untuk mulai mengerjakan.</p>
+                    <a href="{{ $assignment->quiz_url }}" target="_blank" class="btn btn-success btn-lg px-5 py-3 fw-bold rounded-pill shadow-lg d-inline-flex align-items-center gap-2">
+                        <i class="fas fa-external-link-alt"></i> Mulaikan Kuis Online (Quizizz)
+                    </a>
+                </div>
+            </div>
+
+            <div class="content-card mb-4 reveal reveal-delay-2">
+                <div class="content-card-body">
+                    <h5 class="fw-bold text-dark mb-3" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-paper-plane text-primary me-2"></i> Laporkan Hasil / Kirim Bukti</h5>
+                    <form method="POST" action="{{ route('siswa.assignments.submit', $assignment) }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Keterangan / Laporan (Opsional)</label>
+                            <textarea class="form-control" name="answer_text" placeholder="Tuliskan skor Anda atau catatan lainnya jika diperlukan..." rows="4"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Upload Bukti PDF (Opsional)</label>
+                            <input type="file" class="form-control" name="file" accept=".pdf">
+                            <small class="text-muted mt-1 d-block">Unggah screenshot hasil kuis yang disimpan dalam format PDF (jika diminta oleh guru). Maksimal 5MB.</small>
+                        </div>
+                        <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">
+                            <i class="fas fa-check-circle me-1"></i> Kirim Laporan Selesai
+                        </button>
+                    </form>
+                </div>
+            </div>
         @else
             {{-- PDF Submission Form --}}
             @if($assignment->file_path)

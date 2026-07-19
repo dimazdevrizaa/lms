@@ -111,6 +111,7 @@ body::before {
     color: #FFFFFF !important;
     display: flex;
     align-items: center;
+    gap: 0.625rem;
 }
 
 .nav-link {
@@ -673,7 +674,6 @@ body.page-loading .skeleton-wrapper {
     .navbar-brand img {
         height: 28px !important;
         width: 28px !important;
-        margin-right: 0.35rem !important;
     }
     
     .sidebar-toggle {

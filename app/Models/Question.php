@@ -15,6 +15,7 @@ class Question extends Model
         'assignment_id',
         'type',
         'body',
+        'image',
         'order',
         'points',
         'correct_answer',

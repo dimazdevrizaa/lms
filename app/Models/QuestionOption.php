@@ -14,6 +14,7 @@ class QuestionOption extends Model
         'question_id',
         'label',
         'body',
+        'image',
         'is_correct',
     ];
 

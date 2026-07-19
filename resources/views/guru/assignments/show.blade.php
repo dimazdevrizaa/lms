@@ -27,6 +27,8 @@
                             <span class="status-badge status-badge--hadir">{{ $assignment->schoolClass?->name }}</span>
                             @if($assignment->isOnline())
                                 <span class="status-badge" style="background: rgba(13,110,253,0.1); color: #0d6efd;"><i class="fas fa-laptop me-1"></i> Soal Online</span>
+                            @elseif($assignment->type === 'external')
+                                <span class="status-badge" style="background: rgba(25,135,84,0.1); color: var(--primary); font-weight: 700; border: none; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: var(--radius-sm);"><i class="fas fa-link me-1"></i> Kuis Online (Quizizz, dll)</span>
                             @else
                                 <span class="status-badge" style="background: rgba(220,53,69,0.1); color: #dc3545;"><i class="fas fa-file-pdf me-1"></i> PDF</span>
                             @endif
@@ -48,6 +50,23 @@
             </div>
         </div>
     </div>
+
+    @if($assignment->type === 'external')
+        <div class="content-card mb-4" style="border-top: 4px solid var(--primary) !important;">
+            <div class="content-card-body d-flex align-items-center justify-content-between flex-wrap gap-3 py-4">
+                <div>
+                    <h5 class="fw-bold mb-1 text-dark" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-link text-success me-2"></i> Link Kuis Online</h5>
+                    <p class="text-muted mb-0 small">Siswa diarahkan untuk mengerjakan kuis pada platform eksternal berikut.</p>
+                    <a href="{{ $assignment->quiz_url }}" target="_blank" class="small text-primary d-inline-flex align-items-center gap-1 mt-2 fw-semibold" style="word-break: break-all;">
+                        <i class="fas fa-external-link-alt"></i> {{ $assignment->quiz_url }}
+                    </a>
+                </div>
+                <a href="{{ $assignment->quiz_url }}" target="_blank" class="btn btn-success px-4 py-2.5 fw-bold" style="border-radius: var(--radius-sm); border: none; background-color: var(--primary);">
+                    <i class="fas fa-play me-2"></i> Kunjungi Situs Kuis
+                </a>
+            </div>
+        </div>
+    @endif
 
     @if($assignment->isOnline())
         {{-- Online Assignment: Show questions overview + per-student results --}}
@@ -77,6 +96,11 @@
                                     <span class="small" style="color: var(--text-muted);">({{ $question->points }} poin)</span>
                                 </div>
                                 <p class="mb-1">{{ $question->body }}</p>
+                                @if($question->image)
+                                    <div class="mb-2 text-start">
+                                        <img src="{{ $question->image }}" class="img-fluid rounded border" style="max-height: 200px;">
+                                    </div>
+                                @endif
                                 @if($question->type === 'pilihan_ganda')
                                     <div class="ms-2">
                                         @foreach($question->options as $opt)
@@ -84,6 +108,11 @@
                                                 {{ $opt->label }}. {{ $opt->body }}
                                                 @if($opt->is_correct) ✓ @endif
                                             </small><br>
+                                            @if($opt->image)
+                                                <div class="mb-1 ms-3">
+                                                    <img src="{{ $opt->image }}" class="img-fluid rounded border" style="max-height: 80px;">
+                                                </div>
+                                            @endif
                                         @endforeach
                                     </div>
                                 @elseif($question->type === 'isian_singkat')
@@ -220,6 +249,11 @@
                                                         <div>
                                                             <strong>Soal {{ $question->order }}.</strong> {{ $question->body }}
                                                             <span class="small" style="color: var(--text-muted);">({{ $question->points }} poin)</span>
+                                                            @if($question->image)
+                                                                <div class="mt-2 mb-2 text-start">
+                                                                    <img src="{{ $question->image }}" class="img-fluid rounded border" style="max-height: 150px;">
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                         @if($ans)
                                                             @if($ans->is_correct === true)
@@ -240,6 +274,11 @@
                                                                     @if($ans->selected_option_id == $opt->id) ← Jawaban siswa @endif
                                                                     @if($opt->is_correct) ✓ @endif
                                                                 </div>
+                                                                @if($opt->image)
+                                                                    <div class="mt-1 mb-2 ms-3">
+                                                                        <img src="{{ $opt->image }}" class="img-fluid rounded border" style="max-height: 80px;">
+                                                                    </div>
+                                                                @endif
                                                             @endforeach
                                                         </div>
                                                     @elseif($question->type === 'isian_singkat' && $ans)
