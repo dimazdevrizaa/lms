@@ -78,11 +78,7 @@
         </div>
     </form>
 
-    <div class="text-center mt-3">
-        <a class="forgot-link" href="{{ route('register') }}" style="font-size: 0.85rem; text-decoration: none;">
-            {{ __('Belum punya akun? Daftar Akun Baru') }}
-        </a>
-    </div>
+
 
     <div class="parent-access-divider">
         <p class="parent-access-label">Apakah Anda Orang Tua Siswa?</p>
