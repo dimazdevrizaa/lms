@@ -10,8 +10,12 @@
 
     <div class="card mb-3">
         <div class="card-body">
-            <form action="{{ route('tatausaha.students.index') }}" method="GET" class="row g-3">
-                <div class="col-md-4">
+            <form action="{{ route('tatausaha.students.index') }}" method="GET" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Cari Siswa</label>
+                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Nama, email, atau NIS..." value="{{ request('search') }}">
+                </div>
+                <div class="col-md-2">
                     <label class="form-label small fw-bold">Filter Jurusan</label>
                     <select name="major" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">Semua Jurusan</option>
@@ -21,7 +25,7 @@
                         <option value="Umum" @selected(request('major') == 'Umum')>📂 Umum</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                     <label class="form-label small fw-bold">Filter Kelas</label>
                     <select name="class_id" class="form-select form-select-sm" onchange="this.form.submit()">
                         <option value="">Semua Kelas</option>
@@ -32,7 +36,17 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Urutan</label>
+                    <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="name_asc" @selected(request('sort') == 'name_asc')>Nama (A - Z)</option>
+                        <option value="name_desc" @selected(request('sort') == 'name_desc')>Nama (Z - A)</option>
+                        <option value="latest" @selected(request('sort', 'name_asc') == 'latest')>Akun Terbaru</option>
+                        <option value="earliest" @selected(request('sort', 'name_asc') == 'earliest')>Akun Terlama</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-1">
+                    <button type="submit" class="btn btn-sm btn-primary w-100">Filter</button>
                     <a href="{{ route('tatausaha.students.index') }}" class="btn btn-sm btn-outline-secondary w-100">Reset</a>
                 </div>
             </form>
@@ -91,7 +105,13 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="text-center text-muted">Belum ada data.</td>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            @if(request()->filled('search'))
+                                Tidak ada data siswa ditemukan untuk pencarian "{{ request('search') }}".
+                            @else
+                                Belum ada data.
+                            @endif
+                        </td>
                     </tr>
                 @endforelse
                 </tbody>

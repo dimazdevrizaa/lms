@@ -13,11 +13,41 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::orderBy('name')->paginate(20);
+        $query = User::query();
 
-        return view('admin.users.index', compact('users'));
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('role', 'like', "%{$search}%");
+            });
+        }
+
+        // Sort
+        $sort = $request->input('sort', 'name_asc');
+        switch ($sort) {
+            case 'latest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            case 'earliest':
+                $query->orderBy('created_at', 'asc');
+                break;
+            case 'name_desc':
+                $query->orderBy('name', 'desc');
+                break;
+            case 'name_asc':
+            default:
+                $query->orderBy('name', 'asc');
+                break;
+        }
+
+        $users = $query->paginate(20)->appends($request->query());
+
+        return view('admin.users.index', compact('users', 'sort'));
     }
 
     public function create(): View

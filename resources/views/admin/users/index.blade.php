@@ -12,6 +12,38 @@
         <a class="btn btn-primary btn-lg" href="{{ route('admin.users.create') }}">+ Tambah User Baru</a>
     </div>
 
+    <!-- Search and Sort Filter Bar -->
+    <div class="content-card mb-3">
+        <div class="content-card-body p-3">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="row g-2 align-items-center">
+                <div class="col-md-7">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control border-start-0 ps-0" placeholder="Cari nama, email, atau role..." value="{{ request('search') }}">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="sort" class="form-select" onchange="this.form.submit()">
+                        <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Nama (A - Z)</option>
+                        <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Nama (Z - A)</option>
+                        <option value="latest" {{ request('sort', 'name_asc') == 'latest' ? 'selected' : '' }}>Akun Terbaru</option>
+                        <option value="earliest" {{ request('sort', 'name_asc') == 'earliest' ? 'selected' : '' }}>Akun Terlama</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-theme w-100">Filter</button>
+                    @if(request()->filled('search') || (request()->filled('sort') && request('sort') !== 'name_asc'))
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary" title="Hapus Filter">
+                            <i class="fas fa-undo"></i>
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+    </div>
+
     @if($users->isEmpty())
         <div class="content-card">
             <div class="content-card-body">
@@ -19,8 +51,13 @@
                     <div class="empty-state-icon">
                         <i class="fas fa-users" style="font-size: 1.75rem; color: var(--secondary); opacity: 0.5;"></i>
                     </div>
-                    <p class="empty-state-text">Belum ada user. Mulai dengan membuat user baru untuk sistem LMS.</p>
-                    <a href="{{ route('admin.users.create') }}" class="btn btn-outline-primary-theme btn-sm mt-3">+ Tambah Sekarang</a>
+                    @if(request()->filled('search'))
+                        <p class="empty-state-text">Tidak ada user ditemukan untuk pencarian "{{ request('search') }}".</p>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-primary-theme btn-sm mt-3">Reset Pencarian</a>
+                    @else
+                        <p class="empty-state-text">Belum ada user. Mulai dengan membuat user baru untuk sistem LMS.</p>
+                        <a href="{{ route('admin.users.create') }}" class="btn btn-outline-primary-theme btn-sm mt-3">+ Tambah Sekarang</a>
+                    @endif
                 </div>
             </div>
         </div>

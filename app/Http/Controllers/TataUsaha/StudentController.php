@@ -16,22 +16,54 @@ class StudentController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Student::with(['user', 'schoolClass']);
+        $query = Student::with(['user', 'schoolClass'])
+            ->select('students.*')
+            ->join('users', 'users.id', '=', 'students.user_id');
 
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('students.nis', 'like', "%{$search}%")
+                  ->orWhere('users.name', 'like', "%{$search}%")
+                  ->orWhere('users.email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter Jurusan
         if ($request->has('major') && $request->major != '') {
             $query->whereHas('schoolClass', function($q) use ($request) {
                 $q->where('major', $request->major);
             });
         }
 
+        // Filter Kelas
         if ($request->has('class_id') && $request->class_id != '') {
-            $query->where('class_id', $request->class_id);
+            $query->where('students.class_id', $request->class_id);
+        }
+
+        // Sort
+        $sort = $request->input('sort', 'name_asc');
+        switch ($sort) {
+            case 'name_desc':
+                $query->orderBy('users.name', 'desc');
+                break;
+            case 'latest':
+                $query->orderBy('students.created_at', 'desc');
+                break;
+            case 'earliest':
+                $query->orderBy('students.created_at', 'asc');
+                break;
+            case 'name_asc':
+            default:
+                $query->orderBy('users.name', 'asc');
+                break;
         }
 
         $students = $query->paginate(20)->withQueryString();
         $classes = SchoolClass::orderBy('name')->get();
 
-        return view('tatausaha.students.index', compact('students', 'classes'));
+        return view('tatausaha.students.index', compact('students', 'classes', 'sort'));
     }
 
     public function create(): View
