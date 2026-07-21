@@ -45,7 +45,7 @@
                                 @elseif($assignment->isExternal())
                                     <span class="status-badge fs-6" style="background: rgba(25,135,84,0.1); color: var(--primary);"><i class="fas fa-link me-1"></i> Kuis Online (Quizizz, dll)</span>
                                 @else
-                                    <span class="status-badge fs-6" style="background: rgba(220,53,69,0.1); color: #dc3545;"><i class="fas fa-file-pdf me-1"></i> Upload PDF</span>
+                                    <span class="status-badge fs-6" style="background: rgba(13,110,253,0.1); color: #0d6efd;"><i class="fas fa-file-alt me-1"></i> Upload Dokumen</span>
                                 @endif
                                 <small style="color: var(--text-muted);" class="ms-2">(Tipe tidak dapat diubah setelah dibuat)</small>
                             </div>
@@ -159,44 +159,67 @@
                             @enderror
                         </div>
 
-                        <!-- PDF Section -->
-                        @if($assignment->type === 'pdf')
-                            <div class="mb-4">
-                                <label class="form-label fw-semibold" style="color: var(--primary);">📤 File PDF Tugas (Opsional)</label>
-                                @if($assignment->file_path)
-                                    <div class="mb-3">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <span class="small text-muted"><i class="fas fa-file-pdf text-danger me-1"></i> Preview PDF saat ini:</span>
-                                            <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="small text-decoration-none d-none d-md-inline" style="color: var(--secondary); font-weight: 600;">
-                                                <i class="fas fa-external-link-alt me-1"></i> Buka di Tab Baru
-                                            </a>
-                                        </div>
-                                        
-                                        <!-- Mobile Fallback Card (Mobile browsers block inline PDF iframes) -->
-                                        <div class="d-block d-md-none mb-3">
-                                            <div class="card p-4 border text-center shadow-sm" style="border-radius: var(--radius-md) !important; background: rgba(27, 94, 32, 0.015); border-color: rgba(27, 94, 32, 0.08) !important;">
-                                                <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
-                                                <h6 class="fw-bold text-dark mb-1">Tugas PDF</h6>
-                                                <p class="text-muted small mb-4">Browser mobile tidak dapat menampilkan PDF secara langsung di halaman.</p>
-                                                <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="btn btn-sm btn-outline-primary-theme w-100 py-2.5 fw-bold" style="background: var(--primary) !important; color: white !important; border: none; border-radius: var(--radius-sm);">
-                                                    <i class="fas fa-external-link-alt me-1"></i> Buka Dokumen PDF
-                                                </a>
-                                            </div>
-                                        </div>
+                         <!-- PDF Section -->
+                         @if($assignment->type === 'pdf')
+                             <div class="mb-4">
+                                 <label class="form-label fw-semibold" style="color: var(--primary);">📤 File Dokumen Tugas (Opsional)</label>
+                                 @if($assignment->file_path)
+                                     @php
+                                         $isPdf = Str::endsWith(strtolower($assignment->file_path), '.pdf');
+                                         $fileExtension = pathinfo($assignment->file_path, PATHINFO_EXTENSION);
+                                         $fileIcon = match(strtolower($fileExtension)) {
+                                             'pdf' => 'fa-file-pdf text-danger',
+                                             'doc', 'docx' => 'fa-file-word text-primary',
+                                             'xls', 'xlsx' => 'fa-file-excel text-success',
+                                             'ppt', 'pptx' => 'fa-file-powerpoint text-warning',
+                                             default => 'fa-file-alt text-secondary'
+                                         };
+                                     @endphp
+                                     <div class="mb-3">
+                                         <div class="d-flex align-items-center justify-content-between mb-2">
+                                             <span class="small text-muted"><i class="fas {{ $fileIcon }} me-1"></i> File saat ini:</span>
+                                             <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="small text-decoration-none" style="color: var(--secondary); font-weight: 600;">
+                                                 <i class="fas fa-download me-1"></i> Unduh File
+                                             </a>
+                                         </div>
+                                         
+                                         @if($isPdf)
+                                             <!-- Mobile Fallback Card (Mobile browsers block inline PDF iframes) -->
+                                             <div class="d-block d-md-none mb-3">
+                                                 <div class="card p-4 border text-center shadow-sm" style="border-radius: var(--radius-md) !important; background: rgba(27, 94, 32, 0.015); border-color: rgba(27, 94, 32, 0.08) !important;">
+                                                     <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                                                     <h6 class="fw-bold text-dark mb-1">Tugas PDF</h6>
+                                                     <p class="text-muted small mb-4">Browser mobile tidak dapat menampilkan PDF secara langsung di halaman.</p>
+                                                     <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="btn btn-sm btn-outline-primary-theme w-100 py-2.5 fw-bold" style="background: var(--primary) !important; color: white !important; border: none; border-radius: var(--radius-sm);">
+                                                         <i class="fas fa-external-link-alt me-1"></i> Buka Dokumen PDF
+                                                     </a>
+                                                 </div>
+                                             </div>
 
-                                        <!-- Desktop PDF Iframe -->
-                                        <div class="d-none d-md-block border rounded shadow-sm overflow-hidden" style="height: 500px; background-color: #f8f9fa;">
-                                            <iframe src="{{ route('assignments.download', $assignment) }}" width="100%" height="100%" style="border: none;"></iframe>
-                                        </div>
-                                    </div>
-                                @endif
-                                <input type="file" class="form-control" name="file" accept=".pdf">
-                                <small style="color: var(--text-muted);">Pilih file PDF baru jika ingin mengganti file lama (Maksimal 10MB)</small>
-                                @error('file')
-                                    <small class="text-danger d-block">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        @endif
+                                             <!-- Desktop PDF Iframe -->
+                                             <div class="d-none d-md-block border rounded shadow-sm overflow-hidden" style="height: 500px; background-color: #f8f9fa;">
+                                                 <iframe src="{{ route('assignments.download', $assignment) }}" width="100%" height="100%" style="border: none;"></iframe>
+                                             </div>
+                                         @else
+                                             <!-- Fallback Card for non-PDF files -->
+                                             <div class="card p-4 border text-center shadow-sm" style="border-radius: var(--radius-md) !important; background: rgba(27, 94, 32, 0.015); border-color: rgba(27, 94, 32, 0.08) !important;">
+                                                 <i class="fas {{ $fileIcon }} fa-3x mb-3"></i>
+                                                 <h6 class="fw-bold text-dark mb-1">Tugas ({{ strtoupper($fileExtension) }})</h6>
+                                                 <p class="text-muted small mb-4">File ini tidak dapat ditampilkan langsung di browser. Silakan unduh untuk membukanya.</p>
+                                                 <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="btn btn-sm btn-outline-primary-theme w-100 py-2.5 fw-bold" style="background: var(--primary) !important; color: white !important; border: none; border-radius: var(--radius-sm);">
+                                                     <i class="fas fa-download me-1"></i> Unduh File Tugas
+                                                 </a>
+                                             </div>
+                                         @endif
+                                     </div>
+                                 @endif
+                                 <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                                 <small style="color: var(--text-muted);">Pilih file dokumen baru jika ingin mengganti file lama (PDF, Word, Excel, PPT. Maksimal 10MB)</small>
+                                 @error('file')
+                                     <small class="text-danger d-block">{{ $message }}</small>
+                                 @enderror
+                             </div>
+                         @endif
 
                         <!-- External Quiz Section -->
                         @if($assignment->type === 'external')

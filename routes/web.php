@@ -22,6 +22,7 @@ use App\Http\Controllers\TataUsaha\TeacherController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\TataUsaha\TeachingAssignmentController;
 use App\Http\Controllers\TataUsaha\ScheduleController;
+use App\Http\Controllers\Admin\ImpersonationController;
 
 Route::get('/', function () {
     if (! auth()->check()) {
@@ -66,10 +67,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/push/subscribe', [App\Http\Controllers\PushSubscriptionController::class, 'subscribe'])->name('push.subscribe');
     Route::post('/push/unsubscribe', [App\Http\Controllers\PushSubscriptionController::class, 'unsubscribe'])->name('push.unsubscribe');
 
+    // IMPERSONATION STOP
+    Route::post('/impersonate/stop', [ImpersonationController::class, 'stop'])->name('impersonate.stop');
+
     // ADMIN
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('users', AdminUserController::class)->except(['show']);
+        Route::post('impersonate/start/{user}', [ImpersonationController::class, 'start'])->name('impersonate.start');
         Route::resource('academic-years', AcademicYearController::class)->except(['show']);
         Route::resource('classes', AdminClassController::class)->except(['show']);
         Route::resource('subjects', SubjectController::class);

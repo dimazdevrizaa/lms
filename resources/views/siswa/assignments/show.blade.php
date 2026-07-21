@@ -210,16 +210,35 @@
                     @endif
 
                     @if($submission->file_path)
+                        @php
+                            $subIsPdf = Str::endsWith(strtolower($submission->file_path), '.pdf');
+                            $subExtension = pathinfo($submission->file_path, PATHINFO_EXTENSION);
+                            $subIcon = match(strtolower($subExtension)) {
+                                'pdf' => 'fa-file-pdf text-danger',
+                                'doc', 'docx' => 'fa-file-word text-primary',
+                                'xls', 'xlsx' => 'fa-file-excel text-success',
+                                'ppt', 'pptx' => 'fa-file-powerpoint text-warning',
+                                default => 'fa-file-alt text-secondary'
+                            };
+                        @endphp
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-dark"><i class="fas fa-file-pdf text-danger me-1"></i> File PDF Anda:</label>
+                            <label class="form-label fw-bold text-dark"><i class="fas {{ $subIcon }} me-1"></i> File Lampiran Anda ({{ strtoupper($subExtension) }}):</label>
                             <div class="d-flex align-items-center gap-2 mb-3">
                                 <a href="{{ route('submissions.download', $submission) }}" target="_blank" class="btn btn-sm btn-outline-secondary-theme">
-                                    <i class="fas fa-external-link-alt me-1"></i> Buka PDF di Tab Baru
+                                    <i class="fas fa-download me-1"></i> Unduh File
                                 </a>
                             </div>
-                            <div class="rounded border" style="overflow: hidden; height: 500px; background: #f8f9fa;">
-                                <iframe src="{{ route('submissions.download', $submission) }}" width="100%" height="100%" frameborder="0"></iframe>
-                            </div>
+                            @if($subIsPdf)
+                                <div class="rounded border" style="overflow: hidden; height: 500px; background: #f8f9fa;">
+                                    <iframe src="{{ route('submissions.download', $submission) }}" width="100%" height="100%" frameborder="0"></iframe>
+                                </div>
+                            @else
+                                <div class="card p-4 border text-center shadow-sm" style="border-radius: var(--radius-md) !important; background: rgba(27, 94, 32, 0.015); border-color: rgba(27, 94, 32, 0.08) !important;">
+                                    <i class="fas {{ $subIcon }} fa-3x mb-3"></i>
+                                    <h6 class="fw-bold text-dark mb-1">Dokumen Lampiran ({{ strtoupper($subExtension) }})</h6>
+                                    <p class="text-muted small mb-0">File ini tidak dapat ditampilkan langsung di browser. Silakan unduh untuk membukanya.</p>
+                                </div>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -333,9 +352,9 @@
                             <textarea class="form-control" name="answer_text" placeholder="Tuliskan skor Anda atau catatan lainnya jika diperlukan..." rows="4"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Upload Bukti PDF (Opsional)</label>
-                            <input type="file" class="form-control" name="file" accept=".pdf">
-                            <small class="text-muted mt-1 d-block">Unggah screenshot hasil kuis yang disimpan dalam format PDF (jika diminta oleh guru). Maksimal 5MB.</small>
+                            <label class="form-label fw-bold">Upload Bukti Dokumen (Opsional)</label>
+                            <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                            <small class="text-muted mt-1 d-block">Unggah file bukti/dokumen hasil kuis (PDF, Word, Excel, PPT). Maksimal 10MB.</small>
                         </div>
                         <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">
                             <i class="fas fa-check-circle me-1"></i> Kirim Laporan Selesai
@@ -346,19 +365,38 @@
         @else
             {{-- PDF Submission Form --}}
             @if($assignment->file_path)
+                @php
+                    $isPdf = Str::endsWith(strtolower($assignment->file_path), '.pdf');
+                    $fileExtension = pathinfo($assignment->file_path, PATHINFO_EXTENSION);
+                    $fileIcon = match(strtolower($fileExtension)) {
+                        'pdf' => 'fa-file-pdf text-danger',
+                        'doc', 'docx' => 'fa-file-word text-primary',
+                        'xls', 'xlsx' => 'fa-file-excel text-success',
+                        'ppt', 'pptx' => 'fa-file-powerpoint text-warning',
+                        default => 'fa-file-alt text-secondary'
+                    };
+                @endphp
                 <div class="card border-0 shadow-sm mb-4 reveal reveal-delay-1" style="border-radius: var(--radius-md) !important;">
                     <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
-                        <h5 class="fw-bold text-dark mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas fa-file-pdf text-danger me-2"></i> File Soal PDF</h5>
+                        <h5 class="fw-bold text-dark mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif;"><i class="fas {{ $fileIcon }} me-2"></i> File Soal / Instruksi</h5>
                     </div>
                     <div class="card-body p-4">
                         <div class="mb-3">
                             <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="btn btn-outline-secondary-theme btn-sm">
-                                <i class="fas fa-external-link-alt me-1"></i> Buka di Tab Baru
+                                <i class="fas fa-download me-1"></i> Unduh Dokumen
                             </a>
                         </div>
-                        <div class="rounded border" style="overflow: hidden; height: 500px; background: #f8f9fa;">
-                            <iframe src="{{ route('assignments.download', $assignment) }}" width="100%" height="100%" frameborder="0"></iframe>
-                        </div>
+                        @if($isPdf)
+                            <div class="rounded border" style="overflow: hidden; height: 500px; background: #f8f9fa;">
+                                <iframe src="{{ route('assignments.download', $assignment) }}" width="100%" height="100%" frameborder="0"></iframe>
+                            </div>
+                        @else
+                            <div class="card p-4 border text-center shadow-sm" style="border-radius: var(--radius-md) !important; background: rgba(27, 94, 32, 0.015); border-color: rgba(27, 94, 32, 0.08) !important;">
+                                <i class="fas {{ $fileIcon }} fa-3x mb-3"></i>
+                                <h6 class="fw-bold text-dark mb-1">Dokumen Tugas ({{ strtoupper($fileExtension) }})</h6>
+                                <p class="text-muted small mb-0">File ini tidak dapat ditampilkan langsung di browser. Silakan unduh untuk membukanya.</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
             @endif
@@ -373,9 +411,9 @@
                             <textarea class="form-control" name="answer_text" placeholder="Ketik jawaban Anda di sini..." rows="4"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Upload File PDF (Opsional)</label>
-                            <input type="file" class="form-control" name="file" accept=".pdf">
-                            <small class="text-muted mt-1 d-block">Format file wajib berupa PDF. Maksimal 5MB.</small>
+                            <label class="form-label fw-bold">Upload File Dokumen (Opsional)</label>
+                            <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                            <small class="text-muted mt-1 d-block">Format file yang didukung: PDF, Word, Excel, PPT. Maksimal 10MB.</small>
                         </div>
                         <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">
                             <i class="fas fa-check-circle me-1"></i> Kirim Tugas

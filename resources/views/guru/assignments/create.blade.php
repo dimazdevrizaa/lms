@@ -34,7 +34,7 @@
                                 <div class="form-check ms-2 ms-sm-0">
                                     <input class="form-check-input" type="radio" name="type" id="type_pdf" value="pdf" checked onchange="toggleType()">
                                     <label class="form-check-label fw-bold" for="type_pdf">
-                                        <i class="fas fa-file-pdf text-danger me-1"></i> Upload PDF
+                                        <i class="fas fa-file-alt text-primary me-1"></i> Upload Dokumen
                                     </label>
                                 </div>
                                 <div class="form-check ms-2 ms-sm-0">
@@ -165,9 +165,9 @@
                         <!-- PDF Section (shown when type=pdf) -->
                         <div id="pdfSection">
                             <div class="mb-4">
-                                <label class="form-label fw-semibold" style="color: var(--primary);">📤 File PDF Tugas (Opsional)</label>
-                                <input type="file" class="form-control" name="file" accept=".pdf">
-                                <small style="color: var(--text-muted);">Pilih file PDF soal/instruksi tugas jika ada (Maksimal 10MB)</small>
+                                <label class="form-label fw-semibold" style="color: var(--primary);">📤 File Dokumen Tugas (Opsional)</label>
+                                <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+                                <small style="color: var(--text-muted);">Pilih file dokumen soal/instruksi tugas jika ada (PDF, Word, Excel, PPT. Maksimal 10MB)</small>
                                 @error('file')
                                     <small class="text-danger d-block">{{ $message }}</small>
                                 @enderror

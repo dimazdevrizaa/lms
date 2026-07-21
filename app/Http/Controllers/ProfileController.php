@@ -26,6 +26,10 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        if (session()->has('impersonate_original_id')) {
+            return Redirect::route('profile.edit')->with('error', 'Tidak dapat mengubah profil saat dalam sesi impersonasi.');
+        }
+
         $user = $request->user();
         
         $validated = $request->validated();
@@ -68,6 +72,10 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        if (session()->has('impersonate_original_id')) {
+            return Redirect::route('profile.edit')->with('error', 'Tidak dapat menghapus akun saat dalam sesi impersonasi.');
+        }
+
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);

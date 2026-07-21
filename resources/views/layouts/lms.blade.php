@@ -25,6 +25,21 @@
     @stack('styles')
 </head>
 <body>
+    @if(session()->has('impersonate_original_id'))
+        <div class="impersonate-banner d-flex align-items-center justify-content-between px-3 py-2 text-white" 
+             style="background: linear-gradient(135deg, #e65100, #ff8f00); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem; font-weight: 500; border-bottom: 3px solid #ff6f00; z-index: 9999; position: relative;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-user-secret fa-lg text-white"></i>
+                <span>Anda sedang login sebagai <strong>{{ auth()->user()->name }}</strong> (Role: {{ strtoupper(auth()->user()->role) }}). Anda melihat data persis seperti yang mereka lihat.</span>
+            </div>
+            <form method="POST" action="{{ route('impersonate.stop') }}" class="m-0">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-light text-dark fw-bold px-3 py-1 shadow-sm" style="border-radius: var(--radius-sm); border: none; font-size: 0.85rem;">
+                    🔌 Kembali ke Admin
+                </button>
+            </form>
+        </div>
+    @endif
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark flex-nowrap">
         <div class="d-flex align-items-center flex-grow-1">
@@ -182,7 +197,13 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             @if($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <strong><i class="fas fa-exclamation-circle me-2"></i>Terjadi Kesalahan!</strong>

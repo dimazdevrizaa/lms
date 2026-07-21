@@ -107,6 +107,14 @@
                                     <span class="status-badge" style="{{ $roleStyle }}">{{ $roleLabel }}</span>
                                 </td>
                                 <td class="text-center">
+                                    @if($user->role !== 'admin')
+                                        <form method="POST" action="{{ route('admin.impersonate.start', $user) }}" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-info me-1" title="Login Sebagai {{ $user->name }}" style="border-radius: var(--radius-sm); font-weight: 500;">
+                                                🔑 Login Sebagai
+                                            </button>
+                                        </form>
+                                    @endif
                                     <a class="btn btn-sm btn-outline-primary-theme" href="{{ route('admin.users.edit', $user) }}">✏️ Edit</a>
                                     <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('Hapus user ini?')) { document.getElementById('form-{{ $user->id }}').submit(); }" type="button">🗑️ Hapus</button>
                                     <form id="form-{{ $user->id }}" method="POST" action="{{ route('admin.users.destroy', $user) }}" style="display: none;">

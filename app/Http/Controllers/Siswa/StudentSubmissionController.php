@@ -110,7 +110,7 @@ class StudentSubmissionController extends Controller
     {
         $data = $request->validate([
             'answer_text' => ['nullable', 'string'],
-            'file' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx', 'max:10240'],
         ]);
 
         $filePath = null;

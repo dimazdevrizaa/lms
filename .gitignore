@@ -54,4 +54,5 @@ backup_presentasi/
 
 # AI Agent customization & tool files
 .agents/
+.rpiv/
 skills-lock.json

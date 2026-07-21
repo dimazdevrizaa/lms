@@ -66,7 +66,7 @@
                                     @elseif($a->type === 'external')
                                         <span class="status-badge" style="background: rgba(25,135,84,0.1); color: var(--primary); font-weight: 700; border: none; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: var(--radius-sm);"><i class="fas fa-link me-1"></i>Kuis Online</span>
                                     @else
-                                        <span class="status-badge" style="background: rgba(108,117,125,0.1); color: #6c757d;"><i class="fas fa-file-pdf me-1"></i>PDF</span>
+                                        <span class="status-badge" style="background: rgba(108,117,125,0.1); color: #6c757d;"><i class="fas fa-file-alt me-1"></i>Dokumen</span>
                                     @endif
                                 </div>
                                 <small style="color: var(--text-muted);"><i class="fas fa-calendar-check me-1"></i> {{ $a->created_at->format('d M Y') }}</small>
@@ -94,8 +94,18 @@
                                     <i class="fas fa-user-check me-1" style="color: var(--primary);"></i> {{ $a->submissions_count ?? $a->submissions->count() }} Terkumpul
                                 </div>
                                 @if($a->file_path)
-                                    <span class="status-badge" style="background: rgba(220,53,69,0.08); color: #dc3545; cursor: pointer;" onclick="event.stopPropagation(); window.open('{{ route('assignments.download', $a) }}', '_blank')">
-                                        <i class="fas fa-file-pdf"></i> PDF
+                                    @php
+                                        $fileExtension = pathinfo($a->file_path, PATHINFO_EXTENSION);
+                                        $fileIcon = match(strtolower($fileExtension)) {
+                                            'pdf' => 'fa-file-pdf text-danger',
+                                            'doc', 'docx' => 'fa-file-word text-primary',
+                                            'xls', 'xlsx' => 'fa-file-excel text-success',
+                                            'ppt', 'pptx' => 'fa-file-powerpoint text-warning',
+                                            default => 'fa-file-alt text-secondary'
+                                        };
+                                    @endphp
+                                    <span class="status-badge" style="background: rgba(13,110,253,0.08); color: #0d6efd; cursor: pointer;" onclick="event.stopPropagation(); window.open('{{ route('assignments.download', $a) }}', '_blank')">
+                                        <i class="fas {{ $fileIcon }}"></i> {{ strtoupper($fileExtension) }}
                                     </span>
                                 @endif
                             </div>

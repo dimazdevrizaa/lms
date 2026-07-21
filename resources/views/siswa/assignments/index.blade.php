@@ -42,7 +42,20 @@
                     <div class="content-card h-100" style="border-top: none;">
                         <div class="content-card-header">
                             <div class="content-card-header-icon">
-                                <i class="fas {{ $assignment->isOnline() ? 'fa-laptop' : ($assignment->type === 'external' ? 'fa-link' : 'fa-file-pdf') }}"></i>
+                                @php
+                                    $fileIconClass = 'fa-file-alt';
+                                    if ($assignment->file_path) {
+                                        $fileExtension = pathinfo($assignment->file_path, PATHINFO_EXTENSION);
+                                        $fileIconClass = match(strtolower($fileExtension)) {
+                                            'pdf' => 'fa-file-pdf',
+                                            'doc', 'docx' => 'fa-file-word',
+                                            'xls', 'xlsx' => 'fa-file-excel',
+                                            'ppt', 'pptx' => 'fa-file-powerpoint',
+                                            default => 'fa-file-alt'
+                                        };
+                                    }
+                                @endphp
+                                <i class="fas {{ $assignment->isOnline() ? 'fa-laptop' : ($assignment->type === 'external' ? 'fa-link' : $fileIconClass) }}"></i>
                             </div>
                             <div class="flex-grow-1">
                                 <h5 class="content-card-title mb-0">{{ $assignment->title }}</h5>
@@ -61,7 +74,17 @@
                                 @elseif($assignment->type === 'external')
                                     <span class="status-badge" style="background: rgba(25, 135, 84, 0.1); color: var(--primary); font-weight: 700; border: none; font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: var(--radius-sm);"><i class="fas fa-link me-1"></i>Kuis Online</span>
                                 @else
-                                    <span class="status-badge status-badge--pdf"><i class="fas fa-file-pdf me-1"></i>PDF</span>
+                                    @php
+                                        $fileExtension = $assignment->file_path ? pathinfo($assignment->file_path, PATHINFO_EXTENSION) : 'docx';
+                                        $fileIconClass = match(strtolower($fileExtension)) {
+                                            'pdf' => 'fa-file-pdf',
+                                            'doc', 'docx' => 'fa-file-word',
+                                            'xls', 'xlsx' => 'fa-file-excel',
+                                            'ppt', 'pptx' => 'fa-file-powerpoint',
+                                            default => 'fa-file-alt'
+                                        };
+                                    @endphp
+                                    <span class="status-badge status-badge--pdf"><i class="fas {{ $fileIconClass }} me-1"></i>{{ strtoupper($fileExtension) }}</span>
                                 @endif
                                 @if($isSubmitted)
                                     <span class="status-badge status-badge--hadir"><i class="fas fa-check me-1"></i>Sudah Dikumpulkan</span>

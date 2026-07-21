@@ -103,4 +103,55 @@ class AssignmentTest extends TestCase
             'is_correct' => false,
         ]);
     }
+
+    public function test_teacher_and_student_can_upload_doc_docx_xls_xlsx_files(): void
+    {
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        $teacher = Teacher::create([
+            'user_id' => $teacherUser->id,
+            'nip' => '1234567890',
+            'phone' => '08123456789',
+        ]);
+
+        $class = SchoolClass::create(['name' => 'X IPA 1']);
+        $subject = Subject::create(['name' => 'Matematika']);
+
+        // 1. Teacher uploads docx assignment
+        $fakeDocx = \Illuminate\Http\UploadedFile::fake()->create('assignment.docx', 100, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        $response = $this->actingAs($teacherUser)->post(route('guru.assignments.store'), [
+            'class_id' => $class->id,
+            'subject_id' => $subject->id,
+            'type' => 'pdf', // DB type name is still pdf but labeled as Document
+            'title' => 'Tugas Menulis Laporan',
+            'description' => 'Kerjakan di docx.',
+            'due_at' => now()->addDays(7)->format('Y-m-d\TH:i'),
+            'file' => $fakeDocx,
+        ]);
+
+        $response->assertRedirect(route('guru.assignments.index'));
+        $assignment = Assignment::where('title', 'Tugas Menulis Laporan')->first();
+        $this->assertNotNull($assignment);
+        $this->assertStringEndsWith('.docx', $assignment->file_path);
+
+        // 2. Student uploads xlsx submission
+        $studentUser = User::factory()->create(['role' => 'siswa']);
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nis' => '111222',
+            'class_id' => $class->id,
+        ]);
+
+        $fakeXlsx = \Illuminate\Http\UploadedFile::fake()->create('answer.xlsx', 100, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response = $this->actingAs($studentUser)->post(route('siswa.assignments.submit', $assignment), [
+            'answer_text' => 'Ini jawaban saya.',
+            'file' => $fakeXlsx,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseHas('assignment_submissions', [
+            'assignment_id' => $assignment->id,
+            'student_id' => $student->id,
+            'answer_text' => 'Ini jawaban saya.',
+        ]);
+    }
 }

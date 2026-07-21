@@ -141,7 +141,7 @@ class AssignmentController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'due_at' => ['nullable', 'date'],
-            'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx', 'max:10240'],
             // Online questions come as JSON
             'questions_json' => ['nullable', 'string'],
             'quiz_url' => ['nullable', 'url', 'max:255'],
@@ -285,7 +285,7 @@ class AssignmentController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'due_at' => ['nullable', 'date'],
-            'file' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,xls,xlsx,ppt,pptx', 'max:10240'],
             'questions_json' => ['nullable', 'string'],
             'quiz_url' => ['nullable', 'url', 'max:255'],
         ]);

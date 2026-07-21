@@ -113,6 +113,15 @@
                         </div>
 
                         <div class="table-responsive d-none" id="studentTableWrapper">
+                             <!-- Search Input for Students -->
+                             <div class="mb-3">
+                                 <div class="input-group">
+                                     <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: var(--radius-sm) 0 0 var(--radius-sm); border-color: rgba(27,94,32,0.12);">
+                                         <i class="fas fa-search"></i>
+                                     </span>
+                                     <input type="text" id="studentSearch" class="form-control border-start-0 ps-0" placeholder="Cari nama siswa..." style="border-radius: 0 var(--radius-sm) var(--radius-sm) 0; border-color: rgba(27,94,32,0.12);">
+                                 </div>
+                             </div>
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
@@ -216,6 +225,10 @@
         }
 
         function loadStudents(classId) {
+            const studentSearchEl = document.getElementById('studentSearch');
+            if (studentSearchEl) {
+                studentSearchEl.value = '';
+            }
             if (!classId) {
                 studentContainer.classList.remove('d-none');
                 studentTableWrapper.classList.add('d-none');
@@ -233,7 +246,7 @@
                         <tr>
                             <td class="text-muted fw-bold">${index + 1}</td>
                             <td>
-                                <div class="fw-bold text-dark">${student.user.name}</div>
+                                <div class="fw-bold text-dark">${student.user ? student.user.name : 'Siswa Tanpa Akun User'}</div>
                                 <div class="text-muted" style="font-size: 0.8rem;">NIS: ${student.nis}</div>
                                 <div class="mt-2 d-flex align-items-center flex-wrap gap-1">
                                     ${renderStats(student.id)}
@@ -272,6 +285,30 @@
             const radioButtons = document.querySelectorAll('input[type="radio"][value="hadir"]');
             radioButtons.forEach(radio => radio.checked = true);
         });
+
+        const studentSearch = document.getElementById('studentSearch');
+        if (studentSearch) {
+            studentSearch.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+            studentSearch.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+                const rows = studentTableBody.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const nameCell = row.querySelector('.fw-bold.text-dark');
+                    if (nameCell) {
+                        const name = nameCell.textContent.toLowerCase();
+                        if (name.includes(query)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
 
         // Initialize if old class_id exists
         if (classSelect.value) {

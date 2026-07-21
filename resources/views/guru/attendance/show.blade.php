@@ -96,7 +96,7 @@
                                 @foreach($attendance->details as $detail)
                                     <tr>
                                         <td class="ps-4">
-                                            <div class="fw-bold text-dark">{{ $detail->student->user?->name }}</div>
+                                            <div class="fw-bold text-dark">{{ $detail->student->user?->name ?? 'Siswa Tanpa Akun User' }}</div>
                                         </td>
                                         <td class="text-muted">{{ $detail->student->nis }}</td>
                                         <td class="text-center">
