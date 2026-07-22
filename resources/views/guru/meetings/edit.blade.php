@@ -111,13 +111,24 @@
                         </div>
 
                         <!-- Buttons -->
-                        <div class="d-flex gap-2 mt-5">
+                        <div class="d-flex gap-2 mt-5 align-items-center flex-wrap">
                             <button class="btn btn-success px-4 py-2" style="background-color: var(--primary); border: none; border-radius: 12px; font-weight: 600;" type="submit">
                                 <i class="fas fa-check-circle me-2"></i> Perbarui Pertemuan
                             </button>
                             <a class="btn btn-outline-secondary px-4 py-2" style="border-radius: 12px; font-weight: 600;" href="{{ $backUrl }}">Batal</a>
+                            @if(session()->has('impersonate_original_id'))
+                                <button type="button" class="btn btn-outline-danger px-4 py-2 ms-auto" style="border-radius: 12px; font-weight: 600;" onclick="if(confirm('Apakah Anda yakin ingin menghapus pertemuan ini?')) { document.getElementById('delete-meeting-form').submit(); }">
+                                    <i class="fas fa-trash me-1"></i> Hapus Sesi
+                                </button>
+                            @endif
                         </div>
                     </form>
+                    @if(session()->has('impersonate_original_id'))
+                        <form id="delete-meeting-form" action="{{ route('guru.meetings.destroy', $meeting) }}" method="POST" style="display: none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

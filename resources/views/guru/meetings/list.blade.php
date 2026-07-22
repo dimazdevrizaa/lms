@@ -116,13 +116,15 @@
                             <a href="{{ route('guru.meetings.edit', $m) }}" class="btn btn-sm btn-icon-tool" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('guru.meetings.destroy', $m) }}" method="POST" onsubmit="return confirm('Hapus pertemuan ini?')" class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-icon-tool btn-icon-tool--danger" title="Hapus">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                            @if(session()->has('impersonate_original_id'))
+                                <form action="{{ route('guru.meetings.destroy', $m) }}" method="POST" onsubmit="return confirm('Hapus pertemuan ini?')" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-icon-tool btn-icon-tool--danger" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

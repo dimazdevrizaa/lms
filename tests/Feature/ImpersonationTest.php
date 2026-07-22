@@ -90,4 +90,42 @@ class ImpersonationTest extends TestCase
         $student->refresh();
         $this->assertNotEquals('Hacker Student', $student->name);
     }
+
+    public function test_admin_impersonating_teacher_can_delete_meeting_but_regular_teacher_cannot(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        $teacher = \App\Models\Teacher::create([
+            'user_id' => $teacherUser->id,
+            'nip' => '9988776655',
+            'phone' => '081299990000',
+        ]);
+        $class = \App\Models\SchoolClass::create(['name' => 'X IPA 1']);
+        $subject = \App\Models\Subject::create(['name' => 'Fisika']);
+
+        $meeting = \App\Models\Meeting::create([
+            'teacher_id' => $teacher->id,
+            'class_id' => $class->id,
+            'subject_id' => $subject->id,
+            'title' => 'Pertemuan Test Hapus',
+            'date' => '2026-07-25',
+            'number' => 1,
+            'is_visible' => true,
+        ]);
+
+        // 1. Regular teacher attempt to delete -> 403 Forbidden
+        $this->actingAs($teacherUser);
+        $response = $this->delete(route('guru.meetings.destroy', $meeting));
+        $response->assertStatus(403);
+
+        // 2. Admin impersonating teacher attempt to delete -> Success
+        $this->actingAs($admin);
+        $this->post(route('admin.impersonate.start', $teacherUser));
+        $response = $this->delete(route('guru.meetings.destroy', $meeting));
+        $response->assertRedirect(route('guru.meetings.class-meetings', [
+            'classSlug' => $class->slug,
+            'subjectSlug' => $subject->slug,
+        ]));
+        $this->assertSoftDeleted('meetings', ['id' => $meeting->id]);
+    }
 }

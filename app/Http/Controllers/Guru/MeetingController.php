@@ -254,7 +254,8 @@ class MeetingController extends Controller
 
     public function destroy(Meeting $meeting): RedirectResponse
     {
-        abort_unless($meeting->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(($meeting->teacher_id == $teacherId && session()->has('impersonate_original_id')) || Auth::user()->role === 'admin', 403, 'Aksi ini hanya dapat dilakukan dalam mode Impersonasi Admin.');
 
         $classId = $meeting->class_id;
         $subjectId = $meeting->subject_id;

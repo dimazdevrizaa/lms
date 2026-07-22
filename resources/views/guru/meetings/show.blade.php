@@ -37,6 +37,15 @@
                 <a href="{{ route('guru.meetings.edit', $meeting) }}" class="btn btn-outline-primary px-3 py-2" style="border-radius: 10px; font-weight: 600;">
                     <i class="fas fa-edit me-1"></i> Edit Sesi
                 </a>
+                @if(session()->has('impersonate_original_id'))
+                    <form action="{{ route('guru.meetings.destroy', $meeting) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pertemuan ini? Semua materi dan tugas di dalamnya akan ikut terhapus.')" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-outline-danger px-3 py-2" style="border-radius: 10px; font-weight: 600;">
+                            <i class="fas fa-trash me-1"></i> Hapus Sesi
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
         <div class="d-flex gap-3 text-muted flex-wrap align-items-center">
