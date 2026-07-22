@@ -152,6 +152,12 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
+        if ($user->student) {
+            $user->student->delete();
+        }
+        if ($user->teacher) {
+            $user->teacher->delete();
+        }
         $user->delete();
 
         return redirect()->route('admin.users.index')
