@@ -11,35 +11,20 @@
 
         <div>
             <x-input-label for="update_password_current_password" :value="__('Current Password')" style="font-weight: 600; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;" />
-            <div class="position-relative">
-                <x-text-input id="update_password_current_password" name="current_password" type="password" class="form-control pe-5" style="width: 100%;" autocomplete="current-password" />
-                <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('update_password_current_password', this)">
-                    <i class="far fa-eye"></i>
-                </button>
-            </div>
+            <x-text-input id="update_password_current_password" name="current_password" type="password" class="form-control" style="width: 100%;" autocomplete="current-password" />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
 
         <div>
             <x-input-label for="update_password_password" :value="__('New Password')" style="font-weight: 600; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;" />
-            <div class="position-relative">
-                <x-text-input id="update_password_password" name="password" type="password" class="form-control pe-5" style="width: 100%;" autocomplete="new-password" />
-                <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('update_password_password', this)">
-                    <i class="far fa-eye"></i>
-                </button>
-            </div>
+            <x-text-input id="update_password_password" name="password" type="password" class="form-control" style="width: 100%;" autocomplete="new-password" />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
             <x-password-strength-meter inputId="update_password_password" confirmInputId="update_password_password_confirmation" />
         </div>
 
         <div>
             <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" style="font-weight: 600; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;" />
-            <div class="position-relative">
-                <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="form-control pe-5" style="width: 100%;" autocomplete="new-password" />
-                <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('update_password_password_confirmation', this)">
-                    <i class="far fa-eye"></i>
-                </button>
-            </div>
+            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="form-control" style="width: 100%;" autocomplete="new-password" />
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
         </div>
 

@@ -80,24 +80,14 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">🔄 Password</label>
-                                    <div class="position-relative">
-                                        <x-text-input id="admin_create_password" class="form-control pe-5" type="password" name="password" placeholder="Masukkan password" required />
-                                        <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('admin_create_password', this)">
-                                            <i class="far fa-eye"></i>
-                                        </button>
-                                    </div>
+                                    <x-text-input id="admin_create_password" class="form-control" type="password" name="password" placeholder="Masukkan password" required />
                                     @error('password')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label fw-semibold">✅ Konfirmasi Password</label>
-                                    <div class="position-relative">
-                                        <x-text-input id="admin_create_password_confirmation" class="form-control pe-5" type="password" name="password_confirmation" placeholder="Ulangi password" required />
-                                        <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('admin_create_password_confirmation', this)">
-                                            <i class="far fa-eye"></i>
-                                        </button>
-                                    </div>
+                                    <x-text-input id="admin_create_password_confirmation" class="form-control" type="password" name="password_confirmation" placeholder="Ulangi password" required />
                                     @error('password_confirmation')
                                         <small class="text-danger">{{ $message }}</small>
                                     @enderror
