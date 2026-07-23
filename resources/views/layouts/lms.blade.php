@@ -896,6 +896,21 @@
         setInterval(pollNotifications, 30000);
     </script>
     @endauth
+
+    <script>
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const icon = button.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.className = 'far fa-eye-slash';
+            } else {
+                input.type = 'password';
+                if (icon) icon.className = 'far fa-eye';
+            }
+        }
+    </script>
 </body>
 </html>
 

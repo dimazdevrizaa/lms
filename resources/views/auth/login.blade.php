@@ -37,15 +37,21 @@
         <!-- Password -->
         <div class="form-group">
             <label for="password" class="form-label">{{ __('Password') }}</label>
-            <input 
-                id="password" 
-                class="form-input"
-                type="password"
-                name="password"
-                required 
-                autocomplete="current-password"
-                placeholder="Masukkan password Anda"
-            />
+            <div style="position: relative;">
+                <input 
+                    id="password" 
+                    class="form-input"
+                    type="password"
+                    name="password"
+                    required 
+                    autocomplete="current-password"
+                    placeholder="Masukkan password Anda"
+                    style="padding-right: 40px;"
+                />
+                <button type="button" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; cursor: pointer; padding: 4px;" onclick="togglePasswordVisibility('password', this)">
+                    <i class="far fa-eye"></i>
+                </button>
+            </div>
             @if ($errors->has('password'))
                 <div class="form-error">
                     @foreach ($errors->get('password') as $message)

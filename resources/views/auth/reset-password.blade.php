@@ -37,15 +37,21 @@
         <!-- Password -->
         <div class="form-group">
             <label for="password" class="form-label">{{ __('Password Baru') }}</label>
-            <input 
-                id="password" 
-                class="form-input"
-                type="password"
-                name="password"
-                required 
-                autocomplete="new-password"
-                placeholder="Masukkan password baru"
-            />
+            <div style="position: relative;">
+                <input 
+                    id="password" 
+                    class="form-input"
+                    type="password"
+                    name="password"
+                    required 
+                    autocomplete="new-password"
+                    placeholder="Masukkan password baru"
+                    style="padding-right: 40px;"
+                />
+                <button type="button" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; cursor: pointer;" onclick="togglePasswordVisibility('password', this)">
+                    <i class="far fa-eye"></i>
+                </button>
+            </div>
             @if ($errors->has('password'))
                 <div class="form-error">
                     @foreach ($errors->get('password') as $message)
@@ -53,20 +59,27 @@
                     @endforeach
                 </div>
             @endif
+            <x-password-strength-meter inputId="password" confirmInputId="password_confirmation" />
         </div>
 
         <!-- Confirm Password -->
         <div class="form-group">
             <label for="password_confirmation" class="form-label">{{ __('Konfirmasi Password') }}</label>
-            <input 
-                id="password_confirmation" 
-                class="form-input"
-                type="password"
-                name="password_confirmation" 
-                required 
-                autocomplete="new-password"
-                placeholder="Konfirmasi password baru"
-            />
+            <div style="position: relative;">
+                <input 
+                    id="password_confirmation" 
+                    class="form-input"
+                    type="password"
+                    name="password_confirmation" 
+                    required 
+                    autocomplete="new-password"
+                    placeholder="Konfirmasi password baru"
+                    style="padding-right: 40px;"
+                />
+                <button type="button" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; cursor: pointer;" onclick="togglePasswordVisibility('password_confirmation', this)">
+                    <i class="far fa-eye"></i>
+                </button>
+            </div>
             @if ($errors->has('password_confirmation'))
                 <div class="form-error">
                     @foreach ($errors->get('password_confirmation') as $message)

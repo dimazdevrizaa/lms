@@ -19,6 +19,9 @@
         <!-- Guest CSS stylesheet -->
         <link rel="stylesheet" href="{{ asset('css/guest.css') }}">
 
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
         @stack('styles')
     </head>
     <body>
@@ -39,6 +42,20 @@
             </p>
         </div>
 
+        <script>
+            function togglePasswordVisibility(inputId, button) {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+                const icon = button.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    if (icon) icon.className = 'far fa-eye-slash';
+                } else {
+                    input.type = 'password';
+                    if (icon) icon.className = 'far fa-eye';
+                }
+            }
+        </script>
         @stack('scripts')
     </body>
 </html>
