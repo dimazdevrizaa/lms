@@ -89,7 +89,7 @@
                             <thead>
                                 <tr>
                                     <th class="ps-4 text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700;">Nama Siswa</th>
-                                    <th class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700;">NIS</th>
+                                    <th class="text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700;">NISN</th>
                                     <th class="text-center text-muted text-uppercase" style="font-size: 0.75rem; font-weight: 700; width: 140px;">Status</th>
                                 </tr>
                             </thead>
@@ -99,7 +99,7 @@
                                         <td class="ps-4">
                                             <div class="fw-bold text-dark">{{ $detail->student->user?->name ?? 'Siswa Tanpa Akun User' }}</div>
                                         </td>
-                                        <td class="text-muted">{{ $detail->student->nis }}</td>
+                                        <td class="text-muted">{{ $detail->student->nisn }}</td>
                                         <td class="text-center">
                                             @php
                                                 $badgeClass = match($detail->status) {

@@ -63,7 +63,7 @@ class UserController extends Controller
             'password' => ['required', 'string', Password::min(8)->mixedCase()->numbers(), 'confirmed'],
             'role' => ['required', 'in:admin,tatausaha,guru,siswa'],
             'nip' => ['nullable', 'string', 'max:50'],
-            'nis' => ['nullable', 'string', 'max:50'],
+            'nisn' => ['nullable', 'string', 'max:50'],
         ]);
 
         $data['password'] = bcrypt($data['password']);
@@ -85,7 +85,7 @@ class UserController extends Controller
         } elseif ($user->role === 'siswa') {
             Student::create([
                 'user_id' => $user->id,
-                'nis' => $data['nis'] ?? null,
+                'nisn' => $data['nisn'] ?? null,
             ]);
         }
 
@@ -106,7 +106,7 @@ class UserController extends Controller
             'role' => ['required', 'in:admin,tatausaha,guru,siswa'],
             'password' => ['nullable', 'string', Password::min(8)->mixedCase()->numbers(), 'confirmed'],
             'nip' => ['nullable', 'string', 'max:50'],
-            'nis' => ['nullable', 'string', 'max:50'],
+            'nisn' => ['nullable', 'string', 'max:50'],
         ]);
 
         if (! empty($data['password'])) {
@@ -115,11 +115,11 @@ class UserController extends Controller
             unset($data['password']);
         }
 
-        // role/nip/nis bukan bagian dari $fillable User — simpan dulu sebelum di-unset
+        // role/nip/nisn bukan bagian dari $fillable User — simpan dulu sebelum di-unset
         $role = $data['role'];
         $nip = $data['nip'] ?? null;
-        $nis = $data['nis'] ?? null;
-        unset($data['role'], $data['nip'], $data['nis']);
+        $nisn = $data['nisn'] ?? null;
+        unset($data['role'], $data['nip'], $data['nisn']);
 
         $user->update($data);
         $user->role = $role;
@@ -137,11 +137,11 @@ class UserController extends Controller
             }
         } elseif ($user->role === 'siswa') {
             if ($user->student) {
-                $user->student->update(['nis' => $nis]);
+                $user->student->update(['nisn' => $nisn]);
             } else {
                 Student::create([
                     'user_id' => $user->id,
-                    'nis' => $nis,
+                    'nisn' => $nisn,
                 ]);
             }
         }

@@ -59,7 +59,7 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead style="position: sticky; top: 0; background: var(--bg-card); z-index: 2; box-shadow: 0 1px 0 rgba(0,0,0,0.05);">
                                 <tr>
-                                    <th class="ps-4">NIS</th>
+                                    <th class="ps-4">NISN</th>
                                     <th>Nama</th>
                                     <th class="pe-4">Kelas</th>
                                 </tr>
@@ -67,7 +67,7 @@
                             <tbody>
                                 @forelse($students as $student)
                                     <tr>
-                                        <td class="ps-4"><code style="color: var(--primary);">{{ $student->nis }}</code></td>
+                                        <td class="ps-4"><code style="color: var(--primary);">{{ $student->nisn }}</code></td>
                                         <td><strong>{{ $student->user?->name ?? '-' }}</strong></td>
                                         <td class="pe-4">
                                             <span class="status-badge status-badge--hadir">

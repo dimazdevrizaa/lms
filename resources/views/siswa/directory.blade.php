@@ -57,7 +57,7 @@
                                     {{ $c->user->name }}
                                 </h6>
                                 <div class="small text-muted d-flex align-items-center gap-1 mb-1">
-                                    <i class="fas fa-id-card text-success" style="width: 14px;"></i> NIS: {{ $c->nis }}
+                                    <i class="fas fa-id-card text-success" style="width: 14px;"></i> NISN: {{ $c->nisn }}
                                 </div>
                                 <div class="small text-muted d-flex align-items-center gap-1">
                                     <i class="fas fa-phone text-success" style="width: 14px;"></i> {{ $c->phone ?? 'Tidak ada kontak' }}

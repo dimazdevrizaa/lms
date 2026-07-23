@@ -56,10 +56,10 @@
                         @endif
 
                         @if($user->role === 'siswa')
-                        <div class="mb-4" id="nisField">
-                            <label class="form-label fw-semibold">🆔 NIS (Nomor Induk Siswa)</label>
-                            <input class="form-control" type="text" name="nis" value="{{ old('nis', $user->student?->nis) }}" placeholder="Masukkan NIS siswa">
-                            @error('nis')
+                        <div class="mb-4" id="nisnField">
+                            <label class="form-label fw-semibold">🆔 NISN (Nomor Induk Siswa Nasional)</label>
+                            <input class="form-control" type="text" name="nisn" value="{{ old('nisn', $user->student?->nisn) }}" placeholder="Masukkan NISN siswa">
+                            @error('nisn')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -90,10 +90,10 @@
         document.getElementById('roleSelect').addEventListener('change', function() {
             const role = this.value;
             const nipField = document.getElementById('nipField');
-            const nisField = document.getElementById('nisField');
+            const nisnField = document.getElementById('nisnField');
             
             if (nipField) nipField.style.display = role === 'guru' ? 'block' : 'none';
-            if (nisField) nisField.style.display = role === 'siswa' ? 'block' : 'none';
+            if (nisnField) nisnField.style.display = role === 'siswa' ? 'block' : 'none';
         });
     </script>
 @endsection

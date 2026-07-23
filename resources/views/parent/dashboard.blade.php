@@ -32,7 +32,7 @@
                                 Kelas: <strong>{{ $student->schoolClass?->name ?? '-' }}</strong>
                                 <span class="d-none d-sm-inline mx-1">&middot;</span>
                                 <br class="d-sm-none">
-                                NIS: <strong>{{ $student->nis }}</strong>
+                                NISN: <strong>{{ $student->nisn }}</strong>
                                 <span class="d-none d-sm-inline mx-1">&middot;</span>
                                 <br class="d-sm-none">
                                 Tahun Ajaran: <strong>{{ $student->schoolClass?->academicYear?->name ?? '-' }}</strong>

@@ -36,8 +36,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">NIS</label>
-                    <input class="form-control" name="nis" value="{{ old('nis') }}" required>
+                    <label class="form-label fw-semibold">NISN</label>
+                    <input class="form-control" name="nisn" value="{{ old('nisn') }}" required>
                 </div>
 
                 <div class="mb-3">

@@ -261,7 +261,7 @@
                             <td class="text-muted fw-bold">${index + 1}</td>
                             <td>
                                 <div class="fw-bold text-dark">${student.user ? student.user.name : 'Siswa Tanpa Akun User'}</div>
-                                <div class="text-muted" style="font-size: 0.8rem;">NIS: ${student.nis}</div>
+                                <div class="text-muted" style="font-size: 0.8rem;">NISN: ${student.nisn}</div>
                                 <div class="mt-2 d-flex align-items-center flex-wrap gap-1">
                                     ${renderStats(student.id)}
                                 </div>

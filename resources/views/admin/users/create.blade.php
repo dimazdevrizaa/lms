@@ -66,11 +66,11 @@
                             @enderror
                         </div>
 
-                        <!-- NIS (untuk siswa) -->
-                        <div class="mb-4" id="nisField" style="display: none;">
-                            <label class="form-label fw-semibold">🆔 NIS (Nomor Induk Siswa)</label>
-                            <input class="form-control" type="text" name="nis" value="{{ old('nis') }}" placeholder="Masukkan NIS siswa">
-                            @error('nis')
+                        <!-- NISN (untuk siswa) -->
+                        <div class="mb-4" id="nisnField" style="display: none;">
+                            <label class="form-label fw-semibold">🆔 NISN (Nomor Induk Siswa Nasional)</label>
+                            <input class="form-control" type="text" name="nisn" value="{{ old('nisn') }}" placeholder="Masukkan NISN siswa">
+                            @error('nisn')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>

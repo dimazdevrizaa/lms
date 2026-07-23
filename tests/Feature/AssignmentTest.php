@@ -137,7 +137,7 @@ class AssignmentTest extends TestCase
         $studentUser = User::factory()->create(['role' => 'siswa']);
         $student = Student::create([
             'user_id' => $studentUser->id,
-            'nis' => '111222',
+            'nisn' => '111222',
             'class_id' => $class->id,
         ]);
 

@@ -333,7 +333,7 @@
                 <thead>
                     <tr>
                         <th class="no-col">No</th>
-                        <th>NIS</th>
+                        <th>NISN</th>
                         <th>Nama Siswa</th>
                         <th>Kelas</th>
                     </tr>
@@ -342,7 +342,7 @@
                     @foreach($students as $student)
                         <tr>
                             <td class="no-col">{{ $loop->iteration }}</td>
-                            <td><code>{{ $student->nis }}</code></td>
+                            <td><code>{{ $student->nisn }}</code></td>
                             <td><strong>{{ $student->user?->name ?? '-' }}</strong></td>
                             <td>{{ $student->schoolClass?->name ?? '-' }}</td>
                         </tr>

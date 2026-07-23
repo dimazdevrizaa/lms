@@ -173,7 +173,7 @@
                             <tr>
                                 <td>
                                     <div><strong>{{ $submission->student?->user?->name ?? 'Siswa' }}</strong></div>
-                                    <small style="color: var(--text-muted);">NIS: {{ $submission->student?->nis ?? '-' }}</small>
+                                    <small style="color: var(--text-muted);">NISN: {{ $submission->student?->nisn ?? '-' }}</small>
                                 </td>
                                 <td>
                                     <small>{{ $submission->submitted_at ? \Carbon\Carbon::parse($submission->submitted_at)->format('d/m/Y H:i') : '-' }}</small>
@@ -386,7 +386,7 @@
                             <tr>
                                 <td>
                                     <div><strong>{{ $submission->student?->user?->name ?? 'Siswa' }}</strong></div>
-                                    <small style="color: var(--text-muted);">NIS: {{ $submission->student?->nis ?? '-' }}</small>
+                                    <small style="color: var(--text-muted);">NISN: {{ $submission->student?->nisn ?? '-' }}</small>
                                 </td>
                                 <td>
                                     <small>{{ $submission->submitted_at ? \Carbon\Carbon::parse($submission->submitted_at)->format('d/m/Y H:i') : '-' }}</small>

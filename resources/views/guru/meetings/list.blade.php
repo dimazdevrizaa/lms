@@ -20,7 +20,10 @@
                     <p class="text-muted mb-0">Kelola pertemuan kelas <strong>{{ $currentClass->name }}</strong> — <strong>{{ $currentSubject->name }}</strong></p>
                 </div>
             </div>
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ route('guru.classroom.show', $currentClass) }}" class="btn btn-outline-primary-theme px-3 py-2 d-flex align-items-center gap-2" style="border-radius: 12px; font-weight: 600;">
+                    <i class="fas fa-users"></i> Daftar Siswa
+                </a>
                 <a href="{{ route('forum.index', ['classSlug' => $currentClass->slug, 'subjectSlug' => $currentSubject->slug]) }}" class="btn btn-outline-primary-theme px-4 py-2 d-flex align-items-center gap-2" style="border-radius: 12px; font-weight: 600;">
                     <i class="fas fa-comments"></i> Forum Diskusi
                 </a>

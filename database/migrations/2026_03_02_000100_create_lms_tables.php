@@ -42,7 +42,7 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('nis')->unique();
+            $table->string('nisn')->unique();
             $table->string('phone')->nullable();
             $table->foreignId('class_id')->nullable()->constrained('classes')->nullOnDelete();
             $table->timestamps();

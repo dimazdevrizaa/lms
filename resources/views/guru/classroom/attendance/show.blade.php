@@ -90,7 +90,7 @@
                         <tr>
                             <th class="ps-4" style="width: 80px;">No</th>
                             <th>Nama Siswa</th>
-                            <th>NIS</th>
+                            <th>NISN</th>
                             <th class="text-center" style="width: 200px;">Status Kehadiran</th>
                         </tr>
                     </thead>
@@ -102,7 +102,7 @@
                                     <span class="fw-bold text-dark">{{ $detail->student->user?->name }}</span>
                                 </td>
                                 <td>
-                                    <span class="text-muted">{{ $detail->student->nis }}</span>
+                                    <span class="text-muted">{{ $detail->student->nisn }}</span>
                                 </td>
                                 <td class="text-center d-flex justify-content-center">
                                     @php

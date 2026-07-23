@@ -34,7 +34,7 @@
                         <thead>
                             <tr>
                                 <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">No.</th>
-                                <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">🆔 NIS</th>
+                                <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">🆔 NISN</th>
                                 <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">👤 Nama</th>
                                 <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">📞 No. HP</th>
                                 <th class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; border-bottom: 1px solid rgba(37, 103, 30, 0.08);">🔑 Akses Ortu</th>
@@ -46,7 +46,7 @@
                                     <td><strong class="text-dark">{{ $index + 1 }}</strong></td>
                                     <td>
                                         <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-1 fw-bold" style="border-radius: 8px; font-size: 0.75rem;">
-                                            {{ $student->nis }}
+                                            {{ $student->nisn }}
                                         </span>
                                     </td>
                                     <td>
@@ -55,25 +55,29 @@
                                     <td>
                                         <span class="text-muted" style="font-size: 0.85rem;">{{ $student->phone ?? '-' }}</span>
                                     </td>
-                                    <td>
+                                     <td>
                                         <div class="d-flex align-items-center gap-2">
                                             @if ($student->parent_code)
                                                 <code class="bg-light px-2 py-1 rounded text-dark fw-bold border" style="font-size: 0.8rem; border-radius: 6px;">{{ substr($student->parent_code, 0, 2) . str_repeat('*', max(strlen($student->parent_code) - 2, 4)) }}</code>
-                                                <form action="{{ route('parent.code.reveal', $student) }}" method="POST" class="d-inline" target="_blank">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-sm p-1 border-0 text-primary" title="Lihat Kode di Tab Baru" style="background: transparent;">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                </form>
+                                                @if(!empty($isHomeroomTeacher) || auth()->user()->role === 'admin')
+                                                    <form action="{{ route('parent.code.reveal', $student) }}" method="POST" class="d-inline" target="_blank">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-sm p-1 border-0 text-primary" title="Lihat Kode di Tab Baru" style="background: transparent;">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             @else
                                                 <span class="text-muted small">-</span>
                                             @endif
-                                            <form action="{{ route('parent.code.regenerate', $student) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ $student->parent_code ? 'Kode akses lama akan tidak berlaku lagi. Lanjutkan?' : 'Buat kode akses baru. Lanjutkan?' }}')">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm p-1 border-0 text-warning" title="{{ $student->parent_code ? 'Perbarui Kode Ortu' : 'Buat Kode Ortu' }}">
-                                                    <i class="fas fa-sync-alt"></i>
-                                                </button>
-                                            </form>
+                                            @if(!empty($isHomeroomTeacher) || auth()->user()->role === 'admin')
+                                                <form action="{{ route('parent.code.regenerate', $student) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ $student->parent_code ? 'Kode akses lama akan tidak berlaku lagi. Lanjutkan?' : 'Buat kode akses baru. Lanjutkan?' }}')">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm p-1 border-0 text-warning" title="{{ $student->parent_code ? 'Perbarui Kode Ortu' : 'Buat Kode Ortu' }}">
+                                                        <i class="fas fa-sync-alt"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

@@ -48,9 +48,9 @@
                             <div class="p-3 border rounded-3 h-100 d-flex justify-content-between align-items-center bg-light-subtle">
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="d-flex flex-column align-items-center justify-content-center bg-white border text-center p-2 rounded-2" style="min-width: 90px; height: 60px;">
-                                        <small class="text-success fw-bold" style="font-size: 0.7rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ substr($schedule->timeSlot->start_time, 0, 5) }}</small>
+                                        <small class="text-success fw-bold" style="font-size: 0.7rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ substr($schedule->start_time ?? $schedule->timeSlot?->start_time ?? '', 0, 5) }}</small>
                                         <div style="width: 15px; height: 1px; background-color: #dee2e6; margin: 2px 0;"></div>
-                                        <small class="text-muted" style="font-size: 0.7rem;">{{ substr($schedule->timeSlot->end_time, 0, 5) }}</small>
+                                        <small class="text-muted" style="font-size: 0.7rem;">{{ substr($schedule->end_time ?? $schedule->timeSlot?->end_time ?? '', 0, 5) }}</small>
                                     </div>
                                     <div>
                                         <span class="fw-bold text-dark d-block" style="font-size: 0.95rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $schedule->subject->name ?? $schedule->activity ?? '-' }}</span>
@@ -62,7 +62,7 @@
                                     </div>
                                 </div>
                                 <span class="badge bg-success-subtle text-success-theme rounded-pill" style="font-size: 0.65rem;">
-                                    {{ $schedule->timeSlot->label }}
+                                    {{ $schedule->slot_label ?? $schedule->timeSlot?->label ?? '' }}
                                 </span>
                             </div>
                         </div>
@@ -197,22 +197,6 @@
                     </div>
                 </div>
             </div>
-
-            @if(Auth::user()->student)
-                <!-- Parent Access Code Card -->
-                <div class="content-card mb-4" style="background: linear-gradient(135deg, var(--accent-soft), #FFFBE2) !important; border: 1px solid rgba(249, 168, 37, 0.15) !important;">
-                    <div class="content-card-body pt-4">
-                        <h6 class="fw-bold mb-2" style="color: #B26A00;"><i class="fas fa-user-shield me-2"></i> Akses Orang Tua</h6>
-                        <p class="small text-muted mb-3">Kode akses tidak ditampilkan di dashboard siswa. Jika perlu reset atau pembagian ulang, hubungi wali kelas atau tata usaha.</p>
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <code class="bg-white border px-3 py-2 rounded text-dark fw-bold fs-6 flex-grow-1 text-center" style="letter-spacing: 2px; border-color: rgba(249, 168, 37, 0.2) !important;">REDACTED</code>
-                            <button class="btn btn-outline-secondary btn-sm px-3 py-2" type="button" disabled aria-disabled="true">
-                                Terkelola
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endif
         </div>
     </div>
 @endsection

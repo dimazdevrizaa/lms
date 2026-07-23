@@ -103,12 +103,12 @@ class DemoDataSeeder extends Seeder
 
         // 5. Siswa
         $studentsData = [
-            ['name' => 'Andi Pratama', 'email' => 'andi@sma15padang.test', 'nis' => '21001', 'class' => 'XI IPA 1'],
-            ['name' => 'Budi Setiawan', 'email' => 'budi.s@sma15padang.test', 'nis' => '21002', 'class' => 'XI IPA 1'],
-            ['name' => 'Cika Aurelia', 'email' => 'cika@sma15padang.test', 'nis' => '21003', 'class' => 'XI IPA 2'],
-            ['name' => 'Deni Ramadhan', 'email' => 'deni@sma15padang.test', 'nis' => '21004', 'class' => 'XI IPA 2'],
-            ['name' => 'Eka Putri', 'email' => 'eka@sma15padang.test', 'nis' => '22001', 'class' => 'X IPS 1'],
-            ['name' => 'Fahri Hamzah', 'email' => 'fahri@sma15padang.test', 'nis' => '22002', 'class' => 'X IPS 1'],
+            ['name' => 'Andi Pratama', 'email' => 'andi@sma15padang.test', 'nisn' => '21001', 'class' => 'XI IPA 1'],
+            ['name' => 'Budi Setiawan', 'email' => 'budi.s@sma15padang.test', 'nisn' => '21002', 'class' => 'XI IPA 1'],
+            ['name' => 'Cika Aurelia', 'email' => 'cika@sma15padang.test', 'nisn' => '21003', 'class' => 'XI IPA 2'],
+            ['name' => 'Deni Ramadhan', 'email' => 'deni@sma15padang.test', 'nisn' => '21004', 'class' => 'XI IPA 2'],
+            ['name' => 'Eka Putri', 'email' => 'eka@sma15padang.test', 'nisn' => '22001', 'class' => 'X IPS 1'],
+            ['name' => 'Fahri Hamzah', 'email' => 'fahri@sma15padang.test', 'nisn' => '22002', 'class' => 'X IPS 1'],
         ];
 
         foreach ($studentsData as $sData) {
@@ -120,7 +120,7 @@ class DemoDataSeeder extends Seeder
             Student::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'nis' => $sData['nis'],
+                    'nisn' => $sData['nisn'],
                     'phone' => '0878' . rand(10000000, 99999999),
                     'class_id' => $classes[$sData['class']]->id
                 ]

@@ -55,8 +55,8 @@
         @if($user->role === 'siswa' && $user->student)
             <div class="row">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <x-input-label :value="__('NIS (Nomor Induk Siswa)')" style="font-weight: 600; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;" />
-                    <x-text-input type="text" class="form-control" :value="$user->student->nis" disabled />
+                    <x-input-label :value="__('NISN (Nomor Induk Siswa Nasional)')" style="font-weight: 600; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;" />
+                    <x-text-input type="text" class="form-control" :value="$user->student->nisn" disabled />
                 </div>
                 <div class="col-md-6">
                     <x-input-label :value="__('Kelas')" style="font-weight: 600; color: var(--primary); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem;" />

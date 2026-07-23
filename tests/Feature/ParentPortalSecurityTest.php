@@ -20,7 +20,7 @@ class ParentPortalSecurityTest extends TestCase
 
         $student = Student::create([
             'user_id' => $user->id,
-            'nis' => 'NIS-10001',
+            'nisn' => 'NIS-10001',
             'phone' => null,
             'class_id' => null,
             'parent_code' => 'ORTU-ABCDEF1234',

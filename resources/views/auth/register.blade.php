@@ -56,9 +56,9 @@
             />
         </div>
 
-        <!-- Identifier (NIS or NIP/NUPTK) -->
+        <!-- Identifier (NISN or NIP/NUPTK) -->
         <div class="form-group">
-            <label for="identifier" class="form-label" id="identifierLabel">{{ __('NIS (Nomor Induk Siswa)') }}</label>
+            <label for="identifier" class="form-label" id="identifierLabel">{{ __('NISN (Nomor Induk Siswa Nasional)') }}</label>
             <input 
                 id="identifier" 
                 class="form-input" 
@@ -128,8 +128,8 @@
                 label.textContent = "{{ __('NUPTK / NIP') }}";
                 input.placeholder = "{{ __('Masukkan NUPTK atau NIP Anda') }}";
             } else {
-                label.textContent = "{{ __('NIS (Nomor Induk Siswa)') }}";
-                input.placeholder = "{{ __('Masukkan NIS Anda') }}";
+                label.textContent = "{{ __('NISN (Nomor Induk Siswa Nasional)') }}";
+                input.placeholder = "{{ __('Masukkan NISN Anda') }}";
             }
         }
         document.addEventListener('DOMContentLoaded', toggleIdentifierLabel);

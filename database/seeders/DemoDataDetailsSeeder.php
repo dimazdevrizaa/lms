@@ -30,7 +30,7 @@ class DemoDataDetailsSeeder extends Seeder
         }
 
         $students = Student::where('class_id', $class->id)->get();
-        $andi = $students->where('nis', '21001')->first();
+        $andi = $students->where('nisn', '21001')->first();
 
         if (!$andi) {
             $this->command->error('Andi Pratama not found.');

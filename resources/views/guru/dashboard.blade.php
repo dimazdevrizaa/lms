@@ -173,7 +173,10 @@
                                                 <small style="color: var(--text-muted);">{{ $class->students_count }} siswa</small>
                                             </div>
                                         </div>
-                                        <a href="{{ route('guru.meetings.index', ['class_id' => $class->id]) }}" class="btn btn-sm btn-outline-secondary-theme" style="border-radius: 100px;">Buka Ruang</a>
+                                         <div class="d-flex gap-1">
+                                             <a href="{{ route('guru.classroom.show', $class) }}" class="btn btn-sm btn-outline-primary-theme" style="border-radius: 100px;">Data Siswa</a>
+                                             <a href="{{ route('guru.meetings.index', ['class_id' => $class->id]) }}" class="btn btn-sm btn-outline-secondary-theme" style="border-radius: 100px;">Buka Ruang</a>
+                                         </div>
                                     </div>
                                 @endforeach
                             </div>

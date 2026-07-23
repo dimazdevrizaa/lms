@@ -24,7 +24,7 @@ class StudentController extends Controller
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function($q) use ($search) {
-                $q->where('students.nis', 'like', "%{$search}%")
+                $q->where('students.nisn', 'like', "%{$search}%")
                   ->orWhere('users.name', 'like', "%{$search}%")
                   ->orWhere('users.email', 'like', "%{$search}%");
             });
@@ -78,7 +78,7 @@ class StudentController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'nis' => ['required', 'string', 'max:50', 'unique:students,nis'],
+            'nisn' => ['required', 'string', 'max:50', 'unique:students,nisn'],
             'class_id' => ['nullable', 'exists:classes,id'],
         ]);
 
@@ -94,7 +94,7 @@ class StudentController extends Controller
 
         Student::create([
             'user_id' => $user->id,
-            'nis' => $data['nis'],
+            'nisn' => $data['nisn'],
             'class_id' => $data['class_id'] ?? null,
         ]);
 
@@ -114,7 +114,7 @@ class StudentController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $student->user_id],
-            'nis' => ['required', 'string', 'max:50', 'unique:students,nis,' . $student->id],
+            'nisn' => ['required', 'string', 'max:50', 'unique:students,nisn,' . $student->id],
             'class_id' => ['nullable', 'exists:classes,id'],
             'password' => ['nullable', 'string', Password::min(8)->mixedCase()->numbers()],
         ]);
@@ -131,7 +131,7 @@ class StudentController extends Controller
         $student->user->update($userData);
 
         $student->update([
-            'nis' => $data['nis'],
+            'nisn' => $data['nisn'],
             'class_id' => $data['class_id'] ?? null,
         ]);
 

@@ -21,28 +21,62 @@ class ClassroomController extends Controller
         return Teacher::where('user_id', auth()->id())->firstOrFail();
     }
 
-    // DAFTAR KELAS YANG DIAMPU SEBAGAI WALI KELAS
+    private function isTeacherOfClass(Teacher $teacher, SchoolClass $class): bool
+    {
+        if ($class->homeroom_teacher_id === $teacher->id) {
+            return true;
+        }
+
+        if (\App\Models\ClassSubjectTeacher::where('teacher_id', $teacher->id)->where('class_id', $class->id)->exists()) {
+            return true;
+        }
+
+        if (\App\Models\Schedule::where('teacher_id', $teacher->id)->where('class_id', $class->id)->exists()) {
+            return true;
+        }
+
+        if (\App\Models\Meeting::where('teacher_id', $teacher->id)->where('class_id', $class->id)->exists()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // DAFTAR KELAS YANG DIAMPU SEBAGAI WALI KELAS DAN GURU MAPEL
     public function index(): View
     {
         $teacher = $this->getTeacher();
         $classes = $teacher->homeroomClasses()->get();
+        $homeroomClasses = $classes;
 
-        return view('guru.classroom.index', compact('classes'));
+        $assignedClassIds = \App\Models\ClassSubjectTeacher::where('teacher_id', $teacher->id)->pluck('class_id');
+        $scheduleClassIds = \App\Models\Schedule::where('teacher_id', $teacher->id)->pluck('class_id');
+        $meetingClassIds = \App\Models\Meeting::where('teacher_id', $teacher->id)->pluck('class_id');
+
+        $allTaughtClassIds = $assignedClassIds->concat($scheduleClassIds)->concat($meetingClassIds)->unique();
+        $homeroomClassIds = $homeroomClasses->pluck('id');
+        $teachingOnlyClassIds = $allTaughtClassIds->diff($homeroomClassIds);
+
+        $teachingClasses = SchoolClass::whereIn('id', $teachingOnlyClassIds)->withCount('students')->orderBy('name')->get();
+
+        return view('guru.classroom.index', compact('classes', 'homeroomClasses', 'teachingClasses'));
     }
 
     // DETAIL KELAS DAN DATA SISWA
     public function show(SchoolClass $class): View
     {
         $teacher = $this->getTeacher();
-        
-        // Pastikan guru ini adalah wali kelas
-        if ($class->homeroom_teacher_id !== $teacher->id) {
-            abort(403, 'Unauthorized');
+
+        if (! $this->isTeacherOfClass($teacher, $class)) {
+            abort(403, 'Anda tidak memiliki akses untuk melihat data siswa kelas ini.');
         }
 
-        $students = $class->students()->with('user')->orderBy('id')->get();
+        $isHomeroomTeacher = ($class->homeroom_teacher_id === $teacher->id);
+        $students = $class->students()->with('user')->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
 
-        return view('guru.classroom.show', compact('class', 'students'));
+        return view('guru.classroom.show', compact('class', 'students', 'isHomeroomTeacher'));
     }
 
     // ABSENSI KELAS
@@ -54,7 +88,9 @@ class ClassroomController extends Controller
         }
 
         $attendances = $class->classAttendances()->orderByDesc('date')->paginate(10);
-        $students = $class->students()->with('user')->get();
+        $students = $class->students()->with('user')->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
 
         return view('guru.classroom.attendance.index', compact('class', 'attendances', 'students'));
     }
@@ -66,7 +102,9 @@ class ClassroomController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $students = $class->students()->with('user')->orderBy('id')->get();
+        $students = $class->students()->with('user')->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
         $today = now()->toDateString();
 
         return view('guru.classroom.attendance.create', compact('class', 'students', 'today'));
@@ -110,6 +148,8 @@ class ClassroomController extends Controller
         }
 
         $attendance->load(['details.student.user']);
+        $sortedDetails = $attendance->details->sortBy(fn($d) => strtolower($d->student?->user?->name ?? ''), SORT_NATURAL)->values();
+        $attendance->setRelation('details', $sortedDetails);
 
         return view('guru.classroom.attendance.show', compact('class', 'attendance'));
     }
@@ -122,7 +162,9 @@ class ClassroomController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $students = $class->students()->with('user')->get();
+        $students = $class->students()->with('user')->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
         $behaviors = $class->behaviorRecords()->with('student.user')->orderByDesc('date')->paginate(15);
 
         return view('guru.classroom.behavior.index', compact('class', 'students', 'behaviors'));
@@ -135,7 +177,9 @@ class ClassroomController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $students = $class->students()->with('user')->orderBy('id')->get();
+        $students = $class->students()->with('user')->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
 
         return view('guru.classroom.behavior.create', compact('class', 'students'));
     }
@@ -185,7 +229,9 @@ class ClassroomController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $students = $class->students()->with('user', 'grades')->orderBy('id')->get();
+        $students = $class->students()->with('user', 'grades')->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
 
         return view('guru.classroom.grades.index', compact('class', 'students'));
     }
@@ -197,7 +243,9 @@ class ClassroomController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $students = $class->students()->with('user')->orderBy('id')->get();
+        $students = $class->students()->with('user')->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
 
         return view('guru.classroom.grades.input', compact('class', 'students'));
     }

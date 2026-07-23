@@ -13,7 +13,7 @@
             <form action="{{ route('tatausaha.students.index') }}" method="GET" class="row g-2 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label small fw-bold">Cari Siswa</label>
-                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Nama, email, atau NIS..." value="{{ request('search') }}">
+                    <input type="text" name="search" class="form-control form-control-sm" placeholder="Nama, email, atau NISN..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label small fw-bold">Filter Jurusan</label>
@@ -58,7 +58,7 @@
             <table class="table table-striped mb-0">
                 <thead>
                 <tr>
-                    <th>NIS</th>
+                    <th>NISN</th>
                     <th>Nama</th>
                     <th>Jurusan</th>
                     <th>Kelas</th>
@@ -69,7 +69,7 @@
                 <tbody>
                 @forelse($students as $student)
                     <tr>
-                        <td>{{ $student->nis }}</td>
+                        <td>{{ $student->nisn }}</td>
                         <td>{{ $student->user?->name ?? '-' }}</td>
                         <td>
                             <span class="badge {{ $student->schoolClass?->major == 'IPA' ? 'bg-primary' : ($student->schoolClass?->major == 'IPS' ? 'bg-warning text-dark' : 'bg-secondary') }}">

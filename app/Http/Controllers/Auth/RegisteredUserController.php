@@ -48,9 +48,9 @@ class RegisteredUserController extends Controller
         $user->save();
 
         if ($request->role === 'siswa') {
-            // Check unique NIS
+            // Check unique NISN
             $request->validate([
-                'identifier' => ['unique:students,nis'],
+                'identifier' => ['unique:students,nisn'],
             ]);
             // ponytail: auto register to 'Kelas Digital' with minimal DB queries
             $kelasDigital = \App\Models\SchoolClass::firstOrCreate(
@@ -62,7 +62,7 @@ class RegisteredUserController extends Controller
             );
             Student::create([
                 'user_id' => $user->id,
-                'nis' => $request->identifier,
+                'nisn' => $request->identifier,
                 'class_id' => $kelasDigital->id,
             ]);
         } else {

@@ -85,7 +85,7 @@ class DatabaseSeeder extends Seeder
 
         Student::updateOrCreate(
             ['user_id' => $siswaUser->id],
-            ['nis' => '1234567890', 'phone' => '081234567892', 'class_id' => 1],
+            ['nisn' => '1234567890', 'phone' => '081234567892', 'class_id' => 1],
         );
     }
 }
