@@ -19,14 +19,14 @@
     <!-- TomSelect CSS for beautiful dropdowns -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
     <!-- Main LMS CSS stylesheet -->
-    <link rel="stylesheet" href="{{ asset('css/lms.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/lms.css') }}?v={{ filemtime(public_path('css/lms.css')) }}">
     <!-- KaTeX CSS for rendering math formulas -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     @stack('styles')
 </head>
 <body class="{{ session()->has('impersonate_original_id') ? 'has-impersonate-banner' : '' }}">
     @if(session()->has('impersonate_original_id'))
-        <div class="impersonate-banner d-flex align-items-center justify-content-between px-3 px-md-4 py-2 text-white">
+        <div class="impersonate-banner d-flex align-items-center justify-content-between px-3 px-md-4 py-2 text-white" style="background: linear-gradient(135deg, #e65100, #ff8f00) !important; color: #ffffff !important;">
             <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-user-secret fa-lg text-white"></i>
                 <span>Anda sedang login sebagai <strong>{{ auth()->user()->name }}</strong> (Role: {{ strtoupper(auth()->user()->role) }}). Anda melihat data persis seperti yang mereka lihat.</span>

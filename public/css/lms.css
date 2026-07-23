@@ -91,7 +91,8 @@ body::before {
 
 /* ── Impersonate Banner ── */
 .impersonate-banner {
-    background: linear-gradient(135deg, #e65100, #ff8f00);
+    background: linear-gradient(135deg, #e65100, #ff8f00) !important;
+    color: #ffffff !important;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 0.9rem;
     font-weight: 500;
