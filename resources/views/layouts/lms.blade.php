@@ -126,6 +126,7 @@
                     <li><a href="{{ route('admin.academic-years.index') }}" class="{{ request()->routeIs('admin.academic-years.*') ? 'active' : '' }}"><i class="fas fa-calendar"></i> Tahun Ajaran</a></li>
                     <li><a href="{{ route('admin.classes.index') }}" class="{{ request()->routeIs('admin.classes.*') ? 'active' : '' }}"><i class="fas fa-door-open"></i> Data Kelas</a></li>
                     <li><a href="{{ route('admin.subjects.index') }}" class="{{ request()->routeIs('admin.subjects.*') ? 'active' : '' }}"><i class="fas fa-book-open"></i> Mata Pelajaran</a></li>
+                    <li><a href="{{ route('admin.attendances.index') }}" class="{{ request()->routeIs('admin.attendances.*') ? 'active' : '' }}"><i class="fas fa-clipboard-check"></i> Presensi</a></li>
                     
                     <li class="sidebar-header">Sistem</li>
                     <li><a href="{{ route('admin.monitoring.index') }}" class="{{ request()->routeIs('admin.monitoring.*') ? 'active' : '' }}"><i class="fas fa-eye"></i> Monitoring</a></li>

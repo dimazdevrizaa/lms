@@ -20,6 +20,7 @@ use App\Http\Controllers\TataUsaha\ReportController;
 use App\Http\Controllers\TataUsaha\StudentController;
 use App\Http\Controllers\TataUsaha\TeacherController;
 use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
 use App\Http\Controllers\TataUsaha\TeachingAssignmentController;
 use App\Http\Controllers\TataUsaha\ScheduleController;
 use App\Http\Controllers\Admin\ImpersonationController;
@@ -78,6 +79,16 @@ Route::middleware('auth')->group(function () {
         Route::resource('academic-years', AcademicYearController::class)->except(['show']);
         Route::resource('classes', AdminClassController::class)->except(['show']);
         Route::resource('subjects', SubjectController::class);
+
+        // PRESENSI ADMIN
+        Route::prefix('attendances')->name('attendances.')->group(function () {
+            Route::get('/', [AdminAttendanceController::class, 'index'])->name('index');
+            Route::get('/classes/{class}', [AdminAttendanceController::class, 'showClass'])->name('showClass');
+            Route::get('/classes/{class}/subjects/{subject}', [AdminAttendanceController::class, 'showSubject'])->name('showSubject');
+            Route::get('/meetings/{meeting}/edit', [AdminAttendanceController::class, 'editMeetingAttendance'])->name('editMeeting');
+            Route::post('/meetings/{meeting}', [AdminAttendanceController::class, 'updateMeetingAttendance'])->name('updateMeeting');
+        });
+
         Route::get('monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
     });
 
