@@ -144,7 +144,7 @@ body.has-impersonate-banner .main-wrapper {
 
 @media (max-width: 576px) {
     .navbar .dropdown-menu-end {
-        right: -6px !important;
+        right: 12px !important;
         top: calc(100% + 10px) !important;
     }
 }
