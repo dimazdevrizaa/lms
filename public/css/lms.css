@@ -143,8 +143,11 @@ body.has-impersonate-banner .main-wrapper {
 }
 
 @media (max-width: 576px) {
+    .navbar {
+        padding: 0.75rem 1rem !important;
+    }
     .navbar .dropdown-menu-end {
-        right: 12px !important;
+        right: 0 !important;
         top: calc(100% + 10px) !important;
     }
 }

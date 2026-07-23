@@ -50,7 +50,8 @@
             <a class="navbar-brand" href="{{ url('/') }}">
                 {{-- ponytail: school logo replacement --}}
                 <img src="{{ asset('images/logo.jpg') }}" alt="Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover; background: #fff; padding: 2px;">
-                <span>LMS SMA 15&nbsp;Padang</span>
+                <span class="d-none d-sm-inline">LMS SMA 15&nbsp;Padang</span>
+                <span class="d-inline d-sm-none fw-bold ms-1" style="font-size: 0.95rem;">LMS</span>
             </a>
         </div>
 
