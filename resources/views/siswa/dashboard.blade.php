@@ -47,22 +47,22 @@
                         <div class="col">
                             <div class="p-3 border rounded-3 h-100 d-flex justify-content-between align-items-center bg-light-subtle">
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="d-flex flex-column align-items-center justify-content-center bg-white border text-center p-2 rounded-2" style="min-width: 90px; height: 60px;">
-                                        <small class="text-success fw-bold" style="font-size: 0.7rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ substr($schedule->start_time ?? $schedule->timeSlot?->start_time ?? '', 0, 5) }}</small>
-                                        <div style="width: 15px; height: 1px; background-color: #dee2e6; margin: 2px 0;"></div>
-                                        <small class="text-muted" style="font-size: 0.7rem;">{{ substr($schedule->end_time ?? $schedule->timeSlot?->end_time ?? '', 0, 5) }}</small>
+                                    <div class="d-flex flex-column align-items-center justify-content-center p-2 rounded-3 text-center" style="min-width: 95px; height: 64px; background: rgba(27, 94, 32, 0.07); border: 1px solid rgba(27, 94, 32, 0.15);">
+                                        <span class="fw-bold" style="font-size: 0.88rem; color: var(--primary); font-family: 'Plus Jakarta Sans', sans-serif;">{{ substr($schedule->start_time ?? $schedule->timeSlot?->start_time ?? '', 0, 5) }}</span>
+                                        <div style="width: 18px; height: 1.5px; background-color: rgba(27, 94, 32, 0.25); margin: 2px 0;"></div>
+                                        <span class="fw-semibold" style="font-size: 0.78rem; color: var(--text-body);">{{ substr($schedule->end_time ?? $schedule->timeSlot?->end_time ?? '', 0, 5) }}</span>
                                     </div>
                                     <div>
-                                        <span class="fw-bold text-dark d-block" style="font-size: 0.95rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $schedule->subject->name ?? $schedule->activity ?? '-' }}</span>
+                                        <span class="fw-bold text-dark d-block" style="font-size: 0.98rem; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $schedule->subject->name ?? $schedule->activity ?? '-' }}</span>
                                         @if($schedule->subject)
-                                        <small class="text-muted" style="font-size: 0.75rem;">
+                                        <small class="text-muted" style="font-size: 0.8rem;">
                                             <i class="far fa-user me-1"></i> {{ $schedule->teacher->user->name ?? 'Tidak ada guru' }}
                                         </small>
                                         @endif
                                     </div>
                                 </div>
-                                <span class="badge bg-success-subtle text-success-theme rounded-pill" style="font-size: 0.65rem;">
-                                    {{ $schedule->slot_label ?? $schedule->timeSlot?->label ?? '' }}
+                                <span class="badge rounded-pill px-3 py-2 fw-bold" style="font-size: 0.78rem; background-color: rgba(27, 94, 32, 0.1); color: var(--primary); border: 1px solid rgba(27, 94, 32, 0.18);">
+                                    <i class="fas fa-clock me-1" style="font-size: 0.72rem;"></i>{{ $schedule->slot_label ?? $schedule->timeSlot?->label ?? '' }}
                                 </span>
                             </div>
                         </div>
