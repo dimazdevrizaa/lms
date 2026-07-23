@@ -69,14 +69,13 @@ class StudentDashboardController extends Controller
 
         $todaySchedules = collect();
         if ($activeYear) {
-            $todaySchedules = \App\Models\Schedule::where('class_id', $student->class_id)
+            $rawSchedules = \App\Models\Schedule::where('class_id', $student->class_id)
                 ->where('academic_year_id', $activeYear->id)
                 ->where('day', $todayDayName)
                 ->with(['timeSlot', 'subject', 'teacher.user'])
-                ->get()
-                ->sortBy(function ($schedule) {
-                    return $schedule->timeSlot->slot_order ?? 0;
-                });
+                ->get();
+
+            $todaySchedules = \App\Models\Schedule::groupConsecutiveSchedules($rawSchedules);
         }
 
         return view('siswa.dashboard', compact(
@@ -101,19 +100,23 @@ class StudentDashboardController extends Controller
 
         $schoolClass = $student->schoolClass;
 
-        // Teman Sekelas
+        // Teman Sekelas (Sorted Alphabetically A-Z)
         $classmates = Student::where('class_id', $student->class_id)
             ->where('id', '!=', $student->id)
             ->with('user')
-            ->get();
+            ->get()
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)
+            ->values();
 
         // Wali Kelas
         $homeroomTeacher = $schoolClass->homeroomTeacher;
 
-        // Guru Mapel
+        // Guru Mapel (Sorted Alphabetically A-Z by Teacher Name)
         $subjectTeachers = \App\Models\ClassSubjectTeacher::where('class_id', $student->class_id)
             ->with(['teacher.user', 'subject'])
-            ->get();
+            ->get()
+            ->sortBy(fn($t) => strtolower($t->teacher->user?->name ?? ''), SORT_NATURAL)
+            ->values();
 
         return view('siswa.directory', compact('schoolClass', 'classmates', 'homeroomTeacher', 'subjectTeachers'));
     }

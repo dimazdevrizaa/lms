@@ -82,7 +82,7 @@ class ClassroomController extends Controller
         $data = $request->validate([
             'date' => ['required', 'date'],
             'statuses' => ['required', 'array'],
-            'statuses.*' => ['required', 'in:hadir,izin,sakit,alpa'],
+            'statuses.*' => ['required', 'in:hadir,izin,sakit,alpa,cabut'],
         ]);
 
         // Cek apakah absensi untuk tanggal ini sudah ada

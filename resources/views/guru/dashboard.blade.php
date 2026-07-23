@@ -104,22 +104,32 @@
                             @foreach($todaySchedules as $schedule)
                                 <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center border-bottom">
                                     <div class="d-flex align-items-center">
-                                        <div class="p-2 rounded me-3 text-center" style="min-width: 65px; background: rgba(67,160,71,0.06); border-radius: var(--radius-sm);">
-                                            <div class="small fw-bold" style="color: var(--secondary);">{{ \Carbon\Carbon::parse($schedule->timeSlot->start_time)->format('H:i') }}</div>
-                                            <div class="small" style="color: var(--text-muted); font-size: 0.7rem;">{{ \Carbon\Carbon::parse($schedule->timeSlot->end_time)->format('H:i') }}</div>
+                                        <div class="p-2 rounded me-3 text-center" style="min-width: 75px; background: rgba(67,160,71,0.06); border-radius: var(--radius-sm);">
+                                            <div class="small fw-bold" style="color: var(--secondary);">{{ $schedule->start_time ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i') : '-' }}</div>
+                                            <div class="small" style="color: var(--text-muted); font-size: 0.7rem;">{{ $schedule->end_time ? \Carbon\Carbon::parse($schedule->end_time)->format('H:i') : '-' }}</div>
                                         </div>
                                         <div>
-                                            <h6 class="mb-1 fw-bold" style="color: var(--text-heading);">{{ $schedule->subject->name ?? '-' }}</h6>
+                                            <h6 class="mb-1 fw-bold" style="color: var(--text-heading);">{{ $schedule->subject->name ?? $schedule->activity ?? '-' }}</h6>
                                             <div class="d-flex align-items-center gap-2 small" style="color: var(--text-muted);">
-                                                <span><i class="fas fa-door-open me-1"></i> Kelas {{ $schedule->schoolClass->name ?? '-' }}</span>
-                                                <span style="opacity: 0.3;">|</span>
-                                                <span><i class="fas fa-clock me-1"></i> {{ $schedule->timeSlot->label }}</span>
+                                                @if($schedule->schoolClass)
+                                                    <span><i class="fas fa-door-open me-1"></i> Kelas {{ $schedule->schoolClass->name }}</span>
+                                                    <span style="opacity: 0.3;">|</span>
+                                                @endif
+                                                <span><i class="fas fa-clock me-1"></i> {{ $schedule->slot_label }}</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <a href="{{ route('guru.meetings.class-meetings.create', ['classSlug' => $schedule->schoolClass->slug, 'subjectSlug' => $schedule->subject->slug]) }}" class="btn btn-sm btn-outline-accent-theme" style="border-radius: var(--radius-sm);">
-                                        <i class="fas fa-plus me-1"></i> Buat Pertemuan
-                                    </a>
+                                    @if($schedule->schoolClass && $schedule->subject)
+                                        @if(isset($schedule->existingMeeting) && $schedule->existingMeeting)
+                                            <a href="{{ route('guru.meetings.show', $schedule->existingMeeting) }}" class="btn btn-sm btn-success" style="border-radius: var(--radius-sm); font-weight: 600;">
+                                                <i class="fas fa-check-circle me-1"></i> Pertemuan {{ $schedule->existingMeeting->number }}
+                                            </a>
+                                        @else
+                                            <a href="{{ route('guru.meetings.class-meetings.create', ['classSlug' => $schedule->schoolClass->slug, 'subjectSlug' => $schedule->subject->slug]) }}" class="btn btn-sm btn-outline-accent-theme" style="border-radius: var(--radius-sm);">
+                                                <i class="fas fa-plus me-1"></i> Buat Pertemuan
+                                            </a>
+                                        @endif
+                                    @endif
                                 </div>
                             @endforeach
                         </div>

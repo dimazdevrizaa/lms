@@ -20,7 +20,10 @@
                 <h1 class="h3 mb-1" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: var(--primary) !important;">{{ $meeting->title }}</h1>
                 <div class="text-muted small">
                     <span class="me-3"><i class="fas fa-chalkboard-user me-1"></i> {{ $meeting->teacher->user->name }}</span>
-                    <span><i class="fas fa-calendar-alt me-1"></i> {{ \Carbon\Carbon::parse($meeting->date)->format('d M Y') }}</span>
+                    <span class="me-3"><i class="fas fa-calendar-alt me-1"></i> {{ \Carbon\Carbon::parse($meeting->date)->format('d M Y') }}</span>
+                    @if($block = $meeting->schedule_block)
+                        <span><i class="fas fa-clock me-1"></i> {{ $block->jp_count }} JP ({{ \Carbon\Carbon::parse($block->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($block->end_time)->format('H:i') }})</span>
+                    @endif
                 </div>
             </div>
         </div>

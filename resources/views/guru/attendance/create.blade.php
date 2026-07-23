@@ -195,6 +195,13 @@
             border-color: #dc3545;
             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
         }
+        /* Cabut */
+        .status-radio-item input[value="cabut"]:checked + label {
+            background-color: #fd7e14;
+            color: white;
+            border-color: #fd7e14;
+            box-shadow: 0 4px 12px rgba(253, 126, 20, 0.15);
+        }
         
         .status-radio-item label:hover {
             background-color: rgba(27, 94, 32, 0.04);
@@ -220,6 +227,7 @@
             if (stats.izin) html += `<span class="status-badge status-badge--izin me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Izin">${stats.izin} I</span>`;
             if (stats.sakit) html += `<span class="status-badge status-badge--sakit me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Sakit">${stats.sakit} S</span>`;
             if (stats.alpa) html += `<span class="status-badge status-badge--alpa me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Alpa">${stats.alpa} A</span>`;
+            if (stats.cabut) html += `<span class="status-badge status-badge--cabut me-1" style="font-size: 0.65rem; padding: 2px 8px;" title="Total Cabut">${stats.cabut} C</span>`;
             
             return html ? `<small class="text-muted" style="font-size: 10px;">Rekap: </small>${html}` : '';
         }
@@ -237,11 +245,17 @@
 
             const selectedClass = classesData.find(c => c.id == classId);
             if (selectedClass && selectedClass.students) {
+                const sortedStudents = [...selectedClass.students].sort((a, b) => {
+                    const nameA = (a.user && a.user.name) ? a.user.name.toLowerCase() : '';
+                    const nameB = (b.user && b.user.name) ? b.user.name.toLowerCase() : '';
+                    return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+                });
+
                 studentContainer.classList.add('d-none');
                 studentTableWrapper.classList.remove('d-none');
                 studentTableBody.innerHTML = '';
 
-                selectedClass.students.forEach((student, index) => {
+                sortedStudents.forEach((student, index) => {
                     const row = `
                         <tr>
                             <td class="text-muted fw-bold">${index + 1}</td>
@@ -269,6 +283,10 @@
                                     <div class="status-radio-item">
                                         <input type="radio" name="statuses[${student.id}]" id="a_${student.id}" value="alpa" required>
                                         <label for="a_${student.id}">ALPA</label>
+                                    </div>
+                                    <div class="status-radio-item">
+                                        <input type="radio" name="statuses[${student.id}]" id="c_${student.id}" value="cabut" required>
+                                        <label for="c_${student.id}">CABUT</label>
                                     </div>
                                 </div>
                             </td>

@@ -62,8 +62,13 @@
                         <h6 class="fw-bold text-dark mb-2" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.05rem; line-height: 1.45;">{{ $m->title }}</h6>
 
                         {{-- Row 3: Date --}}
-                        <div class="text-muted small mb-auto">
-                            <i class="far fa-calendar-alt me-1"></i>{{ \Carbon\Carbon::parse($m->date)->format('d M Y') }}
+                        <div class="text-muted small mb-auto d-flex align-items-center gap-2 flex-wrap">
+                            <span><i class="far fa-calendar-alt me-1"></i>{{ \Carbon\Carbon::parse($m->date)->format('d M Y') }}</span>
+                            @if($block = $m->schedule_block)
+                                <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 0.7rem; font-weight: 600;">
+                                    <i class="far fa-clock me-1 text-success"></i>{{ $block->jp_count }} JP ({{ \Carbon\Carbon::parse($block->start_time)->format('H:i') }}–{{ \Carbon\Carbon::parse($block->end_time)->format('H:i') }})
+                                </span>
+                            @endif
                         </div>
 
                         {{-- Row 4: Stats chips --}}

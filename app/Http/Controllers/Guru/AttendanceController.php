@@ -58,8 +58,13 @@ class AttendanceController extends Controller
     public function create(Request $request): View
     {
         $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
-        $classes = SchoolClass::with('students.user')->orderBy('name')->get();
+        $classes = SchoolClass::with(['students.user'])->orderBy('name')->get();
         
+        foreach ($classes as $class) {
+            $sortedStudents = $class->students->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)->values();
+            $class->setRelation('students', $sortedStudents);
+        }
+
         $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
         $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
         
@@ -101,6 +106,9 @@ class AttendanceController extends Controller
 
         $attendance->load(['schoolClass', 'subject', 'details.student.user']);
 
+        $sortedDetails = $attendance->details->sortBy(fn($d) => strtolower($d->student->user?->name ?? ''), SORT_NATURAL)->values();
+        $attendance->setRelation('details', $sortedDetails);
+
         return view('guru.attendance.show', compact('attendance'));
     }
 
@@ -112,6 +120,7 @@ class AttendanceController extends Controller
             'meeting_id' => ['required', 'exists:meetings,id'],
             'date' => ['required', 'date'],
             'statuses' => ['nullable', 'array'],
+            'statuses.*' => ['nullable', 'in:hadir,izin,sakit,alpa,cabut'],
         ]);
  
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');

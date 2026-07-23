@@ -67,6 +67,7 @@
                             <span class="status-badge status-badge--izin">Izin: {{ $stats['izin'] ?? 0 }}</span>
                             <span class="status-badge status-badge--sakit">Sakit: {{ $stats['sakit'] ?? 0 }}</span>
                             <span class="status-badge status-badge--alpa">Alpa: {{ $stats['alpa'] ?? 0 }}</span>
+                            <span class="status-badge status-badge--cabut">Cabut: {{ $stats['cabut'] ?? 0 }}</span>
                         </div>
                     </div>
                 </div>
@@ -106,6 +107,7 @@
                                                     'izin' => 'status-badge--izin',
                                                     'sakit' => 'status-badge--sakit',
                                                     'alpa' => 'status-badge--alpa',
+                                                    'cabut' => 'status-badge--cabut',
                                                     default => ''
                                                 };
                                             @endphp

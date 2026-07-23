@@ -89,6 +89,39 @@ body::before {
     pointer-events: none;
 }
 
+/* ── Impersonate Banner ── */
+.impersonate-banner {
+    background: linear-gradient(135deg, #e65100, #ff8f00);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 3px solid #ff6f00;
+}
+
+body.has-impersonate-banner .impersonate-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    min-height: 52px;
+    height: 52px;
+    z-index: 1060;
+    box-sizing: border-box;
+}
+
+body.has-impersonate-banner .navbar {
+    top: 52px !important;
+}
+
+body.has-impersonate-banner .sidebar {
+    top: 116px !important;
+    height: calc(100vh - 116px) !important;
+}
+
+body.has-impersonate-banner .main-wrapper {
+    margin-top: 116px !important;
+}
+
 /* ── Top Navbar ── */
 .navbar {
     background: rgba(27, 94, 32, 0.96) !important;
@@ -1090,6 +1123,11 @@ form.content-card,
 .status-badge--alpa {
     background: rgba(198, 40, 40, 0.1);
     color: #C62828;
+}
+
+.status-badge--cabut {
+    background: rgba(253, 126, 20, 0.15);
+    color: #d9480f;
 }
 
 .status-badge--aktif {

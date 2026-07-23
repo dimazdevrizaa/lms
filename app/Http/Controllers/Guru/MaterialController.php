@@ -71,14 +71,26 @@ class MaterialController extends Controller
             $todayIndo = $daysIndo[now()->dayOfWeek];
 
             if ($todayIndo !== 'Minggu') {
-                $todaySchedules = Schedule::where('teacher_id', $teacher->id)
+                $rawSchedules = Schedule::where('teacher_id', $teacher->id)
                     ->where('academic_year_id', $activeYear->id)
                     ->where('day', $todayIndo)
                     ->with(['schoolClass', 'timeSlot', 'subject'])
-                    ->get()
-                    ->sortBy(function($schedule) {
-                        return $schedule->timeSlot->slot_order;
-                    });
+                    ->get();
+
+                $todaySchedules = Schedule::groupConsecutiveSchedules($rawSchedules);
+
+                // Attach existing meeting for today if already created
+                foreach ($todaySchedules as $block) {
+                    if ($block->subject_id && $block->class_id) {
+                        $block->existingMeeting = \App\Models\Meeting::where('teacher_id', $teacher->id)
+                            ->where('class_id', $block->class_id)
+                            ->where('subject_id', $block->subject_id)
+                            ->where('date', now()->toDateString())
+                            ->first();
+                    } else {
+                        $block->existingMeeting = null;
+                    }
+                }
             }
         }
 

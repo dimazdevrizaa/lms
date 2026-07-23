@@ -107,7 +107,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('attendance_id')->constrained('attendances')->cascadeOnDelete();
             $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
-            $table->enum('status', ['hadir', 'izin', 'sakit', 'alpa'])->default('hadir');
+            $table->enum('status', ['hadir', 'izin', 'sakit', 'alpa', 'cabut'])->default('hadir');
             $table->timestamps();
 
             $table->unique(['attendance_id', 'student_id']);

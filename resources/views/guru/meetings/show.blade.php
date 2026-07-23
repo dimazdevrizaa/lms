@@ -52,6 +52,9 @@
             <span class="d-flex align-items-center gap-1"><i class="fas fa-door-open text-success"></i> {{ $meeting->schoolClass->name }}</span>
             <span class="d-flex align-items-center gap-1"><i class="fas fa-book text-success"></i> {{ $meeting->subject->name }}</span>
             <span class="d-flex align-items-center gap-1"><i class="fas fa-calendar text-success"></i> {{ \Carbon\Carbon::parse($meeting->date)->format('d M Y') }}</span>
+            @if($block = $meeting->schedule_block)
+                <span class="d-flex align-items-center gap-1"><i class="fas fa-clock text-success"></i> {{ $block->jp_count }} JP ({{ \Carbon\Carbon::parse($block->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($block->end_time)->format('H:i') }})</span>
+            @endif
             @if($meeting->is_visible)
                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 fw-bold" style="font-size: 0.75rem;"><i class="fas fa-eye me-1"></i> Terlihat oleh Siswa</span>
             @else

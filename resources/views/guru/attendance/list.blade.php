@@ -97,6 +97,7 @@
                                 <span class="status-badge status-badge--izin" style="font-size: 0.7rem; padding: 3px 10px;">Izin: {{ $stats['izin'] ?? 0 }}</span>
                                 <span class="status-badge status-badge--sakit" style="font-size: 0.7rem; padding: 3px 10px;">Sakit: {{ $stats['sakit'] ?? 0 }}</span>
                                 <span class="status-badge status-badge--alpa" style="font-size: 0.7rem; padding: 3px 10px;">Alpa: {{ $stats['alpa'] ?? 0 }}</span>
+                                <span class="status-badge status-badge--cabut" style="font-size: 0.7rem; padding: 3px 10px;">Cabut: {{ $stats['cabut'] ?? 0 }}</span>
                             </div>
                             
                             <div class="mt-4">

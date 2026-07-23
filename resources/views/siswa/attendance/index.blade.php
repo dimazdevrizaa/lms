@@ -118,6 +118,7 @@
                                             'izin' => 'status-badge--izin',
                                             'sakit' => 'status-badge--sakit',
                                             'alpa' => 'status-badge--alpa',
+                                            'cabut' => 'status-badge--cabut',
                                             default => 'status-badge--pdf'
                                         };
                                         $statusIcon = match($r->status) {
@@ -125,6 +126,7 @@
                                             'izin' => '📄',
                                             'sakit' => '🤒',
                                             'alpa' => '✗',
+                                            'cabut' => '🏃',
                                             default => '-'
                                         };
                                     @endphp
