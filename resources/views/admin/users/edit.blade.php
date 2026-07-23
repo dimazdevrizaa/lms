@@ -65,15 +65,28 @@
                         </div>
                         @endif
 
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">🔄 Password Baru (opsional)</label>
-                                <x-text-input class="form-control" type="password" name="password" />
+                        <div class="mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">🔄 Password Baru (opsional)</label>
+                                    <div class="position-relative">
+                                        <x-text-input id="admin_edit_password" class="form-control pe-5" type="password" name="password" placeholder="Kosongkan jika tidak diubah" />
+                                        <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('admin_edit_password', this)">
+                                            <i class="far fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">✅ Konfirmasi Password Baru</label>
+                                    <div class="position-relative">
+                                        <x-text-input id="admin_edit_password_confirmation" class="form-control pe-5" type="password" name="password_confirmation" placeholder="Konfirmasi password baru" />
+                                        <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('admin_edit_password_confirmation', this)">
+                                            <i class="far fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">✅ Konfirmasi Password Baru</label>
-                                <x-text-input class="form-control" type="password" name="password_confirmation" />
-                            </div>
+                            <x-password-strength-meter inputId="admin_edit_password" confirmInputId="admin_edit_password_confirmation" />
                         </div>
 
                         <div class="d-flex gap-2">

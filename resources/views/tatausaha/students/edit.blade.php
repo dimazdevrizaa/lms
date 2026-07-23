@@ -53,7 +53,13 @@
 
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Ganti Password (Kosongkan jika tidak ingin ganti)</label>
-                    <x-text-input class="form-control" type="password" name="password" />
+                    <div class="position-relative">
+                        <x-text-input id="tu_student_password" class="form-control pe-5" type="password" name="password" placeholder="Kosongkan jika tidak diubah" />
+                        <button type="button" class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2 text-decoration-none shadow-none" onclick="togglePasswordVisibility('tu_student_password', this)">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                    <x-password-strength-meter inputId="tu_student_password" />
                 </div>
 
                 <div class="d-flex gap-2">
