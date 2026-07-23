@@ -27,6 +27,18 @@ html, body {
     box-sizing: border-box;
 }
 
+/* ── Disable Browser Native Password Reveal Icon ── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
 body {
     background: radial-gradient(circle at center, #1B5E20 0%, #0E3E11 100%) !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
