@@ -53,7 +53,7 @@ class Schedule extends Model
             return collect();
         }
 
-        $sorted = $schedules->sortBy(fn($s) => $s->timeSlot->slot_order ?? 0)->values();
+        $sorted = $schedules->sortBy(fn($s) => $s->timeSlot->slot_order ?? $s->timeSlot->start_time ?? 0)->values();
         $grouped = collect();
 
         $currentBlock = null;
@@ -85,13 +85,35 @@ class Schedule extends Model
                 $prevOrder = $currentBlock['last_schedule']->timeSlot->slot_order ?? 0;
                 $currOrder = $schedule->timeSlot->slot_order ?? 0;
 
-                $sameSubject = ($currentBlock['subject_id'] == $subjectId && $currentBlock['class_id'] == $classId && $currentBlock['teacher_id'] == $teacherId && $currentBlock['activity'] === $activity);
-                $isConsecutive = ($currOrder === $prevOrder + 1);
+                $prevEndTime = $currentBlock['last_schedule']->timeSlot->end_time ?? null;
+                $currStartTime = $schedule->timeSlot->start_time ?? null;
+
+                // Same subject, class & activity (resilient to teacher_id being null in one of the slots)
+                $sameSubject = ($currentBlock['class_id'] == $classId
+                    && $currentBlock['activity'] === $activity
+                    && (
+                        ($subjectId !== null && $currentBlock['subject_id'] == $subjectId)
+                        || ($subjectId === null && $currentBlock['subject_id'] === null)
+                    )
+                    && (
+                        $currentBlock['teacher_id'] == $teacherId
+                        || !$currentBlock['teacher_id']
+                        || !$teacherId
+                    )
+                );
+
+                // Consecutive if slot_order is sequential OR start_time equals previous end_time
+                $isConsecutive = ($currOrder === $prevOrder + 1)
+                    || ($prevEndTime && $currStartTime && $prevEndTime === $currStartTime);
 
                 if ($sameSubject && $isConsecutive) {
                     $currentBlock['end_time'] = $schedule->timeSlot->end_time ?? $currentBlock['end_time'];
                     $currentBlock['jp_count'] += 1;
                     $currentBlock['last_slot_label'] = $schedule->timeSlot->label ?? '';
+                    if (!$currentBlock['teacher_id'] && $teacherId) {
+                        $currentBlock['teacher_id'] = $teacherId;
+                        $currentBlock['teacher'] = $schedule->teacher;
+                    }
                 } else {
                     $grouped->push(static::formatBlock($currentBlock));
                     $currentBlock = [
