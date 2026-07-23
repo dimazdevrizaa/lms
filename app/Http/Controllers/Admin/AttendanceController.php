@@ -38,7 +38,7 @@ class AttendanceController extends Controller
         // Retrieve subjects linked to this class via schedules, teaching assignments, or meetings
         $subjectIdsFromSchedules = DB::table('schedules')->where('class_id', $class->id)->pluck('subject_id');
         $subjectIdsFromMeetings = DB::table('meetings')->where('class_id', $class->id)->pluck('subject_id');
-        $subjectIdsFromAssignments = DB::table('teaching_assignments')->where('class_id', $class->id)->pluck('subject_id');
+        $subjectIdsFromAssignments = DB::table('class_subject_teacher')->where('class_id', $class->id)->pluck('subject_id');
 
         $allSubjectIds = $subjectIdsFromSchedules
             ->concat($subjectIdsFromMeetings)
