@@ -27,14 +27,16 @@
 <body class="{{ session()->has('impersonate_original_id') ? 'has-impersonate-banner' : '' }}">
     @if(session()->has('impersonate_original_id'))
         <div class="impersonate-banner d-flex align-items-center justify-content-between px-3 px-md-4 py-2 text-white" style="background: linear-gradient(135deg, #e65100, #ff8f00) !important; color: #ffffff !important;">
-            <div class="d-flex align-items-center gap-2">
-                <i class="fas fa-user-secret fa-lg text-white"></i>
-                <span>Anda sedang login sebagai <strong>{{ auth()->user()->name }}</strong> (Role: {{ strtoupper(auth()->user()->role) }}). Anda melihat data persis seperti yang mereka lihat.</span>
+            <div class="d-flex align-items-center gap-2 overflow-hidden me-2">
+                <i class="fas fa-user-secret text-white flex-shrink-0"></i>
+                <span class="d-none d-sm-inline">Anda sedang login sebagai <strong>{{ auth()->user()->name }}</strong> (Role: {{ strtoupper(auth()->user()->role) }}). Anda melihat data persis seperti yang mereka lihat.</span>
+                <span class="d-inline d-sm-none text-truncate fw-semibold" style="font-size: 0.8rem;">Menyamar: <strong>{{ auth()->user()->name }}</strong></span>
             </div>
-            <form method="POST" action="{{ route('impersonate.stop') }}" class="m-0">
+            <form method="POST" action="{{ route('impersonate.stop') }}" class="m-0 flex-shrink-0">
                 @csrf
-                <button type="submit" class="btn btn-sm btn-light text-dark fw-bold px-3 py-1 shadow-sm" style="border-radius: var(--radius-sm); border: none; font-size: 0.85rem;">
-                    🔌 Kembali ke Admin
+                <button type="submit" class="btn btn-sm btn-light text-dark fw-bold px-2 px-sm-3 py-1 shadow-sm" style="border-radius: var(--radius-sm); border: none; font-size: 0.8rem; white-space: nowrap;">
+                    <span class="d-none d-sm-inline">🔌 Kembali ke Admin</span>
+                    <span class="d-inline d-sm-none">🔌 Admin</span>
                 </button>
             </form>
         </div>
@@ -72,7 +74,7 @@
                 {{-- ponytail: dropdown profile menu --}}
                 <div class="dropdown">
                     <button class="btn btn-link text-white dropdown-toggle d-flex align-items-center gap-2 shadow-none border-0 p-0 text-decoration-none" 
-                            type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            type="button" id="userMenuButton" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
                         <div class="d-flex align-items-center justify-content-center rounded-circle bg-white text-success fw-bold overflow-hidden" 
                              style="width: 32px; height: 32px; font-size: 0.85rem; font-family: 'Plus Jakarta Sans', sans-serif;">
                             @if(auth()->user()->avatar)
@@ -83,7 +85,7 @@
                         </div>
                         <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuButton" style="border-radius: var(--radius-md);">
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuButton" style="border-radius: var(--radius-md); right: 0; left: auto;">
                         <li class="px-3 py-2 border-bottom">
                             <span class="d-block fw-bold text-dark" style="font-size: 0.85rem;">{{ auth()->user()->name }}</span>
                             <small class="text-muted" style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->role) }}</small>

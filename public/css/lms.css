@@ -123,6 +123,13 @@ body.has-impersonate-banner .main-wrapper {
     margin-top: 116px !important;
 }
 
+/* ── Dropdown Menu Alignment Fix ── */
+.navbar .dropdown-menu-end {
+    right: 0 !important;
+    left: auto !important;
+    max-width: calc(100vw - 24px) !important;
+}
+
 /* ── Top Navbar ── */
 .navbar {
     background: rgba(27, 94, 32, 0.96) !important;
