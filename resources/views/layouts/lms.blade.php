@@ -85,7 +85,7 @@
                         </div>
                         <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuButton" style="border-radius: var(--radius-md); right: 0; left: auto;">
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="userMenuButton" style="border-radius: var(--radius-md);">
                         <li class="px-3 py-2 border-bottom">
                             <span class="d-block fw-bold text-dark" style="font-size: 0.85rem;">{{ auth()->user()->name }}</span>
                             <small class="text-muted" style="font-size: 0.75rem;">{{ ucfirst(auth()->user()->role) }}</small>

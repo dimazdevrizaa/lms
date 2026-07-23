@@ -124,10 +124,29 @@ body.has-impersonate-banner .main-wrapper {
 }
 
 /* ── Dropdown Menu Alignment Fix ── */
+.navbar .dropdown {
+    position: relative;
+}
+
 .navbar .dropdown-menu-end {
+    position: absolute !important;
+    top: calc(100% + 12px) !important;
     right: 0 !important;
     left: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    min-width: 210px !important;
     max-width: calc(100vw - 24px) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.15) !important;
+    z-index: 1060 !important;
+}
+
+@media (max-width: 576px) {
+    .navbar .dropdown-menu-end {
+        right: -6px !important;
+        top: calc(100% + 10px) !important;
+    }
 }
 
 /* ── Top Navbar ── */
