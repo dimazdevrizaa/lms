@@ -9,6 +9,7 @@ use App\Models\Teacher;
 use App\Models\Material;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class FileDownloadController extends Controller
 {
@@ -37,7 +38,8 @@ class FileDownloadController extends Controller
             abort(404, 'File not found.');
         }
 
-        $fileName = basename($filePath);
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
+        $fileName = Str::slug($assignment->title) . '_Instruksi.' . $ext;
         $headers = [
             'Content-Disposition' => 'inline; filename="' . $fileName . '"',
         ];
@@ -76,7 +78,10 @@ class FileDownloadController extends Controller
             abort(404, 'File not found.');
         }
 
-        $fileName = basename($filePath);
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
+        $studentName = Str::slug($submission->student?->user?->name ?? 'Siswa');
+        $assignmentTitle = Str::slug($assignment->title ?? 'Tugas');
+        $fileName = "{$studentName}_{$assignmentTitle}.{$ext}";
         $headers = [
             'Content-Disposition' => 'inline; filename="' . $fileName . '"',
         ];
@@ -115,7 +120,8 @@ class FileDownloadController extends Controller
             abort(404, 'File not found.');
         }
 
-        $fileName = basename($filePath);
+        $ext = pathinfo($filePath, PATHINFO_EXTENSION) ?: 'pdf';
+        $fileName = Str::slug($material->title) . '.' . $ext;
         $headers = [
             'Content-Disposition' => 'inline; filename="' . $fileName . '"',
         ];
