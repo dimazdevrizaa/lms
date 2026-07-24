@@ -22,7 +22,11 @@
                 </div>
                 <div class="flex-grow-1">
                     <textarea name="content" class="form-control mb-2" rows="2" placeholder="Tulis pertanyaan atau diskusi..." style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); resize: none; font-size: 0.9rem;" required></textarea>
-                    <div class="text-end">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+                        <small class="text-muted" style="font-size: 0.7rem;">
+                            <i class="fas fa-shield-alt me-1 text-warning"></i>
+                            Harap gunakan bahasa yang sopan. Hindari konten kasar atau menyinggung.
+                        </small>
                         <button type="submit" class="btn btn-sm px-4 py-2 text-white fw-bold" style="background-color: #3f51b5; border: none; border-radius: 10px; font-family: 'Plus Jakarta Sans', sans-serif;">
                             <i class="fas fa-paper-plane me-1"></i> Kirim
                         </button>
@@ -30,6 +34,7 @@
                 </div>
             </div>
         </form>
+
 
         {{-- Posts List --}}
         @if(isset($discussionPosts) && $discussionPosts->count() > 0)

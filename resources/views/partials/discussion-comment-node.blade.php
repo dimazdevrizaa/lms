@@ -57,7 +57,11 @@
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
+                    <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">
+                        <i class="fas fa-info-circle me-1"></i> Gunakan bahasa yang sopan. Hindari komentar kasar atau menyinggung.
+                    </small>
                 </form>
+
 
                 {{-- TikTok-style Flat Nested Replies --}}
                 @php $allReplies = $comment->all_replies; @endphp
