@@ -147,8 +147,8 @@
                         <!-- File PDF -->
                         <div class="mb-4">
                             <label class="form-label fw-bold" style="color: var(--primary);">📤 File PDF Materi</label>
-                            <input type="file" class="form-control" name="file" accept=".pdf" style="border-radius: var(--radius-sm);">
-                            <small class="text-muted">Pilih file PDF materi jika ada (Maksimal 10MB)</small>
+                            <input type="file" class="form-control" name="file" accept=".pdf" onchange="validateFileSize(this)" style="border-radius: var(--radius-sm);">
+                            <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle text-primary me-1"></i> Pilih file PDF materi jika ada. <strong class="text-dark">Maksimal 10 MB</strong>.</small>
                             @error('file')
                                 <small class="text-danger d-block">{{ $message }}</small>
                             @enderror
@@ -163,7 +163,6 @@
                                 <small class="text-danger d-block">{{ $message }}</small>
                             @enderror
                         </div>
-
                         <!-- Buttons -->
                         <div class="d-flex gap-2 mt-5">
                             <button class="btn btn-lg btn-primary px-4" style="border-radius: var(--radius-md);" type="submit">✓ Upload Materi</button>
@@ -173,6 +172,22 @@
                 </div>
             </div>
         </div>
+
+@push('scripts')
+<script>
+function validateFileSize(input, maxMb = 10) {
+    if (input.files && input.files[0]) {
+        const fileSizeMb = (input.files[0].size / (1024 * 1024)).toFixed(2);
+        const maxSizeMb = maxMb;
+        if (input.files[0].size > maxSizeMb * 1024 * 1024) {
+            alert(`⚠️ Ukuran file terlalu besar (${fileSizeMb} MB)!\n\nBatas maksimum file yang diizinkan adalah ${maxSizeMb} MB. Silakan pilih file lain.`);
+            input.value = '';
+        }
+    }
+}
+</script>
+@endpush
+@endsection
 
         <!-- Info Sidebar -->
         <div class="col-lg-4 mb-4 reveal reveal-delay-2">

@@ -353,8 +353,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Upload Bukti Dokumen (Opsional)</label>
-                            <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-                            <small class="text-muted mt-1 d-block">Unggah file bukti/dokumen hasil kuis (PDF, Word, Excel, PPT). Maksimal 10MB.</small>
+                            <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" onchange="validateFileSize(this)">
+                            <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle text-primary me-1"></i> Unggah file bukti (PDF, Word, Excel, PPT). <strong class="text-dark">Maksimal 10 MB</strong>.</small>
                         </div>
                         <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">
                             <i class="fas fa-check-circle me-1"></i> Kirim Laporan Selesai
@@ -412,8 +412,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Upload File Dokumen (Opsional)</label>
-                            <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-                            <small class="text-muted mt-1 d-block">Format file yang didukung: PDF, Word, Excel, PPT. Maksimal 10MB.</small>
+                            <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" onchange="validateFileSize(this)">
+                            <small class="text-muted mt-1 d-block"><i class="fas fa-info-circle text-primary me-1"></i> Format file: PDF, Word, Excel, PPT. <strong class="text-dark">Maksimal 10 MB</strong>.</small>
                         </div>
                         <button class="btn btn-primary btn-lg w-100 mt-3" type="submit">
                             <i class="fas fa-check-circle me-1"></i> Kirim Tugas
@@ -423,4 +423,19 @@
             </div>
         @endif
     @endif
+
+@push('scripts')
+<script>
+function validateFileSize(input, maxMb = 10) {
+    if (input.files && input.files[0]) {
+        const fileSizeMb = (input.files[0].size / (1024 * 1024)).toFixed(2);
+        const maxSizeMb = maxMb;
+        if (input.files[0].size > maxSizeMb * 1024 * 1024) {
+            alert(`⚠️ Ukuran file terlalu besar (${fileSizeMb} MB)!\n\nBatas maksimum file yang diizinkan adalah ${maxSizeMb} MB. Silakan pilih file lain.`);
+            input.value = '';
+        }
+    }
+}
+</script>
+@endpush
 @endsection
