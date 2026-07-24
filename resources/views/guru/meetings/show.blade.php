@@ -5,11 +5,12 @@
 @section('content')
     <!-- Header -->
     <div class="mb-5 reveal">
-            @php
-                $backUrl = auth()->user()->role === 'admin'
-                    ? route('admin.attendances.showSubject', ['class' => $meeting->class_id, 'subject' => $meeting->subject_id])
-                    : route('guru.meetings.class-meetings', ['classSlug' => $meeting->schoolClass->slug, 'subjectSlug' => $meeting->subject->slug]);
-            @endphp
+        @php
+            $backUrl = auth()->user()->role === 'admin'
+                ? route('admin.attendances.showSubject', ['class' => $meeting->class_id, 'subject' => $meeting->subject_id])
+                : route('guru.meetings.class-meetings', ['classSlug' => $meeting->schoolClass->slug, 'subjectSlug' => $meeting->subject->slug]);
+        @endphp
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
             <div class="d-flex align-items-center gap-3">
                 <a href="{{ $backUrl }}" class="btn btn-outline-secondary-theme btn-sm">
                     <i class="fas fa-arrow-left me-1"></i> Kembali
