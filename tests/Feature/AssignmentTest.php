@@ -154,4 +154,39 @@ class AssignmentTest extends TestCase
             'answer_text' => 'Ini jawaban saya.',
         ]);
     }
+
+    public function test_teacher_and_admin_can_extend_assignment_deadline(): void
+    {
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        $teacher = Teacher::create([
+            'user_id' => $teacherUser->id,
+            'nip' => '1234567890',
+            'phone' => '08123456789',
+        ]);
+
+        $class = SchoolClass::create(['name' => 'X IPA 1']);
+        $subject = Subject::create(['name' => 'Matematika']);
+
+        $assignment = Assignment::create([
+            'teacher_id' => $teacher->id,
+            'class_id' => $class->id,
+            'subject_id' => $subject->id,
+            'title' => 'Tugas Matematika 1',
+            'description' => 'Kerjakan soal 1-5.',
+            'due_at' => now()->addDays(1)->format('Y-m-d H:i:s'),
+            'type' => 'pdf',
+        ]);
+
+        $newDeadline = now()->addDays(5)->format('Y-m-d\TH:i');
+
+        $response = $this->actingAs($teacherUser)->post(route('guru.assignments.extend-deadline', $assignment), [
+            'due_at' => $newDeadline,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertEquals(
+            \Carbon\Carbon::parse($newDeadline)->format('Y-m-d H:i'),
+            \Carbon\Carbon::parse($assignment->fresh()->due_at)->format('Y-m-d H:i')
+        );
+    }
 }

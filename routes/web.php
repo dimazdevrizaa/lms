@@ -133,6 +133,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('assignments', AssignmentController::class);
         Route::post('assignments/answers/{answer}/grade', [AssignmentController::class, 'gradeQuestion'])->name('assignments.grade-question');
         Route::post('assignments/submissions/{submission}/grade', [AssignmentController::class, 'gradeSubmission'])->name('assignments.grade-submission');
+        Route::post('assignments/{assignment}/extend-deadline', [AssignmentController::class, 'extendDeadline'])->name('assignments.extend-deadline');
         Route::resource('attendances', AttendanceController::class);
 
         // WALI KELAS - Classroom Management

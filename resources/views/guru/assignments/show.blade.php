@@ -40,7 +40,12 @@
                             @else
                                 <span class="status-badge" style="background: rgba(220,53,69,0.1); color: #dc3545;"><i class="fas fa-file-pdf me-1"></i> PDF</span>
                             @endif
-                            <span class="small" style="color: var(--text-muted);"><i class="fas fa-clock me-1"></i> Deadline: {{ $assignment->due_at ? \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') : 'Tidak ada' }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="small" style="color: var(--text-muted);"><i class="fas fa-clock me-1"></i> Deadline: {{ $assignment->due_at ? \Carbon\Carbon::parse($assignment->due_at)->format('d M Y, H:i') : 'Tidak ada' }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-warning text-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#extendDeadlineModal" style="border-radius: var(--radius-sm); padding: 0.15rem 0.6rem; font-size: 0.75rem;">
+                                    <i class="fas fa-calendar-plus me-1 text-warning"></i> Perpanjang Waktu
+                                </button>
+                            </div>
                             @if($assignment->file_path)
                                 <a href="{{ route('assignments.download', $assignment) }}" target="_blank" class="small fw-bold text-decoration-none" style="color: #dc3545;">
                                     <i class="fas fa-file-pdf me-1"></i> File Instruksi PDF
@@ -616,6 +621,59 @@
                 });
             });
         });
+    </script>
+    <!-- Extend Deadline Modal -->
+    <div class="modal fade" id="extendDeadlineModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--primary); color: white;">
+                    <h5 class="modal-title text-white"><i class="fas fa-clock me-2"></i>Perpanjang Batas Waktu Tugas</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('guru.assignments.extend-deadline', $assignment) }}" method="POST">
+                    @csrf
+                    <div class="modal-body text-start">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="color: var(--primary);">Judul Tugas</label>
+                            <input type="text" class="form-control bg-light" value="{{ $assignment->title }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="color: var(--primary);">Batas Waktu Baru <span class="text-danger">*</span></label>
+                            <input type="datetime-local" id="due_at_input" name="due_at" class="form-control" value="{{ $assignment->due_at ? \Carbon\Carbon::parse($assignment->due_at)->format('Y-m-d\TH:i') : '' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Tambah Cepat (Presets):</label>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addTimePreset(1)">+1 Hari</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addTimePreset(3)">+3 Hari</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addTimePreset(7)">+1 Minggu</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-outline-secondary-theme"><i class="fas fa-save me-1"></i> Simpan Batas Waktu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addTimePreset(days) {
+            const input = document.getElementById('due_at_input');
+            let baseDate = input.value ? new Date(input.value) : new Date();
+            baseDate.setDate(baseDate.getDate() + days);
+            
+            const pad = (num) => String(num).padStart(2, '0');
+            const formatted = baseDate.getFullYear() + '-' +
+                pad(baseDate.getMonth() + 1) + '-' +
+                pad(baseDate.getDate()) + 'T' +
+                pad(baseDate.getHours()) + ':' +
+                pad(baseDate.getMinutes());
+            
+            input.value = formatted;
+        }
     </script>
     @endpush
     @endif

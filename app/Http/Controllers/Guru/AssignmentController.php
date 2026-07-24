@@ -504,4 +504,20 @@ class AssignmentController extends Controller
 
         return back()->with('success', 'Nilai tugas berhasil disimpan.');
     }
+
+    public function extendDeadline(Request $request, Assignment $assignment): RedirectResponse
+    {
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(Auth::user()->role === 'admin' || $assignment->teacher_id == $teacherId, 403);
+
+        $data = $request->validate([
+            'due_at' => ['required', 'date'],
+        ]);
+
+        $assignment->update([
+            'due_at' => $data['due_at'],
+        ]);
+
+        return back()->with('success', 'Batas waktu pengumpulan tugas berhasil diperpanjang.');
+    }
 }
