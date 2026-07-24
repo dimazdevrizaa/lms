@@ -133,23 +133,28 @@ class MaterialController extends Controller
 
     public function create(): View
     {
-        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $teacher = Teacher::where('user_id', Auth::id())->first() ?? Teacher::first();
         $classes = SchoolClass::orderBy('name')->get();
         
-        $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+        $assignedSubjectIds = $teacher ? $teacher->teachingAssignments()->pluck('subject_id') : collect();
         $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
-        
         if ($subjects->isEmpty()) {
             $subjects = Subject::orderBy('name')->get();
         }
 
-        $meetings = Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get();
+        $meetings = $teacher ? Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get() : Meeting::orderBy('number')->get();
 
         return view('guru.materials.create', compact('classes', 'subjects', 'meetings'));
     }
 
     public function store(Request $request): RedirectResponse
     {
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        if (!$teacherId && Auth::user()->role === 'admin') {
+            $teacherId = Meeting::where('id', $request->meeting_id)->value('teacher_id') ?? Teacher::value('id');
+        }
+        abort_unless($teacherId, 403);
+
         $data = $request->validate([
             'class_id' => ['required', 'exists:classes,id'],
             'subject_id' => ['required', 'exists:subjects,id'],
@@ -212,18 +217,19 @@ class MaterialController extends Controller
 
     public function edit(Material $material): View
     {
-        abort_unless($material->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(Auth::user()->role === 'admin' || $material->teacher_id == $teacherId, 403);
 
-        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $teacher = Teacher::where('user_id', Auth::id())->first() ?? Teacher::find($material->teacher_id);
         $classes = SchoolClass::orderBy('name')->get();
         
-        $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+        $assignedSubjectIds = $teacher ? $teacher->teachingAssignments()->pluck('subject_id') : collect();
         $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
         if ($subjects->isEmpty()) {
             $subjects = Subject::orderBy('name')->get();
         }
 
-        $meetings = Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get();
+        $meetings = Meeting::where('class_id', $material->class_id)->where('subject_id', $material->subject_id)->orderBy('number')->get();
 
         return view('guru.materials.edit', compact('material', 'classes', 'subjects', 'meetings'));
     }
@@ -231,7 +237,7 @@ class MaterialController extends Controller
     public function update(Request $request, Material $material): RedirectResponse
     {
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
-        abort_unless($material->teacher_id == $teacherId, 403);
+        abort_unless(Auth::user()->role === 'admin' || $material->teacher_id == $teacherId, 403);
 
         $data = $request->validate([
             'class_id' => ['required', 'exists:classes,id'],

@@ -77,7 +77,7 @@ class AttendanceController extends Controller
 
         $meetings = Meeting::where('class_id', $class->id)
             ->where('subject_id', $subject->id)
-            ->with(['teacher.user', 'attendance.details'])
+            ->with(['teacher.user', 'attendance.details', 'materials', 'assignments'])
             ->orderBy('date', 'desc')
             ->orderBy('number', 'desc')
             ->get();

@@ -104,10 +104,10 @@ class AssignmentController extends Controller
 
     public function create(): View
     {
-        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $teacher = Teacher::where('user_id', Auth::id())->first() ?? Teacher::first();
         $activeYear = AcademicYear::where('is_active', true)->first();
         
-        if ($activeYear) {
+        if ($activeYear && $teacher) {
             $assignedClassIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
                 ->where('academic_year_id', $activeYear->id)
                 ->pluck('class_id');
@@ -119,14 +119,14 @@ class AssignmentController extends Controller
             $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
         } else {
             $classes = SchoolClass::orderBy('name')->get();
-            $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+            $assignedSubjectIds = $teacher ? $teacher->teachingAssignments()->pluck('subject_id') : collect();
             $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
             if ($subjects->isEmpty()) {
                 $subjects = Subject::orderBy('name')->get();
             }
         }
 
-        $meetings = Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get();
+        $meetings = $teacher ? Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get() : Meeting::orderBy('number')->get();
 
         return view('guru.assignments.create', compact('classes', 'subjects', 'meetings'));
     }
@@ -148,6 +148,9 @@ class AssignmentController extends Controller
         ]);
 
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        if (!$teacherId && Auth::user()->role === 'admin') {
+            $teacherId = Meeting::where('id', $request->meeting_id)->value('teacher_id') ?? Teacher::value('id');
+        }
         abort_unless($teacherId, 403);
 
         $filePath = null;
@@ -237,12 +240,13 @@ class AssignmentController extends Controller
 
     public function edit(Assignment $assignment): View
     {
-        abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(Auth::user()->role === 'admin' || $assignment->teacher_id == $teacherId, 403);
 
-        $teacher = Teacher::where('user_id', Auth::id())->firstOrFail();
+        $teacher = Teacher::where('user_id', Auth::id())->first() ?? Teacher::find($assignment->teacher_id);
         $activeYear = AcademicYear::where('is_active', true)->first();
         
-        if ($activeYear) {
+        if ($activeYear && $teacher) {
             $assignedClassIds = ClassSubjectTeacher::where('teacher_id', $teacher->id)
                 ->where('academic_year_id', $activeYear->id)
                 ->pluck('class_id');
@@ -254,14 +258,14 @@ class AssignmentController extends Controller
             $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
         } else {
             $classes = SchoolClass::orderBy('name')->get();
-            $assignedSubjectIds = $teacher->teachingAssignments()->pluck('subject_id');
+            $assignedSubjectIds = $teacher ? $teacher->teachingAssignments()->pluck('subject_id') : collect();
             $subjects = Subject::whereIn('id', $assignedSubjectIds)->orderBy('name')->get();
             if ($subjects->isEmpty()) {
                 $subjects = Subject::orderBy('name')->get();
             }
         }
 
-        $meetings = Meeting::where('teacher_id', $teacher->id)->orderBy('number')->get();
+        $meetings = Meeting::where('class_id', $assignment->class_id)->where('subject_id', $assignment->subject_id)->orderBy('number')->get();
 
         // Load questions with options for online assignments
         if ($assignment->isOnline()) {
@@ -276,7 +280,7 @@ class AssignmentController extends Controller
     public function update(Request $request, Assignment $assignment): RedirectResponse
     {
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
-        abort_unless($assignment->teacher_id == $teacherId, 403);
+        abort_unless(Auth::user()->role === 'admin' || $assignment->teacher_id == $teacherId, 403);
 
         $data = $request->validate([
             'class_id' => ['required', 'exists:classes,id'],
