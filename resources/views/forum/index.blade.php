@@ -49,11 +49,11 @@
                                           placeholder="Bagikan pengumuman atau diskusikan sesuatu dengan kelas..." required></textarea>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                <i class="fas fa-shield-alt me-1 text-warning"></i>
-                                Harap gunakan bahasa yang sopan & hormati sesama pengguna. Hindari konten yang menyinggung, kasar, atau tidak pantas.
-                            </small>
+                        <small class="text-muted d-block mt-3" style="font-size: 0.75rem;">
+                            <i class="fas fa-shield-alt me-1 text-warning"></i>
+                            Harap gunakan bahasa yang sopan & hormati sesama pengguna. Hindari konten yang menyinggung, kasar, atau tidak pantas.
+                        </small>
+                        <div class="d-flex justify-content-end mt-2">
                             <button type="submit" class="btn btn-primary-theme px-4">
                                 <i class="fas fa-paper-plane me-1"></i> Bagikan
                             </button>
