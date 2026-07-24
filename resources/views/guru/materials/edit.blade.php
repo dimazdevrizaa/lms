@@ -8,7 +8,9 @@
         <div class="d-flex align-items-center gap-3">
             @php
                 if (auth()->user()->role === 'admin') {
-                    $backUrl = route('admin.attendances.showSubject', ['class' => $material->class_id, 'subject' => $material->subject_id]);
+                    $backUrl = $material->meeting_id
+                        ? route('admin.attendances.meetingMaterials', $material->meeting_id)
+                        : route('admin.attendances.showSubject', ['class' => $material->class_id, 'subject' => $material->subject_id]);
                 } else {
                     $backUrl = $material->meeting_id 
                         ? route('guru.meetings.show', $material->meeting_id) 

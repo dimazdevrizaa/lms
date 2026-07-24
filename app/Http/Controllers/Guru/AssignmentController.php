@@ -230,7 +230,8 @@ class AssignmentController extends Controller
         }
 
         if ($assignment->meeting_id) {
-            return redirect()->route('guru.meetings.show', $assignment->meeting_id)
+            $route = Auth::user()->role === 'admin' ? 'admin.attendances.meetingAssignments' : 'guru.meetings.show';
+            return redirect()->route($route, $assignment->meeting_id)
                 ->with('success', 'Tugas berhasil dibuat.');
         }
 
@@ -354,7 +355,8 @@ class AssignmentController extends Controller
         }
 
         if ($assignment->meeting_id) {
-            return redirect()->route('guru.meetings.show', $assignment->meeting_id)
+            $route = Auth::user()->role === 'admin' ? 'admin.attendances.meetingAssignments' : 'guru.meetings.show';
+            return redirect()->route($route, $assignment->meeting_id)
                 ->with('success', 'Tugas berhasil diperbarui.');
         }
 
@@ -386,7 +388,8 @@ class AssignmentController extends Controller
 
         // ponytail: redirect back to meeting details if assignment belonged to one
         if ($meetingId) {
-            return redirect()->route('guru.meetings.show', $meetingId)
+            $route = Auth::user()->role === 'admin' ? 'admin.attendances.meetingAssignments' : 'guru.meetings.show';
+            return redirect()->route($route, $meetingId)
                 ->with('success', 'Tugas berhasil dihapus.');
         }
 

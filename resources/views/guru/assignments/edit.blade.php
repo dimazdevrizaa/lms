@@ -5,7 +5,9 @@
 @section('content')
     @php
         if (auth()->user()->role === 'admin') {
-            $backUrl = route('admin.attendances.showSubject', ['class' => $assignment->class_id, 'subject' => $assignment->subject_id]);
+            $backUrl = $assignment->meeting_id
+                ? route('admin.attendances.meetingAssignments', $assignment->meeting_id)
+                : route('admin.attendances.showSubject', ['class' => $assignment->class_id, 'subject' => $assignment->subject_id]);
         } else {
             $backUrl = $assignment->meeting_id 
                 ? route('guru.meetings.show', $assignment->meeting_id) 

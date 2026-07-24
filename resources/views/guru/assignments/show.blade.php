@@ -7,9 +7,13 @@
     <div class="mb-4">
         <div class="d-flex align-items-center gap-3 mb-3">
             @php
-                $backUrl = $assignment->meeting_id 
-                    ? route('guru.meetings.show', $assignment->meeting_id) 
-                    : route('guru.assignments.index');
+                if (auth()->user()->role === 'admin' && $assignment->meeting_id) {
+                    $backUrl = route('admin.attendances.meetingAssignments', $assignment->meeting_id);
+                } elseif ($assignment->meeting_id) {
+                    $backUrl = route('guru.meetings.show', $assignment->meeting_id);
+                } else {
+                    $backUrl = route('guru.assignments.index');
+                }
             @endphp
             <a href="{{ $backUrl }}" class="btn btn-outline-secondary-theme btn-sm" style="border-radius: var(--radius-sm);">
                 <i class="fas fa-arrow-left me-1"></i> Kembali

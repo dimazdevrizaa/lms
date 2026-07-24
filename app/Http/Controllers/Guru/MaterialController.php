@@ -198,7 +198,8 @@ class MaterialController extends Controller
         }
 
         if ($material->meeting_id) {
-            return redirect()->route('guru.meetings.show', $material->meeting_id)
+            $route = Auth::user()->role === 'admin' ? 'admin.attendances.meetingMaterials' : 'guru.meetings.show';
+            return redirect()->route($route, $material->meeting_id)
                 ->with('success', 'Materi berhasil diupload.');
         }
 
@@ -258,7 +259,8 @@ class MaterialController extends Controller
         $material->update($data);
 
         if ($material->meeting_id) {
-            return redirect()->route('guru.meetings.show', $material->meeting_id)
+            $route = Auth::user()->role === 'admin' ? 'admin.attendances.meetingMaterials' : 'guru.meetings.show';
+            return redirect()->route($route, $material->meeting_id)
                 ->with('success', 'Materi berhasil diperbarui.');
         }
 
@@ -271,7 +273,13 @@ class MaterialController extends Controller
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         abort_unless(Auth::user()->role === 'admin' || $material->teacher_id == $teacherId, 403);
 
+        $meetingId = $material->meeting_id;
         $material->delete();
+
+        if (Auth::user()->role === 'admin' && $meetingId) {
+            return redirect()->route('admin.attendances.meetingMaterials', $meetingId)
+                ->with('success', 'Materi berhasil dihapus.');
+        }
 
         return redirect()->route('guru.materials.index')
             ->with('success', 'Materi berhasil dihapus.');

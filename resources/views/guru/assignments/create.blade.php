@@ -4,8 +4,12 @@
 
 @section('content')
     @php
-        if (auth()->user()->role === 'admin' && request('class_id') && request('subject_id')) {
-            $backUrl = route('admin.attendances.showSubject', ['class' => request('class_id'), 'subject' => request('subject_id')]);
+        if (auth()->user()->role === 'admin') {
+            $backUrl = request('meeting_id')
+                ? route('admin.attendances.meetingAssignments', request('meeting_id'))
+                : (request('class_id') && request('subject_id')
+                    ? route('admin.attendances.showSubject', ['class' => request('class_id'), 'subject' => request('subject_id')])
+                    : route('admin.attendances.index'));
         } else {
             $backUrl = request()->has('meeting_id') 
                 ? route('guru.meetings.show', request('meeting_id')) 
