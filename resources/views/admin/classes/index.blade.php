@@ -74,7 +74,8 @@
                                     <small class="text-muted">{{ $class->homeroomTeacher?->user?->name ?? '-' }}</small>
                                 </td>
                                 <td class="text-center">
-                                    <a class="btn btn-sm btn-outline-primary-theme" href="{{ route('admin.classes.edit', $class) }}">✏️ Edit</a>
+                                    <a class="btn btn-sm btn-outline-info me-1" href="{{ route('admin.classes.show', $class) }}">🔍 Detail</a>
+                                    <a class="btn btn-sm btn-outline-primary-theme me-1" href="{{ route('admin.classes.edit', $class) }}">✏️ Edit</a>
                                     <button class="btn btn-sm btn-outline-danger" onclick="if(confirm('Hapus kelas ini?')) { document.getElementById('form-{{ $class->id }}').submit(); }" type="button">🗑️ Hapus</button>
                                     <form id="form-{{ $class->id }}" method="POST" action="{{ route('admin.classes.destroy', $class) }}" style="display: none;">
                                         @csrf

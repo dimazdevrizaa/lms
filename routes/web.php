@@ -77,7 +77,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', AdminUserController::class)->except(['show']);
         Route::post('impersonate/start/{user}', [ImpersonationController::class, 'start'])->name('impersonate.start');
         Route::resource('academic-years', AcademicYearController::class)->except(['show']);
-        Route::resource('classes', AdminClassController::class)->except(['show']);
+        Route::resource('classes', AdminClassController::class);
         Route::resource('subjects', SubjectController::class);
 
         // PRESENSI ADMIN

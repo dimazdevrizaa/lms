@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcademicYear;
+use App\Models\Meeting;
 use App\Models\SchoolClass;
+use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ClassController extends Controller
@@ -19,6 +22,46 @@ class ClassController extends Controller
             ->paginate(20);
 
         return view('admin.classes.index', compact('classes'));
+    }
+
+    public function show(SchoolClass $class): View
+    {
+        $class->load(['academicYear', 'homeroomTeacher.user', 'students.user']);
+        $class->loadCount('students');
+
+        // Retrieve subjects linked to this class via schedules, meetings, or class_subject_teacher
+        $subjectIdsFromSchedules = DB::table('schedules')->where('class_id', $class->id)->pluck('subject_id');
+        $subjectIdsFromMeetings = DB::table('meetings')->where('class_id', $class->id)->pluck('subject_id');
+        $subjectIdsFromAssignments = DB::table('class_subject_teacher')->where('class_id', $class->id)->pluck('subject_id');
+
+        $allSubjectIds = $subjectIdsFromSchedules
+            ->concat($subjectIdsFromMeetings)
+            ->concat($subjectIdsFromAssignments)
+            ->unique()
+            ->filter();
+
+        $subjects = Subject::whereIn('id', $allSubjectIds)
+            ->orderBy('name')
+            ->get();
+
+        if ($subjects->isEmpty()) {
+            $subjects = Subject::orderBy('name')->get();
+        }
+
+        foreach ($subjects as $subject) {
+            $subject->meeting_count = Meeting::where('class_id', $class->id)
+                ->where('subject_id', $subject->id)
+                ->count();
+
+            $subject->completed_attendance_count = Meeting::where('class_id', $class->id)
+                ->where('subject_id', $subject->id)
+                ->whereHas('attendance')
+                ->count();
+        }
+
+        $students = $class->students->sortBy(fn($s) => strtolower($s->user?->name ?? ''), SORT_NATURAL)->values();
+
+        return view('admin.classes.show', compact('class', 'subjects', 'students'));
     }
 
     public function create(): View
