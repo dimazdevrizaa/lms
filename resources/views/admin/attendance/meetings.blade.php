@@ -102,25 +102,13 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-inline-flex gap-1 flex-wrap justify-content-end">
-                                    @if($firstMaterial)
-                                        <a href="{{ route('guru.materials.edit', $firstMaterial->id) }}" class="btn btn-sm btn-outline-info rounded-3">
-                                            <i class="fas fa-book me-1"></i> Edit Materi
-                                        </a>
-                                    @else
-                                        <a href="{{ route('guru.materials.create', ['meeting_id' => $meeting->id, 'class_id' => $class->id, 'subject_id' => $subject->id]) }}" class="btn btn-sm btn-outline-secondary rounded-3">
-                                            <i class="fas fa-plus me-1"></i> Materi
-                                        </a>
-                                    @endif
+                                    <a href="{{ route('guru.meetings.show', $meeting->id) }}#materi-section" class="btn btn-sm btn-outline-info rounded-3">
+                                        <i class="fas fa-book me-1"></i> Kelola Materi @if($meeting->materials->count() > 0)<span class="badge bg-info-subtle text-info ms-1">{{ $meeting->materials->count() }}</span>@endif
+                                    </a>
 
-                                    @if($firstAssignment)
-                                        <a href="{{ route('guru.assignments.edit', $firstAssignment->id) }}" class="btn btn-sm btn-outline-warning rounded-3">
-                                            <i class="fas fa-file-alt me-1"></i> Edit Tugas
-                                        </a>
-                                    @else
-                                        <a href="{{ route('guru.assignments.create', ['meeting_id' => $meeting->id, 'class_id' => $class->id, 'subject_id' => $subject->id]) }}" class="btn btn-sm btn-outline-secondary rounded-3">
-                                            <i class="fas fa-plus me-1"></i> Tugas
-                                        </a>
-                                    @endif
+                                    <a href="{{ route('guru.meetings.show', $meeting->id) }}#tugas-section" class="btn btn-sm btn-outline-warning rounded-3">
+                                        <i class="fas fa-file-alt me-1"></i> Kelola Tugas @if($meeting->assignments->count() > 0)<span class="badge bg-warning-subtle text-warning ms-1">{{ $meeting->assignments->count() }}</span>@endif
+                                    </a>
 
                                     <a href="{{ route('admin.attendances.editMeeting', $meeting->id) }}" class="btn btn-sm btn-outline-primary rounded-3">
                                         <i class="fas fa-user-check me-1"></i> {{ $att ? 'Edit Presensi' : 'Isi Presensi' }}

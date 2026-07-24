@@ -268,7 +268,7 @@
 
     <div class="row">
         <!-- Materi Section -->
-        <div class="col-lg-6 mb-4 reveal">
+        <div class="col-lg-6 mb-4 reveal" id="materi-section">
             <div class="content-card h-100">
                 <div class="content-card-header bg-white d-flex align-items-center justify-content-between py-3">
                     <div class="d-flex align-items-center gap-2">
@@ -277,7 +277,7 @@
                         </div>
                         <h5 class="content-card-title mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;">Materi Pembelajaran</h5>
                     </div>
-                    <a href="{{ route('guru.materials.create', ['meeting_id' => $meeting->id]) }}" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
+                    <a href="{{ route('guru.materials.create', ['meeting_id' => $meeting->id, 'class_id' => $meeting->class_id, 'subject_id' => $meeting->subject_id]) }}" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
                 </div>
@@ -309,7 +309,7 @@
         </div>
 
         <!-- Tugas Section -->
-        <div class="col-lg-6 mb-4 reveal">
+        <div class="col-lg-6 mb-4 reveal" id="tugas-section">
             <div class="content-card h-100">
                 <div class="content-card-header bg-white d-flex align-items-center justify-content-between py-3">
                     <div class="d-flex align-items-center gap-2">
@@ -318,7 +318,7 @@
                         </div>
                         <h5 class="content-card-title mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;">Tugas Siswa</h5>
                     </div>
-                    <a href="{{ route('guru.assignments.create', ['meeting_id' => $meeting->id]) }}" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
+                    <a href="{{ route('guru.assignments.create', ['meeting_id' => $meeting->id, 'class_id' => $meeting->class_id, 'subject_id' => $meeting->subject_id]) }}" class="btn btn-sm btn-outline-success px-3" style="border-radius: 8px;">
                         <i class="fas fa-plus"></i> Tambah
                     </a>
                 </div>
