@@ -142,10 +142,14 @@ class AttendanceController extends Controller
                 'subject_id' => $meeting->subject_id,
                 'teacher_id' => $meeting->teacher_id,
                 'date' => $data['date'],
+                'submitted_at' => now(),
             ]
         );
 
-        $attendance->update(['date' => $data['date']]);
+        $attendance->update([
+            'date' => $data['date'],
+            'submitted_at' => now(),
+        ]);
 
         $statuses = $data['statuses'];
         $students = Student::where('class_id', $meeting->class_id)->pluck('id');

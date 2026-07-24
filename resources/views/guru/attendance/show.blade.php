@@ -33,8 +33,13 @@
                 </div>
                 <div class="content-card-body">
                     <div class="mb-3">
-                        <label class="text-muted small d-block fw-semibold mb-1">Tanggal</label>
+                        <label class="text-muted small d-block fw-semibold mb-1">Tanggal & Waktu Presensi</label>
                         <span class="fw-bold text-dark">{{ \Carbon\Carbon::parse($attendance->date)->format('d F Y') }}</span>
+                        @if($attendance->formatted_submitted_time)
+                            <span class="badge bg-light text-primary border ms-2 font-monospace">
+                                <i class="far fa-clock me-1"></i>Diisi jam {{ $attendance->formatted_submitted_time }} WIB
+                            </span>
+                        @endif
                     </div>
 
                     <div class="mb-3">

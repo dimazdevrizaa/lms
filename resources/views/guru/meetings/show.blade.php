@@ -84,9 +84,16 @@
                 <h5 class="content-card-title mb-0" style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700;">Presensi Siswa</h5>
             </div>
             @if($meeting->attendance)
-                <a href="{{ route('guru.attendances.show', $meeting->attendance) }}" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 8px;">
-                    <i class="fas fa-eye me-1"></i> Detail Presensi
-                </a>
+                <div class="d-flex align-items-center gap-2">
+                    @if($meeting->attendance->formatted_submitted_time)
+                        <span class="badge bg-light text-primary border px-3 py-1.5 small font-monospace">
+                            <i class="far fa-clock me-1"></i>Diisi jam <strong>{{ $meeting->attendance->formatted_submitted_time }} WIB</strong>
+                        </span>
+                    @endif
+                    <a href="{{ route('guru.attendances.show', $meeting->attendance) }}" class="btn btn-sm btn-outline-primary px-3" style="border-radius: 8px;">
+                        <i class="fas fa-eye me-1"></i> Detail Presensi
+                    </a>
+                </div>
             @else
                 <a href="{{ route('guru.attendances.create', ['meeting_id' => $meeting->id]) }}" class="btn btn-sm btn-primary px-3" style="background-color: var(--primary); border: none; border-radius: 8px;">
                     <i class="fas fa-plus me-1"></i> Isi Presensi

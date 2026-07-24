@@ -87,6 +87,11 @@
                                             · <span class="text-secondary fw-semibold">{{ $cabutCount }} C</span>
                                         @endif
                                     </div>
+                                    @if($att->formatted_submitted_time)
+                                        <div class="small text-muted mt-1">
+                                            <i class="far fa-clock text-primary me-1"></i>Diisi jam <strong>{{ $att->formatted_submitted_time }} WIB</strong>
+                                        </div>
+                                    @endif
                                 @else
                                     <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-1 fw-medium">
                                         <i class="fas fa-exclamation-circle me-1"></i>Belum Diisi Guru

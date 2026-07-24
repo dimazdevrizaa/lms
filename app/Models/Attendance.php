@@ -17,7 +17,24 @@ class Attendance extends Model
         'subject_id',
         'meeting_id',
         'date',
+        'submitted_at',
     ];
+
+    protected $casts = [
+        'submitted_at' => 'datetime',
+    ];
+
+    /**
+     * Get formatted submission time (Hour & Minute).
+     */
+    public function getFormattedSubmittedTimeAttribute(): ?string
+    {
+        $time = $this->submitted_at ?? $this->created_at;
+        if (!$time) {
+            return null;
+        }
+        return $time->format('H:i');
+    }
 
     public function meeting(): BelongsTo
     {

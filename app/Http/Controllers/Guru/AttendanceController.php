@@ -126,13 +126,18 @@ class AttendanceController extends Controller
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         abort_unless($teacherId, 403);
  
-        $attendance = Attendance::create([
-            'teacher_id' => $teacherId,
-            'class_id' => $data['class_id'],
-            'subject_id' => $data['subject_id'],
-            'meeting_id' => $data['meeting_id'] ?? null,
-            'date' => $data['date'],
-        ]);
+        $attendance = Attendance::updateOrCreate(
+            [
+                'class_id' => $data['class_id'],
+                'subject_id' => $data['subject_id'],
+                'meeting_id' => $data['meeting_id'] ?? null,
+            ],
+            [
+                'teacher_id' => $teacherId,
+                'date' => $data['date'],
+                'submitted_at' => now(),
+            ]
+        );
  
         $students = Student::where('class_id', $data['class_id'])->pluck('id');
         $statuses = $data['statuses'] ?? [];
