@@ -383,9 +383,9 @@ class AssignmentController extends Controller
             : collect();
 
         $submittedStudentIds = $assignment->submissions->pluck('student_id')->toArray();
-        $submittedSubmissions = $assignment->submissions;
+        $submittedSubmissions = $assignment->submissions->sortBy(fn($sub) => strtolower($sub->student?->user?->name ?? ''));
         $unsubmittedStudents = $allStudents->reject(fn($s) => in_array($s->id, $submittedStudentIds))
-            ->sortBy(fn($s) => $s->user?->name ?? '');
+            ->sortBy(fn($s) => strtolower($s->user?->name ?? ''));
 
         return view('guru.assignments.show', compact('assignment', 'allStudents', 'submittedSubmissions', 'unsubmittedStudents'));
     }
