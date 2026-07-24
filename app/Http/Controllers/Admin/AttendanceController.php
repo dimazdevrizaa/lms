@@ -173,4 +173,30 @@ class AttendanceController extends Controller
             'subject' => $meeting->subject_id,
         ])->with('success', "Presensi Pertemuan #{$meeting->number} ({$meeting->subject->name}) berhasil disimpan/diperbarui oleh Admin.");
     }
+
+    /**
+     * Dedicated Admin page to manage materials for a meeting.
+     */
+    public function meetingMaterials(Meeting $meeting): View
+    {
+        $meeting->load(['schoolClass', 'subject', 'teacher.user', 'materials']);
+        $class = $meeting->schoolClass;
+        $subject = $meeting->subject;
+        $materials = $meeting->materials;
+
+        return view('admin.attendance.materials', compact('meeting', 'class', 'subject', 'materials'));
+    }
+
+    /**
+     * Dedicated Admin page to manage assignments for a meeting.
+     */
+    public function meetingAssignments(Meeting $meeting): View
+    {
+        $meeting->load(['schoolClass', 'subject', 'teacher.user', 'assignments.submissions']);
+        $class = $meeting->schoolClass;
+        $subject = $meeting->subject;
+        $assignments = $meeting->assignments;
+
+        return view('admin.attendance.assignments', compact('meeting', 'class', 'subject', 'assignments'));
+    }
 }

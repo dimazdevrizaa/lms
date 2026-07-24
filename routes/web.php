@@ -80,11 +80,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('classes', AdminClassController::class);
         Route::resource('subjects', SubjectController::class);
 
-        // PRESENSI ADMIN
+        // PRESENSI ADMIN & KELOLA PERTEMUAN
         Route::prefix('attendances')->name('attendances.')->group(function () {
             Route::get('/', [AdminAttendanceController::class, 'index'])->name('index');
             Route::get('/classes/{class}', [AdminAttendanceController::class, 'showClass'])->name('showClass');
             Route::get('/classes/{class}/subjects/{subject}', [AdminAttendanceController::class, 'showSubject'])->name('showSubject');
+            Route::get('/meetings/{meeting}/materials', [AdminAttendanceController::class, 'meetingMaterials'])->name('meetingMaterials');
+            Route::get('/meetings/{meeting}/assignments', [AdminAttendanceController::class, 'meetingAssignments'])->name('meetingAssignments');
             Route::get('/meetings/{meeting}/edit', [AdminAttendanceController::class, 'editMeetingAttendance'])->name('editMeeting');
             Route::post('/meetings/{meeting}', [AdminAttendanceController::class, 'updateMeetingAttendance'])->name('updateMeeting');
         });
