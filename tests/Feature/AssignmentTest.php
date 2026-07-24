@@ -189,4 +189,50 @@ class AssignmentTest extends TestCase
             \Carbon\Carbon::parse($assignment->fresh()->due_at)->format('Y-m-d H:i')
         );
     }
+
+    public function test_admin_and_teacher_can_download_student_submission(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+
+        $adminUser = User::factory()->create(['role' => 'admin']);
+        $teacherUser = User::factory()->create(['role' => 'guru']);
+        $teacher = Teacher::create([
+            'user_id' => $teacherUser->id,
+            'nip' => '1234567890',
+            'phone' => '08123456789',
+        ]);
+
+        $class = SchoolClass::create(['name' => 'X IPA 1']);
+        $subject = Subject::create(['name' => 'Matematika']);
+
+        $assignment = Assignment::create([
+            'teacher_id' => $teacher->id,
+            'class_id' => $class->id,
+            'subject_id' => $subject->id,
+            'title' => 'Tugas Matematika 1',
+            'type' => 'pdf',
+        ]);
+
+        $studentUser = User::factory()->create(['role' => 'siswa']);
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nisn' => '111222',
+            'class_id' => $class->id,
+        ]);
+
+        $filePath = 'submissions/test_submission.pdf';
+        \Illuminate\Support\Facades\Storage::disk('local')->put($filePath, 'fake content');
+
+        $submission = \App\Models\AssignmentSubmission::create([
+            'assignment_id' => $assignment->id,
+            'student_id' => $student->id,
+            'file_path' => $filePath,
+        ]);
+
+        $response = $this->actingAs($adminUser)->get(route('submissions.download', $submission));
+        $response->assertOk();
+
+        $responseGuru = $this->actingAs($teacherUser)->get(route('submissions.download', $submission));
+        $responseGuru->assertOk();
+    }
 }

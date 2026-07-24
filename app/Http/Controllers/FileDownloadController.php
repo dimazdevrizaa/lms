@@ -19,12 +19,15 @@ class FileDownloadController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role === 'guru') {
+        if ($user->role === 'admin') {
+            // Admin can access all assignments
+        } elseif ($user->role === 'guru') {
             $teacherId = Teacher::where('user_id', $user->id)->value('id');
             abort_unless($assignment->teacher_id == $teacherId, 403, 'Unauthorized.');
         } elseif ($user->role === 'siswa') {
             $student = Student::where('user_id', $user->id)->firstOrFail();
-            abort_unless($assignment->class_id == $student->class_id, 403, 'Unauthorized.');
+            $classId = $assignment->class_id ?? $assignment->meeting?->class_id;
+            abort_unless($classId == $student->class_id, 403, 'Unauthorized.');
         } else {
             abort(403, 'Unauthorized.');
         }
@@ -51,7 +54,9 @@ class FileDownloadController extends Controller
         $user = Auth::user();
         $assignment = $submission->assignment;
 
-        if ($user->role === 'guru') {
+        if ($user->role === 'admin') {
+            // Admin can access all student submissions
+        } elseif ($user->role === 'guru') {
             $teacherId = Teacher::where('user_id', $user->id)->value('id');
             abort_unless($assignment->teacher_id == $teacherId, 403, 'Unauthorized.');
         } elseif ($user->role === 'siswa') {
@@ -82,12 +87,15 @@ class FileDownloadController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role === 'guru') {
+        if ($user->role === 'admin') {
+            // Admin can access all materials
+        } elseif ($user->role === 'guru') {
             $teacherId = Teacher::where('user_id', $user->id)->value('id');
             abort_unless($material->teacher_id == $teacherId, 403, 'Unauthorized.');
         } elseif ($user->role === 'siswa') {
             $student = Student::where('user_id', $user->id)->firstOrFail();
-            abort_unless($material->class_id == $student->class_id, 403, 'Unauthorized.');
+            $classId = $material->class_id ?? $material->meeting?->class_id;
+            abort_unless($classId == $student->class_id, 403, 'Unauthorized.');
         } else {
             abort(403, 'Unauthorized.');
         }
