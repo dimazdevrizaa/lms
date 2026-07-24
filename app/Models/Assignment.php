@@ -23,6 +23,10 @@ class Assignment extends Model
         'quiz_url',
     ];
 
+    protected $casts = [
+        'due_at' => 'datetime',
+    ];
+
     public function isOnline(): bool
     {
         return $this->type === 'online';
