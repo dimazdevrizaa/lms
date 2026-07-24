@@ -3,10 +3,17 @@
 @section('title', 'Upload Materi')
 
 @section('content')
+    @php
+        if (auth()->user()->role === 'admin' && request('class_id') && request('subject_id')) {
+            $backUrl = route('admin.attendances.showSubject', ['class' => request('class_id'), 'subject' => request('subject_id')]);
+        } else {
+            $backUrl = request('meeting_id') ? route('guru.meetings.show', request('meeting_id')) : route('guru.materials.index');
+        }
+    @endphp
     <!-- Header -->
     <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3 reveal">
         <div class="d-flex align-items-center gap-3">
-            <a href="{{ request('meeting_id') ? route('guru.meetings.show', request('meeting_id')) : route('guru.materials.index') }}" class="btn btn-outline-secondary-theme btn-sm" style="border-radius: var(--radius-sm);">
+            <a href="{{ $backUrl }}" class="btn btn-outline-secondary-theme btn-sm" style="border-radius: var(--radius-sm);">
                 <i class="fas fa-arrow-left me-1"></i> Kembali
             </a>
             <div>

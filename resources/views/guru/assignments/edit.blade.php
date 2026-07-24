@@ -4,10 +4,13 @@
 
 @section('content')
     @php
-        // ponytail: check if assignment belongs to a meeting and route back to it
-        $backUrl = $assignment->meeting_id 
-            ? route('guru.meetings.show', $assignment->meeting_id) 
-            : route('guru.assignments.index');
+        if (auth()->user()->role === 'admin') {
+            $backUrl = route('admin.attendances.showSubject', ['class' => $assignment->class_id, 'subject' => $assignment->subject_id]);
+        } else {
+            $backUrl = $assignment->meeting_id 
+                ? route('guru.meetings.show', $assignment->meeting_id) 
+                : route('guru.assignments.index');
+        }
     @endphp
     <!-- Header -->
     <div class="d-flex align-items-center gap-3 mb-4">

@@ -4,10 +4,13 @@
 
 @section('content')
     @php
-        // ponytail: check if meeting_id query param is present to go back to specific meeting
-        $backUrl = request()->has('meeting_id') 
-            ? route('guru.meetings.show', request('meeting_id')) 
-            : route('guru.assignments.index');
+        if (auth()->user()->role === 'admin' && request('class_id') && request('subject_id')) {
+            $backUrl = route('admin.attendances.showSubject', ['class' => request('class_id'), 'subject' => request('subject_id')]);
+        } else {
+            $backUrl = request()->has('meeting_id') 
+                ? route('guru.meetings.show', request('meeting_id')) 
+                : route('guru.assignments.index');
+        }
     @endphp
     <!-- Header -->
     <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2 gap-sm-3 mb-4">
