@@ -55,7 +55,7 @@ class Assignment extends Model
 
     public function submissions()
     {
-        return $this->hasMany(AssignmentSubmission::class);
+        return $this->hasMany(AssignmentSubmission::class)->orderBy('created_at', 'desc');
     }
 
     public function questions()
