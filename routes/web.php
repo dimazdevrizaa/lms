@@ -118,8 +118,8 @@ Route::middleware('auth')->group(function () {
         Route::get('reports/print', [ReportController::class, 'print'])->name('reports.print');
     });
 
-    // GURU
-    Route::middleware('role:guru')->prefix('guru')->name('guru.')->group(function () {
+    // GURU & ADMIN
+    Route::middleware('role:guru,admin')->prefix('guru')->name('guru.')->group(function () {
         Route::get('/dashboard', [MaterialController::class, 'dashboard'])->name('dashboard');
         Route::resource('materials', MaterialController::class);
         Route::resource('meetings', MeetingController::class);

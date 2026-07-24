@@ -151,7 +151,7 @@ class MaterialController extends Controller
     {
         $teacherId = Teacher::where('user_id', Auth::id())->value('id');
         if (!$teacherId && Auth::user()->role === 'admin') {
-            $teacherId = Meeting::where('id', $request->meeting_id)->value('teacher_id') ?? Teacher::value('id');
+            $teacherId = $request->meeting_id ? Meeting::where('id', $request->meeting_id)->value('teacher_id') : Teacher::value('id');
         }
         abort_unless($teacherId, 403);
 
@@ -165,9 +165,6 @@ class MaterialController extends Controller
             'youtube_url' => ['nullable', 'url', 'max:255'],
         ]);
 
-        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
-        abort_unless($teacherId, 403);
-
         $filePath = null;
         if ($request->hasFile('file')) {
             $filePath = $request->file('file')->store('materials', 'public');
@@ -179,7 +176,7 @@ class MaterialController extends Controller
             'subject_id' => $data['subject_id'],
             'meeting_id' => $data['meeting_id'],
             'title' => $data['title'],
-            'content' => $data['content'] ?? null,
+            'content' => $data['content'],
             'file_path' => $filePath,
             'youtube_url' => $data['youtube_url'] ?? null,
         ]);
@@ -211,7 +208,8 @@ class MaterialController extends Controller
 
     public function show(Material $material): View
     {
-        abort_unless($material->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(Auth::user()->role === 'admin' || $material->teacher_id == $teacherId, 403);
         return view('guru.materials.show', compact('material'));
     }
 
@@ -270,7 +268,8 @@ class MaterialController extends Controller
 
     public function destroy(Material $material): RedirectResponse
     {
-        abort_unless($material->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(Auth::user()->role === 'admin' || $material->teacher_id == $teacherId, 403);
 
         $material->delete();
 
@@ -278,4 +277,3 @@ class MaterialController extends Controller
             ->with('success', 'Materi berhasil dihapus.');
     }
 }
-

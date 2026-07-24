@@ -364,7 +364,8 @@ class AssignmentController extends Controller
 
     public function show(Assignment $assignment): View
     {
-        abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(Auth::user()->role === 'admin' || $assignment->teacher_id == $teacherId, 403);
 
         $assignment->load(['submissions.student.user', 'submissions.comments.user', 'schoolClass']);
 
@@ -377,7 +378,8 @@ class AssignmentController extends Controller
 
     public function destroy(Assignment $assignment): RedirectResponse
     {
-        abort_unless($assignment->teacher_id == Teacher::where('user_id', Auth::id())->value('id'), 403);
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        abort_unless(Auth::user()->role === 'admin' || $assignment->teacher_id == $teacherId, 403);
 
         $meetingId = $assignment->meeting_id;
         $assignment->delete();
