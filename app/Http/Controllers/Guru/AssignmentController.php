@@ -9,6 +9,7 @@ use App\Models\Question;
 use App\Models\QuestionAnswer;
 use App\Models\QuestionOption;
 use App\Models\SchoolClass;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\ClassSubjectTeacher;
@@ -374,8 +375,19 @@ class AssignmentController extends Controller
         if ($assignment->isOnline()) {
             $assignment->load(['questions.options', 'submissions.questionAnswers.question', 'submissions.questionAnswers.selectedOption']);
         }
-        
-        return view('guru.assignments.show', compact('assignment'));
+
+        $classId = $assignment->class_id ?? $assignment->meeting?->class_id;
+
+        $allStudents = $classId 
+            ? Student::where('class_id', $classId)->with('user')->get() 
+            : collect();
+
+        $submittedStudentIds = $assignment->submissions->pluck('student_id')->toArray();
+        $submittedSubmissions = $assignment->submissions;
+        $unsubmittedStudents = $allStudents->reject(fn($s) => in_array($s->id, $submittedStudentIds))
+            ->sortBy(fn($s) => $s->user?->name ?? '');
+
+        return view('guru.assignments.show', compact('assignment', 'allStudents', 'submittedSubmissions', 'unsubmittedStudents'));
     }
 
     public function destroy(Assignment $assignment): RedirectResponse

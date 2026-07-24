@@ -7,7 +7,11 @@
     <div class="mb-4">
         <div class="d-flex align-items-center gap-3 mb-3">
             @php
-                if (auth()->user()->role === 'admin' && $assignment->meeting_id) {
+                $submittedSubmissions = $submittedSubmissions ?? $assignment->submissions;
+                $allStudents = $allStudents ?? ($assignment->schoolClass?->students ?? $assignment->meeting?->schoolClass?->students ?? collect());
+                $unsubmittedStudents = $unsubmittedStudents ?? collect();
+
+                if (auth()->user()?->role === 'admin' && $assignment->meeting_id) {
                     $backUrl = route('admin.attendances.meetingAssignments', $assignment->meeting_id);
                 } elseif ($assignment->meeting_id) {
                     $backUrl = route('guru.meetings.show', $assignment->meeting_id);
@@ -28,7 +32,7 @@
                         <h4 style="color: var(--primary); font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif;">{{ $assignment->title }}</h4>
                         <p style="color: var(--text-muted);" class="mb-2">{{ $assignment->description }}</p>
                         <div class="d-flex gap-3 flex-wrap">
-                            <span class="status-badge status-badge--hadir">{{ $assignment->schoolClass?->name }}</span>
+                            <span class="status-badge status-badge--hadir">{{ $assignment->schoolClass?->name ?? $assignment->meeting?->schoolClass?->name ?? '-' }}</span>
                             @if($assignment->isOnline())
                                 <span class="status-badge" style="background: rgba(13,110,253,0.1); color: #0d6efd;"><i class="fas fa-laptop me-1"></i> Soal Online</span>
                             @elseif($assignment->type === 'external')
@@ -46,8 +50,8 @@
                     </div>
                     <div class="col-md-4 text-md-end mt-3 mt-md-0">
                         <div class="stat-card d-inline-block text-center" style="padding: 16px 24px;">
-                            <div class="stat-value stat-value--primary" style="font-size: 1.75rem;">{{ $assignment->submissions->count() }}</div>
-                            <div class="stat-label">Pengumpulan</div>
+                            <div class="stat-value stat-value--primary" style="font-size: 1.75rem;">{{ $submittedSubmissions->count() }}{{ $allStudents->count() > 0 ? ' / ' . $allStudents->count() : '' }}</div>
+                            <div class="stat-label">Siswa Mengumpulkan</div>
                         </div>
                     </div>
                 </div>
@@ -173,7 +177,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($assignment->submissions as $submission)
+                        @forelse($submittedSubmissions as $submission)
                             <tr>
                                 <td>
                                     <div><strong>{{ $submission->student?->user?->name ?? 'Siswa' }}</strong></div>
@@ -216,17 +220,38 @@
                                     </button>
                                 </td>
                             </tr>
-
                         @empty
+                        @endforelse
+
+                        @foreach($unsubmittedStudents as $student)
+                            <tr class="table-light opacity-75">
+                                <td>
+                                    <div><strong>{{ $student->user?->name ?? 'Siswa' }}</strong></div>
+                                    <small style="color: var(--text-muted);">NISN: {{ $student->nisn ?? '-' }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 fw-medium" style="font-size: 0.75rem;">
+                                        <i class="fas fa-times-circle me-1"></i>Belum Mengumpulkan
+                                    </span>
+                                </td>
+                                @foreach($assignment->questions as $question)
+                                    <td class="text-center"><span style="color: var(--text-muted);">-</span></td>
+                                @endforeach
+                                <td class="text-center"><span style="color: var(--text-muted);">-</span></td>
+                                <td class="text-center"><span class="text-muted small">-</span></td>
+                            </tr>
+                        @endforeach
+
+                        @if($allStudents->count() === 0)
                             <tr>
                                 <td colspan="{{ 4 + $assignment->questions->count() }}" class="text-center py-5" style="color: var(--text-muted);">
                                     <div class="empty-state">
                                         <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
-                                        <div class="empty-state-text">Belum ada siswa yang mengumpulkan tugas ini.</div>
+                                        <div class="empty-state-text">Belum ada siswa di kelas ini.</div>
                                     </div>
                                 </td>
                             </tr>
-                        @endforelse
+                        @endif
                     </tbody>
                 </table>
             </div>
@@ -386,7 +411,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($assignment->submissions as $submission)
+                        @forelse($submittedSubmissions as $submission)
                             <tr>
                                 <td>
                                     <div><strong>{{ $submission->student?->user?->name ?? 'Siswa' }}</strong></div>
@@ -423,17 +448,39 @@
                                     <button class="btn btn-sm btn-outline-primary-theme" data-bs-toggle="modal" data-bs-target="#gradeModal{{ $submission->id }}" style="border-radius: var(--radius-sm);">
                                         <i class="fas fa-check-circle me-1"></i> Nilai
                                     </button>
-
+                                </td>
+                            </tr>
                         @empty
+                        @endforelse
+
+                        @foreach($unsubmittedStudents as $student)
+                            <tr class="table-light opacity-75">
+                                <td>
+                                    <div><strong>{{ $student->user?->name ?? 'Siswa' }}</strong></div>
+                                    <small style="color: var(--text-muted);">NISN: {{ $student->nisn ?? '-' }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 fw-medium" style="font-size: 0.75rem;">
+                                        <i class="fas fa-times-circle me-1"></i>Belum Mengumpulkan
+                                    </span>
+                                </td>
+                                <td><span style="color: var(--text-muted);">-</span></td>
+                                <td><span style="color: var(--text-muted);">-</span></td>
+                                <td class="text-center"><span style="color: var(--text-muted);">-</span></td>
+                                <td class="text-center"><span class="text-muted small">-</span></td>
+                            </tr>
+                        @endforeach
+
+                        @if($allStudents->count() === 0)
                             <tr>
                                 <td colspan="6" class="text-center py-5">
                                     <div class="empty-state">
                                         <div class="empty-state-icon"><i class="fas fa-inbox"></i></div>
-                                        <div class="empty-state-text">Belum ada siswa yang mengumpulkan tugas ini.</div>
+                                        <div class="empty-state-text">Belum ada siswa di kelas ini.</div>
                                     </div>
                                 </td>
                             </tr>
-                        @endforelse
+                        @endif
                     </tbody>
                 </table>
             </div>
